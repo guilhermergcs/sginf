@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuração AD - Gerenciamento de TI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --sidebar: #1a1a2e;
+            --sidebar-hover: #16213e;
+            --sidebar-active: #0f3460;
+            --accent: #3b82f6;
+            --accent-light: #60a5fa;
+            --bg: #f0f2f5;
+            --surface: #fff;
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --radius: 10px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+        }
+        html, body { height: 100%; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); display: flex; }
+        .sidebar { width: 240px; background: var(--sidebar); color: #fff; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-header h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
+        .sidebar-header span { display: block; font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
+        .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.15s; }
+        .sidebar-nav a:hover { background: var(--sidebar-hover); color: #fff; }
+        .sidebar-nav a.active { background: var(--sidebar-active); color: var(--accent-light); }
+        .sidebar-nav a .icon { font-size: 18px; width: 22px; text-align: center; }
+        .main { margin-left: 240px; flex: 1; padding: 32px; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; }
+        .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px; width: 100%; max-width: 520px; margin-top: 40px; }
+        .card h2 { font-size: 20px; font-weight: 700; color: var(--ink); }
+        .card .subtitle { font-size: 14px; color: var(--muted); margin-top: 4px; margin-bottom: 28px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+        input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; transition: border-color 0.15s; outline: none; font-family: inherit; }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .password-wrapper { position: relative; }
+        .password-wrapper input { padding-right: 44px; }
+        .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 18px; padding: 4px; }
+        .toggle-password:hover { color: var(--muted); }
+        .actions { display: flex; gap: 10px; margin-top: 28px; }
+        .btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover:not(:disabled) { background: #2563eb; }
+        .btn-success { background: #059669; color: #fff; }
+        .btn-success:hover:not(:disabled) { background: #047857; }
+        .feedback { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-size: 14px; display: none; line-height: 1.5; }
+        .feedback.success { display: block; background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .feedback.error { display: block; background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .spinner-inline { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
+        .spinner-inline.visible { display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 700px) { .sidebar { width: 60px; } .sidebar-header h1, .sidebar-header span, .sidebar-nav a span { display: none; } .sidebar-nav a { justify-content: center; padding: 10px; } .main { margin-left: 60px; padding: 16px; } .card { padding: 20px; margin-top: 20px; } .actions { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>Gestão TI</h1>
+            <span>Painel Administrativo</span>
+        </div>
+        <div class="sidebar-nav">
+            <a href="/computadores"><span class="icon">🖥️</span><span>Computadores</span></a>
+            <a href="/impressoras"><span class="icon">🖨️</span><span>Impressoras</span></a>
+            <a href="/config" class="active"><span class="icon">⚙️</span><span>Configuração AD</span></a>
+        </div>
+    </nav>
+
+    <div class="main">
+        <div class="card">
+            <h2>Configuração do Active Directory</h2>
+            <p class="subtitle">Configure os parâmetros de conexão com o servidor AD</p>
+            <form id="config-form">
+                <div class="form-group">
+                    <label for="server">Servidor AD</label>
+                    <input type="text" id="server" name="server" placeholder="dc.exemplo.local">
+                </div>
+                <div class="form-group">
+                    <label for="ad_ip">IP do AD</label>
+                    <input type="text" id="ad_ip" name="ad_ip" placeholder="192.168.1.10">
+                </div>
+                <div class="form-group">
+                    <label for="base_dn">Base DN</label>
+                    <input type="text" id="base_dn" name="base_dn" placeholder="dc=exemplo,dc=local">
+                </div>
+                <div class="form-group">
+                    <label for="username">Usuário</label>
+                    <input type="text" id="username" name="username" placeholder="admin@exemplo.local">
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="password" placeholder="••••••••">
+                        <button type="button" class="toggle-password" id="toggle-password" aria-label="Mostrar senha">👁️</button>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn btn-primary" id="btn-testar">🔌 Testar Conexão</button>
+                    <button type="submit" class="btn btn-success" id="btn-salvar">💾 Salvar</button>
+                </div>
+                <div class="feedback" id="feedback"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const serverInput = document.getElementById('server');
+        const adIpInput = document.getElementById('ad_ip');
+        const baseDnInput = document.getElementById('base_dn');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const btnTestar = document.getElementById('btn-testar');
+        const form = document.getElementById('config-form');
+        const feedback = document.getElementById('feedback');
+        const toggleBtn = document.getElementById('toggle-password');
+
+        toggleBtn.addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            toggleBtn.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+        function setLoading(btn, loading) {
+            btn.disabled = loading;
+            btn.innerHTML = loading ? '<span class="spinner-inline visible"></span> Aguarde...' : btn.dataset.text;
+        }
+
+        function showFeedback(message, type) {
+            feedback.textContent = message;
+            feedback.className = 'feedback ' + type;
+        }
+
+        function getData() {
+            return {
+                server: serverInput.value,
+                ad_ip: adIpInput.value,
+                base_dn: baseDnInput.value,
+                username: usernameInput.value,
+                password: passwordInput.value
+            };
+        }
+
+        async function loadConfig() {
+            try {
+                const resp = await fetch('/api/config');
+                const data = await resp.json();
+                if (data.server) {
+                    serverInput.value = data.server || '';
+                    adIpInput.value = data.ad_ip || '';
+                    baseDnInput.value = data.base_dn || '';
+                    usernameInput.value = data.username || '';
+                }
+            } catch {}
+        }
+
+        btnTestar.addEventListener('click', async () => {
+            btnTestar.dataset.text = btnTestar.innerHTML;
+            setLoading(btnTestar, true);
+            showFeedback('', '');
+            try {
+                const resp = await fetch('/api/config/testar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(getData())
+                });
+                const r = await resp.json();
+                showFeedback(r.message, resp.ok ? 'success' : 'error');
+            } catch {
+                showFeedback('Erro de rede', 'error');
+            } finally { setLoading(btnTestar, false); }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-salvar');
+            btn.dataset.text = btn.innerHTML;
+            setLoading(btn, true);
+            showFeedback('', '');
+            try {
+                const resp = await fetch('/api/config/salvar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(getData())
+                });
+                const r = await resp.json();
+                showFeedback(r.message, resp.ok ? 'success' : 'error');
+            } catch {
+                showFeedback('Erro de rede', 'error');
+            } finally { setLoading(btn, false); }
+        });
+
+        loadConfig();
+    </script>
+</body>
+</html>
