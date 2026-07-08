@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Computadores - Gerenciamento de TI</title>
+    <title>Usuários - Gerenciamento de TI</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -42,18 +42,22 @@
         .btn-primary:hover:not(:disabled) { background: #2563eb; }
         .btn-success { background: #059669; color: #fff; }
         .btn-success:hover:not(:disabled) { background: #047857; }
+        .btn-warning { background: #d97706; color: #fff; }
+        .btn-warning:hover:not(:disabled) { background: #b45309; }
+        .btn-danger { background: #dc2626; color: #fff; }
+        .btn-danger:hover:not(:disabled) { background: #b91c1c; }
         .status-msg { font-size: 13px; color: var(--muted); margin-left: 4px; }
         .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
         .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); }
         .card-header h3 { font-size: 15px; font-weight: 600; }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 10px 20px; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border); background: #fafafa; }
-        td { padding: 10px 20px; font-size: 13px; border-bottom: 1px solid #f3f4f6; }
+        td { padding: 10px 20px; font-size: 13px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
         tr:hover td { background: #f9fafb; }
-        .online { color: #059669; font-weight: 600; }
-        .online::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #059669; margin-right: 6px; }
-        .offline { color: #dc2626; font-weight: 600; }
-        .offline::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #dc2626; margin-right: 6px; }
+        .ativo { color: #059669; font-weight: 600; }
+        .ativo::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #059669; margin-right: 6px; }
+        .inativo { color: #dc2626; font-weight: 600; }
+        .inativo::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #dc2626; margin-right: 6px; }
         .table-wrap { overflow-x: auto; }
         .loading { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
         .loading .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
@@ -64,6 +68,8 @@
         .stat { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 20px; flex: 1; }
         .stat .num { font-size: 24px; font-weight: 700; }
         .stat .label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+        .actions { display: flex; gap: 6px; }
         @media (max-width: 700px) { .sidebar { width: 60px; } .sidebar-header h1, .sidebar-header span, .sidebar-nav a span { display: none; } .sidebar-nav a { justify-content: center; padding: 10px; } .main { margin-left: 60px; padding: 16px; } .summary { flex-direction: column; } }
     </style>
 </head>
@@ -74,44 +80,43 @@
             <span>Painel Administrativo</span>
         </div>
         <div class="sidebar-nav">
-            <a href="/computadores" class="active"><span class="icon">🖥️</span><span>Computadores</span></a>
+            <a href="/computadores"><span class="icon">🖥️</span><span>Computadores</span></a>
             <a href="/impressoras"><span class="icon">🖨️</span><span>Impressoras</span></a>
-            <a href="/usuarios"><span class="icon">👤</span><span>Usuários</span></a>
+            <a href="/usuarios" class="active"><span class="icon">👤</span><span>Usuários</span></a>
             <a href="/config"><span class="icon">⚙️</span><span>Configuração AD</span></a>
         </div>
     </nav>
 
     <div class="main">
         <div class="page-header">
-            <h2>Computadores</h2>
-            <p>Lista de computadores sincronizados do Active Directory</p>
+            <h2>Usuários do AD</h2>
+            <p>Lista de usuários do Active Directory (OU=Domain Users)</p>
         </div>
 
         <div class="summary" id="summary">
-            <div class="stat"><div class="num" id="total-pc">-</div><div class="label">Total</div></div>
-            <div class="stat"><div class="num" id="online-pc" style="color:#059669">-</div><div class="label">Online</div></div>
-            <div class="stat"><div class="num" id="offline-pc" style="color:#dc2626">-</div><div class="label">Offline</div></div>
+            <div class="stat"><div class="num" id="total-usuarios">-</div><div class="label">Total</div></div>
+            <div class="stat"><div class="num" id="ativos-usuarios" style="color:#059669">-</div><div class="label">Ativos</div></div>
+            <div class="stat"><div class="num" id="inativos-usuarios" style="color:#dc2626">-</div><div class="label">Inativos</div></div>
         </div>
 
         <div class="toolbar">
-            <button class="btn btn-primary" id="btn-sync">🔄 Sincronizar do AD</button>
-            <button class="btn btn-success" id="btn-status">⚡ Verificar Status</button>
+            <button class="btn btn-primary" id="btn-carregar">🔄 Carregar Usuários</button>
             <span class="status-msg" id="sync-status"></span>
         </div>
 
         <div class="card">
-            <div class="card-header"><h3>Computadores</h3></div>
+            <div class="card-header"><h3>Usuários</h3></div>
             <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
                             <th>Nome</th>
-                            <th>IP</th>
-                            <th>Usuário Logado</th>
+                            <th>Login</th>
                             <th>Status</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="tab-computadores">
+                    <tbody id="tab-usuarios">
                         <tr><td colspan="4" class="loading"><span class="spinner"></span>Carregando...</td></tr>
                     </tbody>
                 </table>
@@ -121,74 +126,83 @@
 
     <script>
         function $(id) { return document.getElementById(id); }
-        const tbody = $('tab-computadores');
+        const tbody = $('tab-usuarios');
         const statusMsg = $('sync-status');
 
-        function setLoading(btn, loading) {
-            btn.disabled = loading;
-            btn.innerHTML = loading ? '<span class="spinner-inline visible"></span> Aguarde...' : btn.dataset.text;
-        }
         function showStatus(msg, ok) {
             statusMsg.textContent = msg;
             statusMsg.style.color = ok ? '#059669' : '#dc2626';
         }
 
         async function carregar() {
+            const btn = $('btn-carregar');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-inline visible"></span> Carregando...';
+            showStatus('Carregando usuários...');
             try {
-                const resp = await fetch('/api/computadores');
-                const dados = await resp.json();
+                const resp = await fetch('/api/usuarios');
+                const r = await resp.json();
+                if (!resp.ok) { showStatus(r.message, false); return; }
+                const dados = r.dados;
                 const total = dados.length;
-                const online = dados.filter(d => d.status === 'online').length;
-                $('total-pc').textContent = total;
-                $('online-pc').textContent = online;
-                $('offline-pc').textContent = total - online;
+                const ativos = dados.filter(d => d.status === 'ativo').length;
+                $('total-usuarios').textContent = total;
+                $('ativos-usuarios').textContent = ativos;
+                $('inativos-usuarios').textContent = total - ativos;
 
-                tbody.innerHTML = total ? '' : '<tr><td colspan="4" class="loading">Nenhum computador. Clique em Sincronizar.</td></tr>';
-                dados.forEach(pc => {
+                tbody.innerHTML = total ? '' : '<tr><td colspan="4" class="loading">Nenhum usuário encontrado.</td></tr>';
+                dados.forEach(u => {
                     const linha = document.createElement('tr');
+                    const acao = u.status === 'ativo'
+                        ? `<button class="btn btn-warning btn-sm" onclick="desativar('${u.login}')">🔒 Desativar</button>`
+                        : `<button class="btn btn-success btn-sm" onclick="ativar('${u.login}')">🔓 Ativar</button>`;
                     linha.innerHTML = `
-                        <td><strong>${pc.nome}</strong></td>
-                        <td style="font-family:monospace;font-size:12px;color:var(--muted)">${pc.ip || 'N/A'}</td>
-                        <td>${pc.usuario_logado || '<span style="color:var(--muted)">Nenhum</span>'}</td>
-                        <td><span class="${pc.status}">${pc.status}</span></td>
+                        <td><strong>${u.nome}</strong></td>
+                        <td style="font-family:monospace;font-size:12px;color:var(--muted)">${u.login}</td>
+                        <td><span class="${u.status}">${u.status}</span></td>
+                        <td><div class="actions">${acao}</div></td>
                     `;
                     tbody.appendChild(linha);
                 });
+                showStatus(`${total} usuários carregados`, true);
             } catch {
                 tbody.innerHTML = '<tr><td colspan="4" class="loading" style="color:#dc2626">Erro ao carregar</td></tr>';
+                showStatus('Erro de rede', false);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔄 Carregar Usuários';
             }
         }
 
-        async function sincronizar() {
-            const btn = $('btn-sync');
-            btn.dataset.text = btn.innerHTML;
-            setLoading(btn, true);
-            showStatus('Sincronizando...');
+        async function ativar(login) {
+            if (!confirm(`Ativar usuário ${login}?`)) return;
             try {
-                const resp = await fetch('/api/sync/computadores', { method: 'POST' });
+                const resp = await fetch('/api/usuarios/ativar', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({login})
+                });
                 const r = await resp.json();
                 showStatus(r.message, resp.ok);
                 if (resp.ok) carregar();
             } catch { showStatus('Erro de rede', false); }
-            finally { setLoading(btn, false); }
         }
 
-        async function verificar() {
-            const btn = $('btn-status');
-            btn.dataset.text = btn.innerHTML;
-            setLoading(btn, true);
-            showStatus('Verificando...');
+        async function desativar(login) {
+            if (!confirm(`Desativar usuário ${login}?`)) return;
             try {
-                const resp = await fetch('/api/sync/status', { method: 'POST' });
+                const resp = await fetch('/api/usuarios/desativar', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({login})
+                });
                 const r = await resp.json();
                 showStatus(r.message, resp.ok);
                 if (resp.ok) carregar();
             } catch { showStatus('Erro de rede', false); }
-            finally { setLoading(btn, false); }
         }
 
-        $('btn-sync').addEventListener('click', sincronizar);
-        $('btn-status').addEventListener('click', verificar);
+        $('btn-carregar').addEventListener('click', carregar);
         window.addEventListener('DOMContentLoaded', carregar);
     </script>
 </body>
