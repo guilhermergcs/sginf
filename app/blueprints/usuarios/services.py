@@ -1,7 +1,5 @@
 from ldap3 import Server, Connection, ALL, core, MODIFY_REPLACE
 
-OU_BASE = 'OU=Domain Users'
-
 def _conectar(config):
     target = config['ad_ip'] or config['server']
     ad_server = Server(target, get_info=ALL)
@@ -10,7 +8,8 @@ def _conectar(config):
 
 def listar_usuarios_ad(config):
     base_dn = config['base_dn']
-    search_base = f'{OU_BASE},{base_dn}'
+    ou_base = config.get('ou_usuarios', 'OU=Domain Users')
+    search_base = f'{ou_base},{base_dn}'
     ad_conn = _conectar(config)
     ad_conn.search(
         search_base=search_base,
@@ -33,7 +32,8 @@ def listar_usuarios_ad(config):
 
 def _set_user_status(config, sam_account_name, ativo):
     base_dn = config['base_dn']
-    search_base = f'{OU_BASE},{base_dn}'
+    ou_base = config.get('ou_usuarios', 'OU=Domain Users')
+    search_base = f'{ou_base},{base_dn}'
     ad_conn = _conectar(config)
     ad_conn.search(
         search_base=search_base,
