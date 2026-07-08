@@ -6,10 +6,15 @@ def _conectar(config):
     ad_conn = Connection(ad_server, user=config['username'], password=config['password'], auto_bind=True)
     return ad_conn
 
-def listar_usuarios_ad(config):
+def _search_base(config, default='CN=Users'):
     base_dn = config['base_dn']
-    ou_base = config.get('ou_usuarios', 'CN=Users')
-    search_base = f'{ou_base},{base_dn}'
+    ou = config.get('ou_usuarios', default)
+    if ou.lower().endswith(base_dn.lower()):
+        return ou
+    return f'{ou},{base_dn}'
+
+def listar_usuarios_ad(config):
+    search_base = _search_base(config)
     ad_conn = _conectar(config)
     ad_conn.search(
         search_base=search_base,
@@ -31,9 +36,7 @@ def listar_usuarios_ad(config):
     return usuarios
 
 def _set_user_status(config, sam_account_name, ativo):
-    base_dn = config['base_dn']
-    ou_base = config.get('ou_usuarios', 'CN=Users')
-    search_base = f'{ou_base},{base_dn}'
+    search_base = _search_base(config)
     ad_conn = _conectar(config)
     ad_conn.search(
         search_base=search_base,
