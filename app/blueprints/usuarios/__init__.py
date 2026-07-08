@@ -16,7 +16,7 @@ def get_usuarios():
     if not config:
         return jsonify({"status": "error", "message": "Configuração AD não encontrada"}), 400
     try:
-        usuarios = listar_usuarios_ad(config)
+        usuarios = listar_usuarios_ad(dict(config))
         return jsonify({"status": "success", "dados": usuarios})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -40,7 +40,7 @@ def _alterar_status(ativo):
     if not config:
         return jsonify({"status": "error", "message": "Configuração AD não encontrada"}), 400
     try:
-        _set_user_status(config, login, ativo)
+        _set_user_status(dict(config), login, ativo)
         acao = 'ativado' if ativo else 'desativado'
         return jsonify({"status": "success", "message": f"Usuário {login} {acao} com sucesso!"})
     except ValueError as e:
