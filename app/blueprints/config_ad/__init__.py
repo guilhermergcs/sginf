@@ -10,8 +10,8 @@ def page_config():
     config = conn.execute('SELECT * FROM config_ad WHERE id=1').fetchone()
     conn.close()
     if config:
-        return render_template('config.html', server=config['server'], ad_ip=config['ad_ip'] or '', base_dn=config['base_dn'], username=config['username'], ou_usuarios=config['ou_usuarios'] or 'OU=Domain Users')
-    return render_template('config.html', server='', ad_ip='', base_dn='', username='', ou_usuarios='OU=Domain Users')
+        return render_template('config.html', server=config['server'], ad_ip=config['ad_ip'] or '', base_dn=config['base_dn'], username=config['username'], ou_usuarios=config['ou_usuarios'] or 'CN=Users')
+    return render_template('config.html', server='', ad_ip='', base_dn='', username='', ou_usuarios='CN=Users')
 
 @config_ad_bp.route('/api/config')
 def get_config():

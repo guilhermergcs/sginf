@@ -96,7 +96,7 @@
                 </div>
                 <div class="form-group">
                     <label for="ou_usuarios">OU de Usuários</label>
-                    <input type="text" id="ou_usuarios" name="ou_usuarios" placeholder="OU=Domain Users" value="{{ ou_usuarios }}">
+                    <input type="text" id="ou_usuarios" name="ou_usuarios" placeholder="CN=Users" value="{{ ou_usuarios }}">
                 </div>
                 <div class="form-group">
                     <label for="password">Senha</label>
@@ -161,7 +161,7 @@
                     serverInput.value = data.server || '';
                     adIpInput.value = data.ad_ip || '';
                     baseDnInput.value = data.base_dn || '';
-                    ouUsuariosInput.value = data.ou_usuarios || 'OU=Domain Users';
+                    ouUsuariosInput.value = data.ou_usuarios || 'CN=Users';
                     usernameInput.value = data.username || '';
                 }
             } catch {}

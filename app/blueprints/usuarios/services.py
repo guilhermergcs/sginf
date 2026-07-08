@@ -8,7 +8,7 @@ def _conectar(config):
 
 def listar_usuarios_ad(config):
     base_dn = config['base_dn']
-    ou_base = config.get('ou_usuarios', 'OU=Domain Users')
+    ou_base = config.get('ou_usuarios', 'CN=Users')
     search_base = f'{ou_base},{base_dn}'
     ad_conn = _conectar(config)
     ad_conn.search(
@@ -32,7 +32,7 @@ def listar_usuarios_ad(config):
 
 def _set_user_status(config, sam_account_name, ativo):
     base_dn = config['base_dn']
-    ou_base = config.get('ou_usuarios', 'OU=Domain Users')
+    ou_base = config.get('ou_usuarios', 'CN=Users')
     search_base = f'{ou_base},{base_dn}'
     ad_conn = _conectar(config)
     ad_conn.search(
