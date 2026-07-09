@@ -73,6 +73,10 @@
       <h3 class="dialog-title">Editar Usuário</h3>
       <p class="dialog-subtitle" id="edit-dialog-user"></p>
       <div class="form-group">
+        <label for="edit-login">Login (sAMAccountName)</label>
+        <input type="text" id="edit-login" placeholder="nome.usuario">
+      </div>
+      <div class="form-group">
         <label for="edit-nome">Nome</label>
         <input type="text" id="edit-nome" placeholder="Nome completo">
       </div>
@@ -321,6 +325,7 @@
   var editDialog = document.getElementById('edit-dialog');
   var editLogin = '';
   var editInputs = {
+    login: document.getElementById('edit-login'),
     nome: document.getElementById('edit-nome'),
     email: document.getElementById('edit-email'),
     departamento: document.getElementById('edit-departamento'),
@@ -331,6 +336,7 @@
   function abrirEditar(btn) {
     editLogin = btn.dataset.login;
     document.getElementById('edit-dialog-user').textContent = 'Login: ' + editLogin;
+    editInputs.login.value = btn.dataset.login || '';
     editInputs.nome.value = btn.dataset.nome || '';
     editInputs.email.value = btn.dataset.email || '';
     editInputs.departamento.value = btn.dataset.departamento || '';
@@ -347,6 +353,8 @@
 
   document.getElementById('edit-ok').addEventListener('click', async function() {
     var campos = {};
+    var novoLogin = editInputs.login.value.trim();
+    if (novoLogin && novoLogin !== editLogin) campos.login = novoLogin;
     if (editInputs.nome.value.trim()) campos.nome = editInputs.nome.value.trim();
     if (editInputs.email.value.trim()) campos.email = editInputs.email.value.trim();
     if (editInputs.departamento.value.trim()) campos.departamento = editInputs.departamento.value.trim();
@@ -364,7 +372,7 @@
       var resp = await fetch('/api/usuarios/editar', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({login: editLogin, ...campos})
+        body: JSON.stringify({login_antigo: editLogin, campos: campos})
       });
       var r = await resp.json();
       if (resp.ok) {
@@ -392,6 +400,7 @@
   });
 
   editDialog.addEventListener('close', function() {
+    editInputs.login.value = '';
     editInputs.nome.value = '';
     editInputs.email.value = '';
     editInputs.departamento.value = '';

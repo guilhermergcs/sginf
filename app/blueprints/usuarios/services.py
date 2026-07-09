@@ -96,6 +96,7 @@ def _update_user(config, sam_account_name, campos):
         raise ValueError(f"Usuário {sam_account_name} não encontrado")
     dn = ad_conn.entries[0].entry_dn
     mapeamento = {
+        'login': 'sAMAccountName',
         'nome': 'cn',
         'displayName': 'displayName',
         'email': 'mail',

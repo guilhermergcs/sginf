@@ -54,13 +54,10 @@ def trocar_senha():
 @usuarios_bp.route('/api/usuarios/editar', methods=['POST'])
 def editar_usuario():
     dados = request.json
-    login = dados.get('login')
-    if not login:
-        return jsonify({"status": "error", "message": "Login é obrigatório"}), 400
-    campos = {}
-    for k in ('nome', 'displayName', 'email', 'departamento', 'cargo'):
-        if k in dados:
-            campos[k] = dados[k]
+    login_antigo = dados.get('login_antigo')
+    if not login_antigo:
+        return jsonify({"status": "error", "message": "Login antigo é obrigatório"}), 400
+    campos = dados.get('campos', {})
     if not campos:
         return jsonify({"status": "error", "message": "Nenhum campo para alterar"}), 400
     conn_db = get_db_connection()
@@ -69,8 +66,9 @@ def editar_usuario():
     if not config:
         return jsonify({"status": "error", "message": "Configuração AD não encontrada"}), 400
     try:
-        _update_user(dict(config), login, campos)
-        return jsonify({"status": "success", "message": f"Usuário {login} atualizado com sucesso!"})
+        _update_user(dict(config), login_antigo, campos)
+        novo_login = campos.get('login', login_antigo)
+        return jsonify({"status": "success", "message": f"Usuário {novo_login} atualizado com sucesso!"})
     except ValueError as e:
         return jsonify({"status": "error", "message": str(e)}), 404
     except Exception as e:
