@@ -33,27 +33,32 @@
   <div id="tab-grupos-pagination"></div>
 </div>
 
-<div class="card" id="membros-card" style="display:none">
-  <div class="card-header">
-    <h3>Membros de <span id="grupo-selecionado"></span></h3>
-    <button class="btn btn-success btn-sm" id="btn-adicionar-membro"><svg class="icon-lg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Adicionar Membro</button>
+<dialog id="membros-dialog" class="dialog dialog-wide">
+  <div class="dialog-body">
+    <h3 class="dialog-title">Membros de <span id="grupo-selecionado"></span></h3>
+    <div class="dialog-actions" style="justify-content:flex-start;margin-bottom:12px">
+      <button class="btn btn-success btn-sm" id="btn-adicionar-membro"><svg class="icon-lg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Adicionar Membro</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Login</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tab-membros">
+          <tr><td colspan="3" class="loading">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="tab-membros-pagination" style="margin-bottom:12px"></div>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" id="membros-close" autofocus>Fechar</button>
+    </div>
   </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Login</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody id="tab-membros">
-        <tr><td colspan="3" class="loading">Selecione um grupo.</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div id="tab-membros-pagination"></div>
-</div>
+</dialog>
 
 {% set membro_search_id = 'membro-search-field' %}
 <dialog id="add-member-dialog" class="dialog">
@@ -77,7 +82,7 @@
 <script>
   var tbodyGrupos = document.getElementById('tab-grupos');
   var tbodyMembros = document.getElementById('tab-membros');
-  var membrosCard = document.getElementById('membros-card');
+  var membrosDialog = document.getElementById('membros-dialog');
   var grupoSelecionado = document.getElementById('grupo-selecionado');
   var grupoAtual = '';
   var statusMsg = document.getElementById('sync-status');
@@ -119,8 +124,8 @@
   async function selecionarGrupo(cn) {
     grupoAtual = cn;
     grupoSelecionado.textContent = cn;
-    membrosCard.style.display = '';
     tbodyMembros.innerHTML = '<tr><td colspan="3" class="loading"><span class="spinner"></span> Carregando...</td></tr>';
+    membrosDialog.showModal();
     try {
       var resp = await fetch('/api/grupos/membros?group=' + encodeURIComponent(cn));
       var r = await resp.json();
@@ -138,6 +143,10 @@
       tbodyMembros.innerHTML = '<tr><td colspan="3" class="loading loading-error">Erro ao carregar membros.</td></tr>';
     }
   }
+
+  document.getElementById('membros-close').addEventListener('click', function() {
+    membrosDialog.close();
+  });
 
   async function removerMembro(group, user) {
     if (!await confirmDialog('Remover usuário <strong>' + user + '</strong> do grupo <strong>' + group + '</strong>?')) return;

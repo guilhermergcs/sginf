@@ -920,3 +920,7 @@ th:first-child, th.select-col {
 .form-group {
   position: relative;
 }
+
+.dialog-wide {
+  width: min(90vw, 700px);
+}
