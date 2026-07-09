@@ -108,13 +108,14 @@ def criar_usuario():
     departamento = dados.get('departamento', '').strip()
     cargo = dados.get('cargo', '').strip()
     trocar_senha = dados.get('trocar_senha_proximo_login', False)
+    grupo_ad = dados.get('grupo_ad', '').strip()
     conn_db = get_db_connection()
     config = conn_db.execute('SELECT * FROM config_ad WHERE id=1').fetchone()
     conn_db.close()
     if not config:
         return jsonify({"status": "error", "message": "Configuração AD não encontrada"}), 400
     try:
-        _create_user(dict(config), login, nome, senha, email, departamento, cargo, trocar_senha)
+        _create_user(dict(config), login, nome, senha, email, departamento, cargo, trocar_senha, grupo_ad)
         return jsonify({"status": "success", "message": f"Usuário {login} criado com sucesso!"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500

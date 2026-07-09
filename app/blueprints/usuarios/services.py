@@ -1,4 +1,4 @@
-from ldap3 import Server, Connection, ALL, core, MODIFY_REPLACE
+from ldap3 import Server, Connection, ALL, core, MODIFY_REPLACE, MODIFY_ADD
 
 def _conectar(config, use_ssl=False):
     target = config['ad_ip'] or config['server']
@@ -133,7 +133,7 @@ def _delete_user(config, sam_account_name):
     ad_conn.unbind()
     raise Exception(f"Falha ao excluir usuário: {ad_conn.result.get('message', 'erro desconhecido')}")
 
-def _create_user(config, login, nome_completo, senha, email='', departamento='', cargo='', trocar_senha_proximo_login=False):
+def _create_user(config, login, nome_completo, senha, email='', departamento='', cargo='', trocar_senha_proximo_login=False, grupo_ad=''):
     base_dn = config['base_dn']
     target_ou = f'OU=DomainUsers,OU=ManagedUsers,{base_dn}'
     dn = f'CN={nome_completo},{target_ou}'
@@ -159,6 +159,18 @@ def _create_user(config, login, nome_completo, senha, email='', departamento='',
         msg = ad_conn.result.get('message', 'erro desconhecido')
         ad_conn.unbind()
         raise Exception(f"Falha ao criar usuário: {msg}")
+
+    if grupo_ad:
+        grupos_ou = f'OU=ManagedGroups,{base_dn}'
+        ad_conn.search(
+            search_base=grupos_ou,
+            search_filter=f'(cn={grupo_ad})',
+            attributes=['distinguishedName']
+        )
+        if ad_conn.entries:
+            group_dn = ad_conn.entries[0].entry_dn
+            ad_conn.modify(group_dn, {'member': [(MODIFY_ADD, [dn])]})
+
     ad_conn.unbind()
 
     ad_conn = _conectar(config, use_ssl=True)

@@ -132,6 +132,10 @@
         <input type="text" id="create-cargo" placeholder="Cargo">
       </div>
       <div class="form-group">
+        <label for="create-grupo">Grupo AD</label>
+        <select id="create-grupo"><option value="">Nenhum</option></select>
+      </div>
+      <div class="form-group">
         <label for="create-senha">Senha *</label>
         <div class="password-wrapper">
           <input type="password" id="create-senha" placeholder="Mínimo 6 caracteres" minlength="6" required>
@@ -396,18 +400,24 @@
     departamento: document.getElementById('create-departamento'),
     cargo: document.getElementById('create-cargo'),
     senha: document.getElementById('create-senha'),
-    trocar_senha: document.getElementById('create-trocar-senha')
+    trocar_senha: document.getElementById('create-trocar-senha'),
+    grupo: document.getElementById('create-grupo')
   };
   var createFeedback = document.getElementById('create-feedback');
 
   document.getElementById('btn-criar').addEventListener('click', function() {
-    for (var k in createInputs) { var el = createInputs[k]; if (el.type === 'checkbox') el.checked = false; else el.value = ''; }
+    for (var k in createInputs) { var el = createInputs[k]; if (el.type === 'checkbox') el.checked = false; else if (el.tagName === 'SELECT') el.selectedIndex = 0; else el.value = ''; }
     createFeedback.textContent = '';
     createFeedback.className = 'dialog-message';
     var okBtn = document.getElementById('create-ok');
     okBtn.disabled = false;
     okBtn.innerHTML = 'Criar Usuário';
     document.getElementById('create-cancel').disabled = false;
+    fetch('/api/grupos').then(function(r){return r.json()}).then(function(r){
+      if (!r.dados) return;
+      createInputs.grupo.innerHTML = '<option value="">Nenhum</option>';
+      r.dados.forEach(function(g){ createInputs.grupo.innerHTML += '<option value="' + g.cn + '">' + g.cn + '</option>'; });
+    });
     createDialog.showModal();
     createInputs.login.focus();
   });
@@ -441,7 +451,8 @@
           departamento: createInputs.departamento.value.trim(),
           cargo: createInputs.cargo.value.trim(),
           senha: senha,
-          trocar_senha_proximo_login: createInputs.trocar_senha.checked
+          trocar_senha_proximo_login: createInputs.trocar_senha.checked,
+          grupo_ad: createInputs.grupo.value
         })
       });
       var r = await resp.json();
