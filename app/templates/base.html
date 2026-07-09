@@ -145,7 +145,7 @@
         var match = !q || Array.from(row.cells).some(function(cell) {
           return cell.textContent.toLowerCase().includes(q);
         });
-        row.style.display = match ? '' : 'none';
+        row.dataset.filtered = match ? 'false' : 'true';
       });
       var st = pagState[tbodyId];
       if (st) { st.page = 1; applyPagination(tbodyId); }
@@ -164,11 +164,8 @@
       if (!st) return;
       var tbody = document.getElementById(tbodyId);
       if (!tbody) return;
-      var rows = Array.from(tbody.rows).filter(function(r) { return !r.classList.contains('loading'); });
-      var visible = [];
-      rows.forEach(function(r) {
-        if (r.style.display !== 'none') visible.push(r);
-      });
+      var allRows = Array.from(tbody.rows).filter(function(r) { return !r.classList.contains('loading'); });
+      var filtered = allRows.filter(function(r) { return r.dataset.filtered !== 'true'; });
 
       if (st.perPage === 0) {
         var pgEl = document.getElementById(tbodyId + '-pagination');
@@ -176,16 +173,17 @@
         return;
       }
 
-      var totalPages = Math.max(1, Math.ceil(visible.length / st.perPage));
+      var totalPages = Math.max(1, Math.ceil(filtered.length / st.perPage));
       if (st.page > totalPages) st.page = totalPages || 1;
 
-      visible.forEach(function(r, i) {
+      allRows.forEach(function(r) { r.style.display = r.dataset.filtered === 'true' ? 'none' : ''; });
+      filtered.forEach(function(r, i) {
         r.style.display = (i >= (st.page - 1) * st.perPage && i < st.page * st.perPage) ? '' : 'none';
       });
 
       var pgEl = document.getElementById(tbodyId + '-pagination');
       if (!pgEl) return;
-      if (visible.length <= st.perPage) { pgEl.innerHTML = ''; return; }
+      if (filtered.length <= st.perPage) { pgEl.innerHTML = ''; return; }
       pgEl.innerHTML = '<div class="pagination">'
         + '<button class="btn btn-sm btn-secondary" onclick="goPage(\'' + tbodyId + '\',1)" ' + (st.page <= 1 ? 'disabled' : '') + ' aria-label="Primeira página">«</button>'
         + '<button class="btn btn-sm btn-secondary" onclick="goPage(\'' + tbodyId + '\',' + (st.page - 1) + ')" ' + (st.page <= 1 ? 'disabled' : '') + ' aria-label="Página anterior">‹</button>'
