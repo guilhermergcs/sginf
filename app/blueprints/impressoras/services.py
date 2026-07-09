@@ -1,4 +1,6 @@
 import asyncio
+import warnings
+warnings.filterwarnings('ignore', message="The 'pysnmp-lextudio' package is deprecated")
 from pysnmp.hlapi.asyncio import getCmd, SnmpEngine, CommunityData, UdpTransportTarget, ContextData, ObjectType, ObjectIdentity
 
 async def _check_one(ip, comunidade):

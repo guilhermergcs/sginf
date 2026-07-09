@@ -1,209 +1,301 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Usuários - Gerenciamento de TI</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --sidebar: #1a1a2e;
-            --sidebar-hover: #16213e;
-            --sidebar-active: #0f3460;
-            --accent: #3b82f6;
-            --accent-light: #60a5fa;
-            --bg: #f0f2f5;
-            --surface: #fff;
-            --ink: #1f2937;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-            --radius: 10px;
-            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-        }
-        html, body { height: 100%; }
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); display: flex; }
-        .sidebar { width: 240px; background: var(--sidebar); color: #fff; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
-        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-        .sidebar-header h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
-        .sidebar-header span { display: block; font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
-        .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
-        .sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.15s; }
-        .sidebar-nav a:hover { background: var(--sidebar-hover); color: #fff; }
-        .sidebar-nav a.active { background: var(--sidebar-active); color: var(--accent-light); }
-        .sidebar-nav a .icon { font-size: 18px; width: 22px; text-align: center; }
-        .main { margin-left: 240px; flex: 1; padding: 32px; min-height: 100vh; }
-        .page-header { margin-bottom: 24px; }
-        .page-header h2 { font-size: 22px; font-weight: 700; }
-        .page-header p { font-size: 14px; color: var(--muted); margin-top: 4px; }
-        .toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-primary { background: var(--accent); color: #fff; }
-        .btn-primary:hover:not(:disabled) { background: #2563eb; }
-        .btn-success { background: #059669; color: #fff; }
-        .btn-success:hover:not(:disabled) { background: #047857; }
-        .btn-warning { background: #d97706; color: #fff; }
-        .btn-warning:hover:not(:disabled) { background: #b45309; }
-        .btn-danger { background: #dc2626; color: #fff; }
-        .btn-danger:hover:not(:disabled) { background: #b91c1c; }
-        .status-msg { font-size: 13px; color: var(--muted); margin-left: 4px; }
-        .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-        .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); }
-        .card-header h3 { font-size: 15px; font-weight: 600; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 10px 20px; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border); background: #fafafa; }
-        td { padding: 10px 20px; font-size: 13px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
-        tr:hover td { background: #f9fafb; }
-        .ativo { color: #059669; font-weight: 600; }
-        .ativo::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #059669; margin-right: 6px; }
-        .inativo { color: #dc2626; font-weight: 600; }
-        .inativo::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #dc2626; margin-right: 6px; }
-        .table-wrap { overflow-x: auto; }
-        .loading { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
-        .loading .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .spinner-inline { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
-        .spinner-inline.visible { display: inline-block; }
-        .summary { display: flex; gap: 16px; margin-bottom: 20px; }
-        .stat { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 20px; flex: 1; }
-        .stat .num { font-size: 24px; font-weight: 700; }
-        .stat .label { font-size: 12px; color: var(--muted); margin-top: 4px; }
-        .btn-sm { padding: 5px 12px; font-size: 12px; }
-        .actions { display: flex; gap: 6px; }
-        @media (max-width: 700px) { .sidebar { width: 60px; } .sidebar-header h1, .sidebar-header span, .sidebar-nav a span { display: none; } .sidebar-nav a { justify-content: center; padding: 10px; } .main { margin-left: 60px; padding: 16px; } .summary { flex-direction: column; } }
-    </style>
-</head>
-<body>
-    <nav class="sidebar">
-        <div class="sidebar-header">
-            <h1>Gestão TI</h1>
-            <span>Painel Administrativo</span>
-        </div>
-        <div class="sidebar-nav">
-            <a href="/computadores"><span class="icon">🖥️</span><span>Computadores</span></a>
-            <a href="/impressoras"><span class="icon">🖨️</span><span>Impressoras</span></a>
-            <a href="/usuarios" class="active"><span class="icon">👤</span><span>Usuários</span></a>
-            <a href="/config"><span class="icon">⚙️</span><span>Configuração AD</span></a>
-        </div>
-    </nav>
+{% extends "base.html" %}
+{% block title %}Usuários - Gerenciamento de TI{% endblock %}
+{% block nav_usuarios %}active{% endblock %}
 
-    <div class="main">
-        <div class="page-header">
-            <h2>Usuários do AD</h2>
-            <p>Lista de usuários do Active Directory</p>
-        </div>
+{% block content %}
+<div class="page-header">
+  <h2>Usuários do AD</h2>
+  <p>Lista de usuários do Active Directory</p>
+</div>
 
-        <div class="summary" id="summary">
-            <div class="stat"><div class="num" id="total-usuarios">-</div><div class="label">Total</div></div>
-            <div class="stat"><div class="num" id="ativos-usuarios" style="color:#059669">-</div><div class="label">Ativos</div></div>
-            <div class="stat"><div class="num" id="inativos-usuarios" style="color:#dc2626">-</div><div class="label">Inativos</div></div>
-        </div>
+<div class="summary" id="summary">
+  <div class="stat"><div class="num" id="total-usuarios">-</div><div class="label">Total</div></div>
+  <div class="stat"><div class="num num-success" id="ativos-usuarios">-</div><div class="label">Ativos</div></div>
+  <div class="stat"><div class="num num-danger" id="inativos-usuarios">-</div><div class="label">Inativos</div></div>
+</div>
 
-        <div class="toolbar">
-            <button class="btn btn-primary" id="btn-carregar">🔄 Carregar Usuários</button>
-            <span class="status-msg" id="sync-status"></span>
-        </div>
+<div class="toolbar">
+  <button class="btn btn-warning btn-sm" id="btn-desativar-selecionados" style="display:none">Desativar selecionados</button>
+  <button class="btn btn-success btn-sm" id="btn-ativar-selecionados" style="display:none">Ativar selecionados</button>
+  <button class="btn btn-primary" id="btn-carregar"><svg class="icon-lg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Carregar Usuários <span class="kbd-hint">Ctrl+Shift+S</span></button>
+  <span class="status-msg" id="sync-status"></span>
+  <input type="text" class="search-input" placeholder="Buscar usuário..." oninput="filterTable('tab-usuarios', this.value)" aria-label="Buscar usuário">
+</div>
 
-        <div class="card">
-            <div class="card-header"><h3>Usuários</h3></div>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Login</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tab-usuarios">
-                        <tr><td colspan="4" class="loading"><span class="spinner"></span>Carregando...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+<div class="card">
+  <div class="card-header"><h3>Usuários</h3></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="select-col"><input type="checkbox" onchange="toggleAll(this,'tab-usuarios')" aria-label="Selecionar todos"></th>
+          <th onclick="sortTable('tab-usuarios',1)" aria-sort="none">Nome</th>
+          <th onclick="sortTable('tab-usuarios',2)" aria-sort="none">Login</th>
+          <th onclick="sortTable('tab-usuarios',3)" aria-sort="none">Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tab-usuarios">
+        <tr><td colspan="5" class="loading"><span class="spinner"></span>Carregando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="tab-usuarios-pagination"></div>
+</div>
+  <dialog id="password-dialog" class="dialog">
+    <div class="dialog-body">
+      <h3 class="dialog-title" id="password-dialog-title">Trocar Senha</h3>
+      <p class="dialog-subtitle" id="password-dialog-user"></p>
+      <div class="form-group">
+        <label for="nova-senha">Nova Senha</label>
+        <div class="password-wrapper">
+          <input type="password" id="nova-senha" placeholder="Mínimo 6 caracteres" minlength="6">
+          <button type="button" class="toggle-password" id="toggle-nova-senha" aria-label="Mostrar senha"><svg class="icon-lg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
         </div>
+      </div>
+      <div class="form-group">
+        <label for="confirmar-senha">Confirmar Senha</label>
+        <div class="password-wrapper">
+          <input type="password" id="confirmar-senha" placeholder="Repita a nova senha">
+          <button type="button" class="toggle-password" id="toggle-confirmar-senha" aria-label="Mostrar senha"><svg class="icon-lg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+      </div>
+      <p class="dialog-message" id="password-feedback"></p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="password-cancel" autofocus>Cancelar</button>
+        <button class="btn btn-primary" id="password-ok">Alterar Senha</button>
+      </div>
     </div>
+  </dialog>
+{% endblock %}
 
-    <script>
-        function $(id) { return document.getElementById(id); }
-        const tbody = $('tab-usuarios');
-        const statusMsg = $('sync-status');
+{% block scripts %}
+<script>
+  const tbody = $('tab-usuarios');
+  const statusMsg = $('sync-status');
 
-        function showStatus(msg, ok) {
-            statusMsg.textContent = msg;
-            statusMsg.style.color = ok ? '#059669' : '#dc2626';
-        }
+  async function carregar() {
+    const btn = $('btn-carregar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-inline visible"></span> Carregando...';
+    showStatus('Carregando usuários...');
+    try {
+      const resp = await fetch('/api/usuarios');
+      const r = await resp.json();
+      if (!resp.ok) { showStatus(r.message, false); return; }
+      const dados = r.dados;
+      const total = dados.length;
+      const ativos = dados.filter(d => d.status === 'ativo').length;
+      $('total-usuarios').textContent = total;
+      $('ativos-usuarios').textContent = ativos;
+      $('inativos-usuarios').textContent = total - ativos;
 
-        async function carregar() {
-            const btn = $('btn-carregar');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-inline visible"></span> Carregando...';
-            showStatus('Carregando usuários...');
-            try {
-                const resp = await fetch('/api/usuarios');
-                const r = await resp.json();
-                if (!resp.ok) { showStatus(r.message, false); return; }
-                const dados = r.dados;
-                const total = dados.length;
-                const ativos = dados.filter(d => d.status === 'ativo').length;
-                $('total-usuarios').textContent = total;
-                $('ativos-usuarios').textContent = ativos;
-                $('inativos-usuarios').textContent = total - ativos;
+      tbody.innerHTML = total ? '' : '<tr><td colspan="5" class="loading">Nenhum usuário encontrado.</td></tr>';
+      dados.forEach(u => {
+        const linha = document.createElement('tr');
+        const acao = (u.status === 'ativo'
+          ? `<button class="btn btn-warning btn-sm" onclick="desativar('${u.login}')"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Desativar</button>`
+          : `<button class="btn btn-success btn-sm" onclick="ativar('${u.login}')"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg> Ativar</button>`)
+          + `<button class="btn btn-sm btn-secondary" onclick="abrirTrocarSenha('${u.login}')" title="Trocar senha"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>`;
+        linha.innerHTML = `
+          <td class="select-col"><input type="checkbox" class="row-select" value="${u.login}" data-status="${u.status}" aria-label="Selecionar ${u.nome}"></td>
+          <td><strong>${u.nome}</strong></td>
+          <td class="cell-mono">${u.login}</td>
+          <td><span class="${u.status}">${u.status}</span></td>
+          <td><div class="actions">${acao}</div></td>
+        `;
+        tbody.appendChild(linha);
+      });
+      initPagination('tab-usuarios', 25);
+      showStatus(`${total} usuários carregados`, true);
+    } catch {
+      tbody.innerHTML = '<tr><td colspan="5" class="loading loading-error">Erro ao carregar <button class="retry-link" onclick="carregar()">Tentar novamente</button></td></tr>';
+      showStatus('Falha ao carregar usuários do AD. Verifique a conexão com o servidor.', false);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<svg class=\"icon-lg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"23 4 23 10 17 10\"/><polyline points=\"1 20 1 14 7 14\"/><path d=\"M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15\"/></svg> Carregar Usuários';
+    }
+  }
 
-                tbody.innerHTML = total ? '' : '<tr><td colspan="4" class="loading">Nenhum usuário encontrado.</td></tr>';
-                dados.forEach(u => {
-                    const linha = document.createElement('tr');
-                    const acao = u.status === 'ativo'
-                        ? `<button class="btn btn-warning btn-sm" onclick="desativar('${u.login}')">🔒 Desativar</button>`
-                        : `<button class="btn btn-success btn-sm" onclick="ativar('${u.login}')">🔓 Ativar</button>`;
-                    linha.innerHTML = `
-                        <td><strong>${u.nome}</strong></td>
-                        <td style="font-family:monospace;font-size:12px;color:var(--muted)">${u.login}</td>
-                        <td><span class="${u.status}">${u.status}</span></td>
-                        <td><div class="actions">${acao}</div></td>
-                    `;
-                    tbody.appendChild(linha);
-                });
-                showStatus(`${total} usuários carregados`, true);
-            } catch {
-                tbody.innerHTML = '<tr><td colspan="4" class="loading" style="color:#dc2626">Erro ao carregar</td></tr>';
-                showStatus('Erro de rede', false);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '🔄 Carregar Usuários';
-            }
-        }
+  async function ativar(login) {
+    if (!await confirmDialog(`Ativar usuário ${login}?`)) return;
+    try {
+      const resp = await fetch('/api/usuarios/ativar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({login})
+      });
+      const r = await resp.json();
+      showStatus(r.message, resp.ok);
+      if (resp.ok) carregar();
+    } catch { showStatus('Falha ao ativar usuário. Verifique a conexão com o AD.', false); }
+  }
 
-        async function ativar(login) {
-            if (!confirm(`Ativar usuário ${login}?`)) return;
-            try {
-                const resp = await fetch('/api/usuarios/ativar', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({login})
-                });
-                const r = await resp.json();
-                showStatus(r.message, resp.ok);
-                if (resp.ok) carregar();
-            } catch { showStatus('Erro de rede', false); }
-        }
+  async function desativar(login) {
+    if (!await confirmDialog(`Desativar usuário ${login}?`)) return;
+    try {
+      const resp = await fetch('/api/usuarios/desativar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({login})
+      });
+      const r = await resp.json();
+      showStatus(r.message, resp.ok);
+      if (resp.ok) carregar();
+    } catch { showStatus('Falha ao desativar usuário. Verifique a conexão com o AD.', false); }
+  }
 
-        async function desativar(login) {
-            if (!confirm(`Desativar usuário ${login}?`)) return;
-            try {
-                const resp = await fetch('/api/usuarios/desativar', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({login})
-                });
-                const r = await resp.json();
-                showStatus(r.message, resp.ok);
-                if (resp.ok) carregar();
-            } catch { showStatus('Erro de rede', false); }
-        }
+  var ativarBtn = $('btn-ativar-selecionados');
+  var desativarBtn = $('btn-desativar-selecionados');
 
-        $('btn-carregar').addEventListener('click', carregar);
-        window.addEventListener('DOMContentLoaded', carregar);
-    </script>
-</body>
-</html>
+  function updateBatchBtns() {
+    var ids = getSelectedIds('tab-usuarios');
+    var ativar = ids.filter(function(id) { return document.querySelector('#tab-usuarios .row-select[value="' + id + '"]').dataset.status === 'inativo'; });
+    var desativar = ids.filter(function(id) { return document.querySelector('#tab-usuarios .row-select[value="' + id + '"]').dataset.status === 'ativo'; });
+    ativarBtn.style.display = ativar.length ? 'inline-flex' : 'none';
+    ativarBtn.textContent = 'Ativar ' + ativar.length;
+    desativarBtn.style.display = desativar.length ? 'inline-flex' : 'none';
+    desativarBtn.textContent = 'Desativar ' + desativar.length;
+  }
+
+  ativarBtn.addEventListener('click', async function() {
+    var ids = getSelectedIds('tab-usuarios').filter(function(id) { return document.querySelector('#tab-usuarios .row-select[value="' + id + '"]').dataset.status === 'inativo'; });
+    if (!ids.length) return;
+    for (var i = 0; i < ids.length; i++) {
+      try {
+        var resp = await fetch('/api/usuarios/ativar', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({login: ids[i]}) });
+        var r = await resp.json();
+        showStatus(r.message, resp.ok);
+        if (!resp.ok) break;
+      } catch { showStatus('Falha ao ativar usuários. Verifique a conexão.', false); break; }
+    }
+    carregar();
+  });
+
+  desativarBtn.addEventListener('click', async function() {
+    var ids = getSelectedIds('tab-usuarios').filter(function(id) { return document.querySelector('#tab-usuarios .row-select[value="' + id + '"]').dataset.status === 'ativo'; });
+    if (!ids.length) return;
+    if (!await confirmDialog('Desativar ' + ids.length + ' usuário' + (ids.length > 1 ? 's' : '') + ' selecionado' + (ids.length > 1 ? 's' : '') + '?')) return;
+    for (var i = 0; i < ids.length; i++) {
+      try {
+        var resp = await fetch('/api/usuarios/desativar', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({login: ids[i]}) });
+        var r = await resp.json();
+        showStatus(r.message, resp.ok);
+        if (!resp.ok) break;
+      } catch { showStatus('Falha ao desativar usuários. Verifique a conexão.', false); break; }
+    }
+    carregar();
+  });
+
+  var origToggleAllUsuarios = window.toggleAll;
+  window.toggleAll = function(src, tbodyId) {
+    if (origToggleAllUsuarios) origToggleAllUsuarios(src, tbodyId);
+    if (tbodyId === 'tab-usuarios') updateBatchBtns();
+  };
+
+  var senhaDialog = document.getElementById('password-dialog');
+  var senhaLogin = '';
+  var senhaInput = document.getElementById('nova-senha');
+  var confirmarInput = document.getElementById('confirmar-senha');
+  var senhaFeedback = document.getElementById('password-feedback');
+
+  document.getElementById('toggle-nova-senha').addEventListener('click', function() {
+    var type = senhaInput.type === 'password' ? 'text' : 'password';
+    senhaInput.type = type;
+    this.setAttribute('aria-label', type === 'password' ? 'Mostrar senha' : 'Ocultar senha');
+    this.innerHTML = type === 'password'
+      ? '<svg class=\"icon-lg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>'
+      : '<svg class=\"icon-lg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24\"/><line x1=\"1\" y1=\"1\" x2=\"23\" y2=\"23\"/></svg>';
+  });
+
+  document.getElementById('toggle-confirmar-senha').addEventListener('click', function() {
+    var type = confirmarInput.type === 'password' ? 'text' : 'password';
+    confirmarInput.type = type;
+    this.setAttribute('aria-label', type === 'password' ? 'Mostrar senha' : 'Ocultar senha');
+    this.innerHTML = type === 'password'
+      ? '<svg class=\"icon-lg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>'
+      : '<svg class=\"icon-lg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24\"/><line x1=\"1\" y1=\"1\" x2=\"23\" y2=\"23\"/></svg>';
+  });
+
+  function abrirTrocarSenha(login) {
+    senhaLogin = login;
+    document.getElementById('password-dialog-title').textContent = 'Trocar Senha';
+    document.getElementById('password-dialog-user').textContent = 'Usuário: ' + login;
+    senhaInput.value = '';
+    confirmarInput.value = '';
+    senhaFeedback.textContent = '';
+    senhaFeedback.className = 'dialog-message';
+    var okBtn = document.getElementById('password-ok');
+    okBtn.disabled = false;
+    okBtn.innerHTML = '<svg class="icon-lg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Alterar Senha';
+    document.getElementById('password-cancel').disabled = false;
+    senhaDialog.showModal();
+    senhaInput.focus();
+  }
+
+  document.getElementById('password-ok').addEventListener('click', async function() {
+    var nova = senhaInput.value;
+    var confirmar = confirmarInput.value;
+    if (!nova || nova.length < 6) {
+      senhaFeedback.textContent = 'A senha deve ter no mínimo 6 caracteres.';
+      senhaFeedback.className = 'dialog-message feedback-error';
+      senhaInput.focus();
+      return;
+    }
+    if (nova !== confirmar) {
+      senhaFeedback.textContent = 'As senhas não conferem.';
+      senhaFeedback.className = 'dialog-message feedback-error';
+      confirmarInput.focus();
+      return;
+    }
+    var btn = this;
+    btn.disabled = true;
+    btn.innerHTML = 'Alterando...';
+    document.getElementById('password-cancel').disabled = true;
+    try {
+      var resp = await fetch('/api/usuarios/trocar-senha', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({login: senhaLogin, nova_senha: nova})
+      });
+      var r = await resp.json();
+      if (resp.ok) {
+        senhaDialog.close();
+        showStatus(r.message, true);
+      } else {
+        senhaFeedback.textContent = r.message || 'Erro ao alterar senha.';
+        senhaFeedback.className = 'dialog-message feedback-error';
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="icon-lg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Alterar Senha';
+        document.getElementById('password-cancel').disabled = false;
+      }
+    } catch {
+      senhaFeedback.textContent = 'Erro de rede. Verifique a conexão com o servidor.';
+      senhaFeedback.className = 'dialog-message feedback-error';
+      btn.disabled = false;
+      btn.innerHTML = '<svg class="icon-lg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Alterar Senha';
+      document.getElementById('password-cancel').disabled = false;
+    }
+  });
+
+  document.getElementById('password-cancel').addEventListener('click', function() {
+    senhaDialog.close();
+  });
+
+  senhaDialog.addEventListener('close', function() {
+    senhaInput.value = '';
+    confirmarInput.value = '';
+    senhaFeedback.textContent = '';
+    senhaFeedback.className = 'dialog-message';
+  });
+
+  $('btn-carregar').addEventListener('click', carregar);
+  window.addEventListener('DOMContentLoaded', function() {
+    carregar();
+    bindRowSelection('tab-usuarios');
+    document.getElementById('tab-usuarios').addEventListener('change', function(e) {
+      if (e.target.closest('.row-select')) updateBatchBtns();
+    });
+  });
+</script>
+{% endblock %}

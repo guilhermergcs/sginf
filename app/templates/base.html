@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Gerenciamento de TI{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%233b82f6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='1.5' y='2' width='13' height='9' rx='1.5'/%3E%3Cline x1='5' y1='14' x2='11' y2='14'/%3E%3Cline x1='8' y1='11' x2='8' y2='14'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h1>Gestão TI</h1>
+      <span>Painel Administrativo</span>
+    </div>
+    <div class="sidebar-nav">
+      <a href="/computadores" class="{% block nav_computadores %}{% endblock %}">
+        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span><span>Computadores</span>
+      </a>
+      <a href="/impressoras" class="{% block nav_impressoras %}{% endblock %}">
+        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span><span>Impressoras</span>
+      </a>
+      <a href="/usuarios" class="{% block nav_usuarios %}{% endblock %}">
+        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Usuários AD</span>
+      </a>
+      <a href="/config" class="{% block nav_config %}{% endblock %}">
+        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span>Configuração AD</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="{% block main_class %}main{% endblock %}">
+    {% block content %}{% endblock %}
+  </div>
+
+  <dialog id="confirm-dialog" class="dialog">
+    <div class="dialog-body">
+      <p id="confirm-message" class="dialog-message"></p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="confirm-cancel" autofocus>Cancelar</button>
+        <button class="btn btn-danger" id="confirm-ok" aria-label="Confirmar ação">Confirmar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    function $(id) { return document.getElementById(id); }
+
+    function setLoading(btn, loading) {
+      btn.disabled = loading;
+      btn.innerHTML = loading ? '<span class="spinner-inline visible"></span> Aguarde...' : btn.dataset.text;
+    }
+
+    function showStatus(msg, ok) {
+      const el = document.getElementById('sync-status');
+      if (!el) return;
+      el.textContent = msg;
+      el.className = 'status-msg' + (ok !== undefined ? (ok ? ' success' : ' error') : '');
+    }
+
+    function confirmDialog(msg) {
+      return new Promise(resolve => {
+        const dlg = document.getElementById('confirm-dialog');
+        const msgEl = document.getElementById('confirm-message');
+        const okBtn = document.getElementById('confirm-ok');
+        const cancelBtn = document.getElementById('confirm-cancel');
+        msgEl.textContent = msg;
+        const cleanup = () => {
+          dlg.removeEventListener('close', onClose);
+          okBtn.removeEventListener('click', onOk);
+          cancelBtn.removeEventListener('click', onCancel);
+        };
+        const onClose = () => { cleanup(); resolve(false); };
+        const onOk = () => { cleanup(); dlg.close(); resolve(true); };
+        const onCancel = () => { cleanup(); dlg.close(); resolve(false); };
+        dlg.addEventListener('close', onClose);
+        okBtn.addEventListener('click', onOk);
+        cancelBtn.addEventListener('click', onCancel);
+        dlg.showModal();
+      });
+    }
+  </script>
+  <script>
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') {
+        e.preventDefault();
+        var btn = document.querySelector('#btn-sync, #btn-carregar');
+        if (btn) btn.click();
+      }
+    });
+
+    function toggleAll(source, tbodyId) {
+      document.querySelectorAll('#' + tbodyId + ' .row-select').forEach(function(cb) {
+        cb.checked = source.checked;
+        cb.closest('tr').classList.toggle('selected', source.checked);
+      });
+    }
+
+    function bindRowSelection(tbodyId) {
+      var tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      tbody.addEventListener('click', function(e) {
+        var cb = e.target.closest('.row-select');
+        if (!cb) return;
+        var tr = cb.closest('tr');
+        tr.classList.toggle('selected', cb.checked);
+        if (e.shiftKey) {
+          var all = Array.from(tbody.querySelectorAll('.row-select'));
+          var idx = all.indexOf(cb);
+          var last = parseInt(tbody.dataset.lastChecked || '-1');
+          if (last >= 0) {
+            var start = Math.min(last, idx);
+            var end = Math.max(last, idx);
+            for (var i = start; i <= end; i++) {
+              all[i].checked = cb.checked;
+              all[i].closest('tr').classList.toggle('selected', cb.checked);
+            }
+          }
+          tbody.dataset.lastChecked = idx;
+        }
+      });
+      tbody.addEventListener('change', function(e) {
+        if (e.target.closest('.row-select')) {
+          tbody.dataset.lastChecked = Array.from(tbody.querySelectorAll('.row-select')).indexOf(e.target);
+        }
+      });
+    }
+
+    function getSelectedIds(tbodyId) {
+      return Array.from(document.querySelectorAll('#' + tbodyId + ' .row-select:checked')).map(function(cb) {
+        return cb.value;
+      });
+    }
+
+    function filterTable(tbodyId, query) {
+      var tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      var q = query.toLowerCase();
+      Array.from(tbody.rows).forEach(function(row) {
+        if (row.classList.contains('loading')) return;
+        var match = !q || Array.from(row.cells).some(function(cell) {
+          return cell.textContent.toLowerCase().includes(q);
+        });
+        row.style.display = match ? '' : 'none';
+      });
+      var st = pagState[tbodyId];
+      if (st) { st.page = 1; applyPagination(tbodyId); }
+    }
+
+    var pagState = {};
+    var sortState = {};
+
+    function initPagination(tbodyId, perPage) {
+      pagState[tbodyId] = { page: 1, perPage: perPage || 25 };
+      applyPagination(tbodyId);
+    }
+
+    function applyPagination(tbodyId) {
+      var st = pagState[tbodyId];
+      if (!st) return;
+      var tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      var rows = Array.from(tbody.rows).filter(function(r) { return !r.classList.contains('loading'); });
+      var visible = [];
+      rows.forEach(function(r) {
+        if (r.style.display !== 'none') visible.push(r);
+      });
+
+      if (st.perPage === 0) {
+        var pgEl = document.getElementById(tbodyId + '-pagination');
+        if (pgEl) pgEl.innerHTML = '';
+        return;
+      }
+
+      var totalPages = Math.max(1, Math.ceil(visible.length / st.perPage));
+      if (st.page > totalPages) st.page = totalPages || 1;
+
+      visible.forEach(function(r, i) {
+        r.style.display = (i >= (st.page - 1) * st.perPage && i < st.page * st.perPage) ? '' : 'none';
+      });
+
+      var pgEl = document.getElementById(tbodyId + '-pagination');
+      if (!pgEl) return;
+      if (visible.length <= st.perPage) { pgEl.innerHTML = ''; return; }
+      pgEl.innerHTML = '<div class="pagination">'
+        + '<button class="btn btn-sm btn-secondary" onclick="goPage(\'' + tbodyId + '\',1)" ' + (st.page <= 1 ? 'disabled' : '') + ' aria-label="Primeira página">«</button>'
+        + '<button class="btn btn-sm btn-secondary" onclick="goPage(\'' + tbodyId + '\',' + (st.page - 1) + ')" ' + (st.page <= 1 ? 'disabled' : '') + ' aria-label="Página anterior">‹</button>'
+        + '<span class="page-info">' + st.page + '/' + totalPages + '</span>'
+        + '<button class="btn btn-sm btn-secondary" onclick="goPage(\'' + tbodyId + '\',' + (st.page + 1) + ')" ' + (st.page >= totalPages ? 'disabled' : '') + ' aria-label="Próxima página">›</button>'
+        + '<button class="btn btn-sm btn-secondary" onclick="goPage(\'' + tbodyId + '\',' + totalPages + ')" ' + (st.page >= totalPages ? 'disabled' : '') + ' aria-label="Última página">»</button>'
+        + '<select class="page-size" onchange="setPageSize(\'' + tbodyId + '\',this.value)" aria-label="Itens por página">'
+        + '<option value="25"' + (st.perPage === 25 ? ' selected' : '') + '>25/pág</option>'
+        + '<option value="50"' + (st.perPage === 50 ? ' selected' : '') + '>50/pág</option>'
+        + '<option value="100"' + (st.perPage === 100 ? ' selected' : '') + '>100/pág</option>'
+        + '<option value="0"' + (st.perPage === 0 ? ' selected' : '') + '>Todas</option>'
+        + '</select></div>';
+    }
+
+    function goPage(tbodyId, page) {
+      var st = pagState[tbodyId];
+      if (!st) return;
+      st.page = page;
+      applyPagination(tbodyId);
+      var allCb = document.querySelector('#' + tbodyId + ' .row-select');
+      if (allCb) { allCb.checked = false; }
+    }
+
+    function setPageSize(tbodyId, size) {
+      var st = pagState[tbodyId];
+      if (!st) return;
+      st.perPage = parseInt(size);
+      st.page = 1;
+      applyPagination(tbodyId);
+    }
+
+    function sortTable(tbodyId, colIdx) {
+      var tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      var rows = Array.from(tbody.rows).filter(function(r) { return !r.classList.contains('loading'); });
+
+      var st = sortState[tbodyId] || { col: -1, asc: true };
+      var same = st.col === colIdx;
+      st.col = colIdx;
+      st.asc = same ? !st.asc : true;
+      sortState[tbodyId] = st;
+
+      rows.sort(function(a, b) {
+        var va = (a.cells[colIdx] ? a.cells[colIdx].textContent.trim() : '').toLowerCase();
+        var vb = (b.cells[colIdx] ? b.cells[colIdx].textContent.trim() : '').toLowerCase();
+        if (va === vb) return 0;
+        return st.asc ? (va < vb ? -1 : 1) : (va > vb ? -1 : 1);
+      });
+
+      rows.forEach(function(r) { tbody.appendChild(r); });
+
+      tbody.querySelectorAll('.sort-indicator').forEach(function(el) { el.remove(); });
+      var headerRow = tbody.previousElementSibling;
+      if (headerRow) {
+        var th = headerRow.querySelectorAll('th')[colIdx];
+        if (th) {
+          var arrow = document.createElement('span');
+          arrow.className = 'sort-indicator';
+          arrow.textContent = st.asc ? ' ▲' : ' ▼';
+          th.appendChild(arrow);
+        }
+      }
+      applyPagination(tbodyId);
+    }
+
+    function toggleAll(source, tbodyId) {
+      document.querySelectorAll('#' + tbodyId + ' .row-select').forEach(function(cb) {
+        var row = cb.closest('tr');
+        if (row.style.display === 'none') return;
+        cb.checked = source.checked;
+        row.classList.toggle('selected', source.checked);
+      });
+    }
+
+    function showTooltip(btn, msg) {
+      var tip = document.createElement('span');
+      tip.className = 'kbd-hint';
+      tip.textContent = msg;
+      btn.parentNode.insertBefore(tip, btn.nextSibling);
+      setTimeout(function() { tip.remove(); }, 3000);
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js"></script>
+<!-- impeccable-live-end -->
+</body>
+</html>

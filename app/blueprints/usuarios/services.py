@@ -1,6 +1,29 @@
 from ldap3 import Server, Connection, ALL, core, MODIFY_REPLACE
 
-def _conectar(config):
+def _conectar(config, use_ssl=False):
+    target = config['ad_ip'] or config['server']
+    if use_ssl:
+        ad_server = Server(target, port=636, use_ssl=True, get_info=ALL)
+    else:
+        ad_server = Server(target, get_info=ALL)
+    ad_conn = Connection(ad_server, user=config['username'], password=config['password'], auto_bind=True)
+    return ad_conn
+
+def _set_password(config, sam_account_name, nova_senha):
+    search_base = _search_base(config)
+    ad_conn = _conectar(config, use_ssl=True)
+    ad_conn.search(
+        search_base=search_base,
+        search_filter=f'(sAMAccountName={sam_account_name})',
+        attributes=['distinguishedName']
+    )
+    if not ad_conn.entries:
+        ad_conn.unbind()
+        raise ValueError(f"Usuário {sam_account_name} não encontrado")
+    dn = ad_conn.entries[0].entry_dn
+    nova_senha_encoded = f'"{nova_senha}"'.encode('utf-16-le')
+    ad_conn.modify(dn, {'unicodePwd': [(MODIFY_REPLACE, [nova_senha_encoded])]})
+    ad_conn.unbind()
     target = config['ad_ip'] or config['server']
     ad_server = Server(target, get_info=ALL)
     ad_conn = Connection(ad_server, user=config['username'], password=config['password'], auto_bind=True)
