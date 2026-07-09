@@ -1,0 +1,946 @@
+- generic [active] [ref=e1] [box=0,0,914,902]:
+  - navigation [ref=e2] [box=0,0,240,902]:
+    - generic [ref=e3] [box=0,0,240,87]:
+      - heading "Gestão TI" [level=1] [ref=e4] [box=20,24,200,21]
+      - generic [ref=e5] [box=20,47,200,15]: Painel Administrativo
+    - generic [ref=e6] [box=0,87,240,815]:
+      - link "Computadores" [ref=e7] [cursor=pointer] [box=10,99,220,39]:
+        - /url: /computadores
+        - img [ref=e9] [box=26,110,18,18]
+        - generic [ref=e11] [box=58,109,94,19]: Computadores
+      - link "Impressoras" [ref=e12] [cursor=pointer] [box=10,140,220,39]:
+        - /url: /impressoras
+        - img [ref=e14] [box=26,151,18,18]
+        - generic [ref=e18] [box=58,150,76,19]: Impressoras
+      - link "Usuários AD" [ref=e19] [cursor=pointer] [box=10,181,220,39]:
+        - /url: /usuarios
+        - img [ref=e21] [box=26,192,18,18]
+        - generic [ref=e24] [box=58,191,78,19]: Usuários AD
+      - link "Configuração AD" [ref=e25] [cursor=pointer] [box=10,222,220,39]:
+        - /url: /config
+        - img [ref=e27] [box=26,233,18,18]
+        - generic [ref=e30] [box=58,232,108,19]: Configuração AD
+  - generic [ref=e31] [box=240,0,686,917]:
+    - generic [ref=e32] [box=272,32,622,53]:
+      - heading "Computadores" [level=2] [ref=e33] [box=272,32,622,30]
+      - paragraph [ref=e34] [box=272,66,622,19]: Lista de computadores sincronizados do Active Directory
+    - generic [ref=e35] [box=272,109,622,84]:
+      - generic [ref=e36] [box=272,109,197,84]:
+        - generic [ref=e37] [box=292,125,157,32]: "111"
+        - generic [ref=e38] [box=292,161,157,16]: Total
+      - generic [ref=e39] [box=485,109,197,84]:
+        - generic [ref=e40] [box=505,125,157,32]: "22"
+        - generic [ref=e41] [box=505,161,157,16]: Online
+      - generic [ref=e42] [box=698,109,197,84]:
+        - generic [ref=e43] [box=718,125,157,32]: "89"
+        - generic [ref=e44] [box=718,161,157,16]: Offline
+    - generic [ref=e45] [box=272,213,622,73]:
+      - button "Sincronizar do AD Ctrl+Shift+S" [ref=e46] [cursor=pointer] [box=272,213,248,34]:
+        - img [ref=e47] [box=290,221,18,18]
+        - text: Sincronizar do AD
+        - generic [ref=e51] [box=438,224,64,12]: Ctrl+Shift+S
+      - button "Verificar Status" [ref=e52] [cursor=pointer] [box=528,213,155,34]:
+        - img [ref=e53] [box=546,221,18,18]
+        - text: Verificar Status
+      - textbox "Buscar computador" [ref=e55] [box=694,255,200,31]:
+        - /placeholder: Buscar computador...
+    - generic [ref=e56] [box=272,306,622,6211]:
+      - heading "Computadores" [level=3] [ref=e58] [box=292,322,100,20]
+      - table [ref=e60] [box=272,359,622,6158]:
+        - rowgroup [ref=e61] [box=272,359,622,53]:
+          - row "Selecionar todos Nome IP Usuário Logado Status" [ref=e62] [box=272,359,622,53]:
+            - columnheader "Selecionar todos" [ref=e63] [box=272,359,56,53]:
+              - checkbox "Selecionar todos" [ref=e64] [cursor=pointer] [box=292,376,16,16]
+            - columnheader "Nome" [ref=e65] [box=328,359,156,53]
+            - columnheader "IP" [ref=e66] [box=484,359,231,53]
+            - columnheader "Usuário Logado" [ref=e67] [box=715,359,95,53]
+            - columnheader "Status" [ref=e68] [box=810,359,84,53]
+        - rowgroup [ref=e69] [box=272,412,622,6105]:
+          - row "Selecionar GOB-VW-AD01 GOB-VW-AD01 10.20.1.19 Nenhum online" [ref=e73] [box=272,412,622,55]:
+            - cell "Selecionar GOB-VW-AD01" [ref=e74] [box=272,412,56,55]:
+              - checkbox "Selecionar GOB-VW-AD01" [ref=e75] [cursor=pointer] [box=292,430,16,16]
+            - cell "GOB-VW-AD01" [ref=e76] [box=328,412,156,55]:
+              - strong [ref=e77] [box=348,431,93,17]: GOB-VW-AD01
+            - cell "10.20.1.19" [ref=e78] [box=484,412,231,55]
+            - cell "Nenhum" [ref=e79] [box=715,412,95,55]
+            - cell "online" [ref=e80] [box=810,412,84,55]
+          - row "Selecionar DESKTOP-TESTE2 DESKTOP-TESTE2 10.20.50.50 Nenhum offline" [ref=e81] [box=272,467,622,55]:
+            - cell "Selecionar DESKTOP-TESTE2" [ref=e82] [box=272,467,56,55]:
+              - checkbox "Selecionar DESKTOP-TESTE2" [ref=e83] [cursor=pointer] [box=292,485,16,16]
+            - cell "DESKTOP-TESTE2" [ref=e84] [box=328,467,156,55]:
+              - strong [ref=e85] [box=348,486,106,17]: DESKTOP-TESTE2
+            - cell "10.20.50.50" [ref=e86] [box=484,467,231,55]
+            - cell "Nenhum" [ref=e87] [box=715,467,95,55]
+            - cell "offline" [ref=e88] [box=810,467,84,55]
+          - row "Selecionar TESTE-GOB TESTE-GOB 10.20.50.67 Nenhum online" [ref=e89] [box=272,522,622,55]:
+            - cell "Selecionar TESTE-GOB" [ref=e90] [box=272,522,56,55]:
+              - checkbox "Selecionar TESTE-GOB" [ref=e91] [cursor=pointer] [box=292,540,16,16]
+            - cell "TESTE-GOB" [ref=e92] [box=328,522,156,55]:
+              - strong [ref=e93] [box=348,541,69,17]: TESTE-GOB
+            - cell "10.20.50.67" [ref=e94] [box=484,522,231,55]
+            - cell "Nenhum" [ref=e95] [box=715,522,95,55]
+            - cell "online" [ref=e96] [box=810,522,84,55]
+          - row "Selecionar SAFL-02 SAFL-02 10.20.62.105 Nenhum offline" [ref=e97] [box=272,577,622,55]:
+            - cell "Selecionar SAFL-02" [ref=e98] [box=272,577,56,55]:
+              - checkbox "Selecionar SAFL-02" [ref=e99] [cursor=pointer] [box=292,595,16,16]
+            - cell "SAFL-02" [ref=e100] [box=328,577,156,55]:
+              - strong [ref=e101] [box=348,596,50,17]: SAFL-02
+            - cell "10.20.62.105" [ref=e102] [box=484,577,231,55]
+            - cell "Nenhum" [ref=e103] [box=715,577,95,55]
+            - cell "offline" [ref=e104] [box=810,577,84,55]
+          - row "Selecionar INF45 INF45 10.20.2.45 Nenhum offline" [ref=e105] [box=272,632,622,55]:
+            - cell "Selecionar INF45" [ref=e106] [box=272,632,56,55]:
+              - checkbox "Selecionar INF45" [ref=e107] [cursor=pointer] [box=292,650,16,16]
+            - cell "INF45" [ref=e108] [box=328,632,156,55]:
+              - strong [ref=e109] [box=348,651,36,17]: INF45
+            - cell "10.20.2.45" [ref=e110] [box=484,632,231,55]
+            - cell "Nenhum" [ref=e111] [box=715,632,95,55]
+            - cell "offline" [ref=e112] [box=810,632,84,55]
+          - row "Selecionar INF44 INF44 10.20.2.44 Nenhum offline" [ref=e113] [box=272,687,622,55]:
+            - cell "Selecionar INF44" [ref=e114] [box=272,687,56,55]:
+              - checkbox "Selecionar INF44" [ref=e115] [cursor=pointer] [box=292,705,16,16]
+            - cell "INF44" [ref=e116] [box=328,687,156,55]:
+              - strong [ref=e117] [box=348,706,36,17]: INF44
+            - cell "10.20.2.44" [ref=e118] [box=484,687,231,55]
+            - cell "Nenhum" [ref=e119] [box=715,687,95,55]
+            - cell "offline" [ref=e120] [box=810,687,84,55]
+          - row "Selecionar INF71 INF71 10.20.150.184 Nenhum offline" [ref=e121] [box=272,742,622,55]:
+            - cell "Selecionar INF71" [ref=e122] [box=272,742,56,55]:
+              - checkbox "Selecionar INF71" [ref=e123] [cursor=pointer] [box=292,760,16,16]
+            - cell "INF71" [ref=e124] [box=328,742,156,55]:
+              - strong [ref=e125] [box=348,761,36,17]: INF71
+            - cell "10.20.150.184" [ref=e126] [box=484,742,231,55]
+            - cell "Nenhum" [ref=e127] [box=715,742,95,55]
+            - cell "offline" [ref=e128] [box=810,742,84,55]
+          - row "Selecionar INF46 INF46 10.20.2.46 Nenhum offline" [ref=e129] [box=272,797,622,55]:
+            - cell "Selecionar INF46" [ref=e130] [box=272,797,56,55]:
+              - checkbox "Selecionar INF46" [ref=e131] [cursor=pointer] [box=292,815,16,16]
+            - cell "INF46" [ref=e132] [box=328,797,156,55]:
+              - strong [ref=e133] [box=348,816,36,17]: INF46
+            - cell "10.20.2.46" [ref=e134] [box=484,797,231,55]
+            - cell "Nenhum" [ref=e135] [box=715,797,95,55]
+            - cell "offline" [ref=e136] [box=810,797,84,55]
+          - row "Selecionar INF90 INF90 10.20.50.75 Nenhum offline" [ref=e137] [box=272,852,622,55]:
+            - cell "Selecionar INF90" [ref=e138] [box=272,852,56,55]:
+              - checkbox "Selecionar INF90" [ref=e139] [cursor=pointer] [box=292,870,16,16]
+            - cell "INF90" [ref=e140] [box=328,852,156,55]:
+              - strong [ref=e141] [box=348,871,36,17]: INF90
+            - cell "10.20.50.75" [ref=e142] [box=484,852,231,55]
+            - cell "Nenhum" [ref=e143] [box=715,852,95,55]
+            - cell "offline" [ref=e144] [box=810,852,84,55]
+          - row "Selecionar INF73 INF73 10.20.150.186 Nenhum offline" [ref=e145] [box=272,907,622,55]:
+            - cell "Selecionar INF73" [ref=e146] [box=272,907,56,55]:
+              - checkbox "Selecionar INF73" [ref=e147] [cursor=pointer] [box=292,925,16,16]
+            - cell "INF73" [ref=e148] [box=328,907,156,55]:
+              - strong [ref=e149] [box=348,926,36,17]: INF73
+            - cell "10.20.150.186" [ref=e150] [box=484,907,231,55]
+            - cell "Nenhum" [ref=e151] [box=715,907,95,55]
+            - cell "offline" [ref=e152] [box=810,907,84,55]
+          - row "Selecionar SERVIDOR_IMPRES SERVIDOR_IMPRES Servidor_Impressora.gob.local Nenhum offline" [ref=e153] [box=272,962,622,55]:
+            - cell "Selecionar SERVIDOR_IMPRES" [ref=e154] [box=272,962,56,55]:
+              - checkbox "Selecionar SERVIDOR_IMPRES" [ref=e155] [cursor=pointer] [box=292,980,16,16]
+            - cell "SERVIDOR_IMPRES" [ref=e156] [box=328,962,156,55]:
+              - strong [ref=e157] [box=348,981,116,17]: SERVIDOR_IMPRES
+            - cell "Servidor_Impressora.gob.local" [ref=e158] [box=484,962,231,55]
+            - cell "Nenhum" [ref=e159] [box=715,962,95,55]
+            - cell "offline" [ref=e160] [box=810,962,84,55]
+          - row "Selecionar INF100 INF100 10.20.2.100 Nenhum offline" [ref=e161] [box=272,1017,622,55]:
+            - cell "Selecionar INF100" [ref=e162] [box=272,1017,56,55]:
+              - checkbox "Selecionar INF100" [ref=e163] [cursor=pointer] [box=292,1035,16,16]
+            - cell "INF100" [ref=e164] [box=328,1017,156,55]:
+              - strong [ref=e165] [box=348,1036,44,17]: INF100
+            - cell "10.20.2.100" [ref=e166] [box=484,1017,231,55]
+            - cell "Nenhum" [ref=e167] [box=715,1017,95,55]
+            - cell "offline" [ref=e168] [box=810,1017,84,55]
+          - row "Selecionar INF02 INF02 10.20.50.74 Nenhum offline" [ref=e169] [box=272,1072,622,55]:
+            - cell "Selecionar INF02" [ref=e170] [box=272,1072,56,55]:
+              - checkbox "Selecionar INF02" [ref=e171] [cursor=pointer] [box=292,1090,16,16]
+            - cell "INF02" [ref=e172] [box=328,1072,156,55]:
+              - strong [ref=e173] [box=348,1091,36,17]: INF02
+            - cell "10.20.50.74" [ref=e174] [box=484,1072,231,55]
+            - cell "Nenhum" [ref=e175] [box=715,1072,95,55]
+            - cell "offline" [ref=e176] [box=810,1072,84,55]
+          - row "Selecionar INF-40 INF-40 10.20.50.50 Nenhum offline" [ref=e177] [box=272,1127,622,55]:
+            - cell "Selecionar INF-40" [ref=e178] [box=272,1127,56,55]:
+              - checkbox "Selecionar INF-40" [ref=e179] [cursor=pointer] [box=292,1145,16,16]
+            - cell "INF-40" [ref=e180] [box=328,1127,156,55]:
+              - strong [ref=e181] [box=348,1146,41,17]: INF-40
+            - cell "10.20.50.50" [ref=e182] [box=484,1127,231,55]
+            - cell "Nenhum" [ref=e183] [box=715,1127,95,55]
+            - cell "offline" [ref=e184] [box=810,1127,84,55]
+          - row "Selecionar INF84 INF84 10.20.150.166 Nenhum offline" [ref=e185] [box=272,1182,622,55]:
+            - cell "Selecionar INF84" [ref=e186] [box=272,1182,56,55]:
+              - checkbox "Selecionar INF84" [ref=e187] [cursor=pointer] [box=292,1200,16,16]
+            - cell "INF84" [ref=e188] [box=328,1182,156,55]:
+              - strong [ref=e189] [box=348,1201,36,17]: INF84
+            - cell "10.20.150.166" [ref=e190] [box=484,1182,231,55]
+            - cell "Nenhum" [ref=e191] [box=715,1182,95,55]
+            - cell "offline" [ref=e192] [box=810,1182,84,55]
+          - row "Selecionar INF43 INF43 10.20.150.161 Nenhum offline" [ref=e193] [box=272,1237,622,55]:
+            - cell "Selecionar INF43" [ref=e194] [box=272,1237,56,55]:
+              - checkbox "Selecionar INF43" [ref=e195] [cursor=pointer] [box=292,1255,16,16]
+            - cell "INF43" [ref=e196] [box=328,1237,156,55]:
+              - strong [ref=e197] [box=348,1256,36,17]: INF43
+            - cell "10.20.150.161" [ref=e198] [box=484,1237,231,55]
+            - cell "Nenhum" [ref=e199] [box=715,1237,95,55]
+            - cell "offline" [ref=e200] [box=810,1237,84,55]
+          - row "Selecionar INF35 INF35 10.20.2.35 Nenhum offline" [ref=e201] [box=272,1292,622,55]:
+            - cell "Selecionar INF35" [ref=e202] [box=272,1292,56,55]:
+              - checkbox "Selecionar INF35" [ref=e203] [cursor=pointer] [box=292,1310,16,16]
+            - cell "INF35" [ref=e204] [box=328,1292,156,55]:
+              - strong [ref=e205] [box=348,1311,36,17]: INF35
+            - cell "10.20.2.35" [ref=e206] [box=484,1292,231,55]
+            - cell "Nenhum" [ref=e207] [box=715,1292,95,55]
+            - cell "offline" [ref=e208] [box=810,1292,84,55]
+          - row "Selecionar INF36 INF36 10.20.2.36 Nenhum offline" [ref=e209] [box=272,1347,622,55]:
+            - cell "Selecionar INF36" [ref=e210] [box=272,1347,56,55]:
+              - checkbox "Selecionar INF36" [ref=e211] [cursor=pointer] [box=292,1365,16,16]
+            - cell "INF36" [ref=e212] [box=328,1347,156,55]:
+              - strong [ref=e213] [box=348,1366,36,17]: INF36
+            - cell "10.20.2.36" [ref=e214] [box=484,1347,231,55]
+            - cell "Nenhum" [ref=e215] [box=715,1347,95,55]
+            - cell "offline" [ref=e216] [box=810,1347,84,55]
+          - row "Selecionar INF24 INF24 10.20.150.167 Nenhum offline" [ref=e217] [box=272,1402,622,55]:
+            - cell "Selecionar INF24" [ref=e218] [box=272,1402,56,55]:
+              - checkbox "Selecionar INF24" [ref=e219] [cursor=pointer] [box=292,1420,16,16]
+            - cell "INF24" [ref=e220] [box=328,1402,156,55]:
+              - strong [ref=e221] [box=348,1421,36,17]: INF24
+            - cell "10.20.150.167" [ref=e222] [box=484,1402,231,55]
+            - cell "Nenhum" [ref=e223] [box=715,1402,95,55]
+            - cell "offline" [ref=e224] [box=810,1402,84,55]
+          - row "Selecionar INF10 INF10 INF10.gob.local Nenhum offline" [ref=e225] [box=272,1457,622,55]:
+            - cell "Selecionar INF10" [ref=e226] [box=272,1457,56,55]:
+              - checkbox "Selecionar INF10" [ref=e227] [cursor=pointer] [box=292,1475,16,16]
+            - cell "INF10" [ref=e228] [box=328,1457,156,55]:
+              - strong [ref=e229] [box=348,1476,36,17]: INF10
+            - cell "INF10.gob.local" [ref=e230] [box=484,1457,231,55]
+            - cell "Nenhum" [ref=e231] [box=715,1457,95,55]
+            - cell "offline" [ref=e232] [box=810,1457,84,55]
+          - row "Selecionar INF89 INF89 10.20.50.254 Nenhum offline" [ref=e233] [box=272,1512,622,55]:
+            - cell "Selecionar INF89" [ref=e234] [box=272,1512,56,55]:
+              - checkbox "Selecionar INF89" [ref=e235] [cursor=pointer] [box=292,1530,16,16]
+            - cell "INF89" [ref=e236] [box=328,1512,156,55]:
+              - strong [ref=e237] [box=348,1531,36,17]: INF89
+            - cell "10.20.50.254" [ref=e238] [box=484,1512,231,55]
+            - cell "Nenhum" [ref=e239] [box=715,1512,95,55]
+            - cell "offline" [ref=e240] [box=810,1512,84,55]
+          - row "Selecionar INF31 INF31 10.20.50.43 Nenhum offline" [ref=e241] [box=272,1567,622,55]:
+            - cell "Selecionar INF31" [ref=e242] [box=272,1567,56,55]:
+              - checkbox "Selecionar INF31" [ref=e243] [cursor=pointer] [box=292,1585,16,16]
+            - cell "INF31" [ref=e244] [box=328,1567,156,55]:
+              - strong [ref=e245] [box=348,1586,36,17]: INF31
+            - cell "10.20.50.43" [ref=e246] [box=484,1567,231,55]
+            - cell "Nenhum" [ref=e247] [box=715,1567,95,55]
+            - cell "offline" [ref=e248] [box=810,1567,84,55]
+          - row "Selecionar INF26 INF26 10.20.64.215 Nenhum offline" [ref=e249] [box=272,1622,622,55]:
+            - cell "Selecionar INF26" [ref=e250] [box=272,1622,56,55]:
+              - checkbox "Selecionar INF26" [ref=e251] [cursor=pointer] [box=292,1640,16,16]
+            - cell "INF26" [ref=e252] [box=328,1622,156,55]:
+              - strong [ref=e253] [box=348,1641,36,17]: INF26
+            - cell "10.20.64.215" [ref=e254] [box=484,1622,231,55]
+            - cell "Nenhum" [ref=e255] [box=715,1622,95,55]
+            - cell "offline" [ref=e256] [box=810,1622,84,55]
+          - row "Selecionar INF50 INF50 10.20.51.120 Nenhum offline" [ref=e257] [box=272,1677,622,55]:
+            - cell "Selecionar INF50" [ref=e258] [box=272,1677,56,55]:
+              - checkbox "Selecionar INF50" [ref=e259] [cursor=pointer] [box=292,1695,16,16]
+            - cell "INF50" [ref=e260] [box=328,1677,156,55]:
+              - strong [ref=e261] [box=348,1696,36,17]: INF50
+            - cell "10.20.51.120" [ref=e262] [box=484,1677,231,55]
+            - cell "Nenhum" [ref=e263] [box=715,1677,95,55]
+            - cell "offline" [ref=e264] [box=810,1677,84,55]
+          - row "Selecionar INF-52 INF-52 10.20.50.193 Nenhum offline" [ref=e265] [box=272,1732,622,55]:
+            - cell "Selecionar INF-52" [ref=e266] [box=272,1732,56,55]:
+              - checkbox "Selecionar INF-52" [ref=e267] [cursor=pointer] [box=292,1750,16,16]
+            - cell "INF-52" [ref=e268] [box=328,1732,156,55]:
+              - strong [ref=e269] [box=348,1751,41,17]: INF-52
+            - cell "10.20.50.193" [ref=e270] [box=484,1732,231,55]
+            - cell "Nenhum" [ref=e271] [box=715,1732,95,55]
+            - cell "offline" [ref=e272] [box=810,1732,84,55]
+          - row "Selecionar INF77 INF77 10.20.50.42 Nenhum offline" [ref=e273] [box=272,1787,622,55]:
+            - cell "Selecionar INF77" [ref=e274] [box=272,1787,56,55]:
+              - checkbox "Selecionar INF77" [ref=e275] [cursor=pointer] [box=292,1805,16,16]
+            - cell "INF77" [ref=e276] [box=328,1787,156,55]:
+              - strong [ref=e277] [box=348,1806,36,17]: INF77
+            - cell "10.20.50.42" [ref=e278] [box=484,1787,231,55]
+            - cell "Nenhum" [ref=e279] [box=715,1787,95,55]
+            - cell "offline" [ref=e280] [box=810,1787,84,55]
+          - row "Selecionar INF72 INF72 INF72.gob.local Nenhum offline" [ref=e281] [box=272,1842,622,55]:
+            - cell "Selecionar INF72" [ref=e282] [box=272,1842,56,55]:
+              - checkbox "Selecionar INF72" [ref=e283] [cursor=pointer] [box=292,1860,16,16]
+            - cell "INF72" [ref=e284] [box=328,1842,156,55]:
+              - strong [ref=e285] [box=348,1861,36,17]: INF72
+            - cell "INF72.gob.local" [ref=e286] [box=484,1842,231,55]
+            - cell "Nenhum" [ref=e287] [box=715,1842,95,55]
+            - cell "offline" [ref=e288] [box=810,1842,84,55]
+          - row "Selecionar PMW-SRV-BKP01 PMW-SRV-BKP01 10.20.1.14 Nenhum online" [ref=e289] [box=272,1897,622,55]:
+            - cell "Selecionar PMW-SRV-BKP01" [ref=e290] [box=272,1897,56,55]:
+              - checkbox "Selecionar PMW-SRV-BKP01" [ref=e291] [cursor=pointer] [box=292,1915,16,16]
+            - cell "PMW-SRV-BKP01" [ref=e292] [box=328,1897,156,55]:
+              - strong [ref=e293] [box=348,1916,108,17]: PMW-SRV-BKP01
+            - cell "10.20.1.14" [ref=e294] [box=484,1897,231,55]
+            - cell "Nenhum" [ref=e295] [box=715,1897,95,55]
+            - cell "online" [ref=e296] [box=810,1897,84,55]
+          - row "Selecionar GOB GOB gob.gob.local Nenhum offline" [ref=e297] [box=272,1952,622,55]:
+            - cell "Selecionar GOB" [ref=e298] [box=272,1952,56,55]:
+              - checkbox "Selecionar GOB" [ref=e299] [cursor=pointer] [box=292,1970,16,16]
+            - cell "GOB" [ref=e300] [box=328,1952,156,55]:
+              - strong [ref=e301] [box=348,1971,27,17]: GOB
+            - cell "gob.gob.local" [ref=e302] [box=484,1952,231,55]
+            - cell "Nenhum" [ref=e303] [box=715,1952,95,55]
+            - cell "offline" [ref=e304] [box=810,1952,84,55]
+          - row "Selecionar VMW-SRV-DBMSP01 VMW-SRV-DBMSP01 10.20.1.6 Nenhum online" [ref=e305] [box=272,2007,622,55]:
+            - cell "Selecionar VMW-SRV-DBMSP01" [ref=e306] [box=272,2007,56,55]:
+              - checkbox "Selecionar VMW-SRV-DBMSP01" [ref=e307] [cursor=pointer] [box=292,2025,16,16]
+            - cell "VMW-SRV-DBMSP01" [ref=e308] [box=328,2007,156,55]:
+              - strong [ref=e309] [box=348,2017,69,34]: VMW-SRV-DBMSP01
+            - cell "10.20.1.6" [ref=e310] [box=484,2007,231,55]
+            - cell "Nenhum" [ref=e311] [box=715,2007,95,55]
+            - cell "online" [ref=e312] [box=810,2007,84,55]
+          - row "Selecionar VMW-SRV-DBMSH01 VMW-SRV-DBMSH01 vmw-srv-dbmsh01.gob.local Nenhum offline" [ref=e313] [box=272,2062,622,55]:
+            - cell "Selecionar VMW-SRV-DBMSH01" [ref=e314] [box=272,2062,56,55]:
+              - checkbox "Selecionar VMW-SRV-DBMSH01" [ref=e315] [cursor=pointer] [box=292,2080,16,16]
+            - cell "VMW-SRV-DBMSH01" [ref=e316] [box=328,2062,156,55]:
+              - strong [ref=e317] [box=348,2072,69,34]: VMW-SRV-DBMSH01
+            - cell "vmw-srv-dbmsh01.gob.local" [ref=e318] [box=484,2062,231,55]
+            - cell "Nenhum" [ref=e319] [box=715,2062,95,55]
+            - cell "offline" [ref=e320] [box=810,2062,84,55]
+          - row "Selecionar VMW-SRV-PROJUD VMW-SRV-PROJUD 10.20.1.58 Nenhum offline" [ref=e321] [box=272,2117,622,55]:
+            - cell "Selecionar VMW-SRV-PROJUD" [ref=e322] [box=272,2117,56,55]:
+              - checkbox "Selecionar VMW-SRV-PROJUD" [ref=e323] [cursor=pointer] [box=292,2135,16,16]
+            - cell "VMW-SRV-PROJUD" [ref=e324] [box=328,2117,156,55]:
+              - strong [ref=e325] [box=348,2127,69,34]: VMW-SRV-PROJUD
+            - cell "10.20.1.58" [ref=e326] [box=484,2117,231,55]
+            - cell "Nenhum" [ref=e327] [box=715,2117,95,55]
+            - cell "offline" [ref=e328] [box=810,2117,84,55]
+          - row "Selecionar GOB-01 GOB-01 10.20.50.113 Nenhum offline" [ref=e329] [box=272,2172,622,55]:
+            - cell "Selecionar GOB-01" [ref=e330] [box=272,2172,56,55]:
+              - checkbox "Selecionar GOB-01" [ref=e331] [cursor=pointer] [box=292,2190,16,16]
+            - cell "GOB-01" [ref=e332] [box=328,2172,156,55]:
+              - strong [ref=e333] [box=348,2191,48,17]: GOB-01
+            - cell "10.20.50.113" [ref=e334] [box=484,2172,231,55]
+            - cell "Nenhum" [ref=e335] [box=715,2172,95,55]
+            - cell "offline" [ref=e336] [box=810,2172,84,55]
+          - row "Selecionar INF82 INF82 INF82.gob.local Nenhum offline" [ref=e337] [box=272,2227,622,55]:
+            - cell "Selecionar INF82" [ref=e338] [box=272,2227,56,55]:
+              - checkbox "Selecionar INF82" [ref=e339] [cursor=pointer] [box=292,2245,16,16]
+            - cell "INF82" [ref=e340] [box=328,2227,156,55]:
+              - strong [ref=e341] [box=348,2246,36,17]: INF82
+            - cell "INF82.gob.local" [ref=e342] [box=484,2227,231,55]
+            - cell "Nenhum" [ref=e343] [box=715,2227,95,55]
+            - cell "offline" [ref=e344] [box=810,2227,84,55]
+          - row "Selecionar PMW-HOST-H01 PMW-HOST-H01 10.20.0.13 Nenhum offline" [ref=e345] [box=272,2282,622,55]:
+            - cell "Selecionar PMW-HOST-H01" [ref=e346] [box=272,2282,56,55]:
+              - checkbox "Selecionar PMW-HOST-H01" [ref=e347] [cursor=pointer] [box=292,2300,16,16]
+            - cell "PMW-HOST-H01" [ref=e348] [box=328,2282,156,55]:
+              - strong [ref=e349] [box=348,2301,104,17]: PMW-HOST-H01
+            - cell "10.20.0.13" [ref=e350] [box=484,2282,231,55]
+            - cell "Nenhum" [ref=e351] [box=715,2282,95,55]
+            - cell "offline" [ref=e352] [box=810,2282,84,55]
+          - row "Selecionar INF85 INF85 10.20.50.64 Nenhum online" [ref=e353] [box=272,2337,622,55]:
+            - cell "Selecionar INF85" [ref=e354] [box=272,2337,56,55]:
+              - checkbox "Selecionar INF85" [ref=e355] [cursor=pointer] [box=292,2355,16,16]
+            - cell "INF85" [ref=e356] [box=328,2337,156,55]:
+              - strong [ref=e357] [box=348,2356,36,17]: INF85
+            - cell "10.20.50.64" [ref=e358] [box=484,2337,231,55]
+            - cell "Nenhum" [ref=e359] [box=715,2337,95,55]
+            - cell "online" [ref=e360] [box=810,2337,84,55]
+          - row "Selecionar INF83 INF83 10.20.2.87 Nenhum offline" [ref=e361] [box=272,2392,622,55]:
+            - cell "Selecionar INF83" [ref=e362] [box=272,2392,56,55]:
+              - checkbox "Selecionar INF83" [ref=e363] [cursor=pointer] [box=292,2410,16,16]
+            - cell "INF83" [ref=e364] [box=328,2392,156,55]:
+              - strong [ref=e365] [box=348,2411,36,17]: INF83
+            - cell "10.20.2.87" [ref=e366] [box=484,2392,231,55]
+            - cell "Nenhum" [ref=e367] [box=715,2392,95,55]
+            - cell "offline" [ref=e368] [box=810,2392,84,55]
+          - row "Selecionar INF78 INF78 10.20.2.81 Nenhum offline" [ref=e369] [box=272,2447,622,55]:
+            - cell "Selecionar INF78" [ref=e370] [box=272,2447,56,55]:
+              - checkbox "Selecionar INF78" [ref=e371] [cursor=pointer] [box=292,2465,16,16]
+            - cell "INF78" [ref=e372] [box=328,2447,156,55]:
+              - strong [ref=e373] [box=348,2466,36,17]: INF78
+            - cell "10.20.2.81" [ref=e374] [box=484,2447,231,55]
+            - cell "Nenhum" [ref=e375] [box=715,2447,95,55]
+            - cell "offline" [ref=e376] [box=810,2447,84,55]
+          - row "Selecionar PMW-HOST-H02 PMW-HOST-H02 10.20.0.14 Nenhum offline" [ref=e377] [box=272,2502,622,55]:
+            - cell "Selecionar PMW-HOST-H02" [ref=e378] [box=272,2502,56,55]:
+              - checkbox "Selecionar PMW-HOST-H02" [ref=e379] [cursor=pointer] [box=292,2520,16,16]
+            - cell "PMW-HOST-H02" [ref=e380] [box=328,2502,156,55]:
+              - strong [ref=e381] [box=348,2521,104,17]: PMW-HOST-H02
+            - cell "10.20.0.14" [ref=e382] [box=484,2502,231,55]
+            - cell "Nenhum" [ref=e383] [box=715,2502,95,55]
+            - cell "offline" [ref=e384] [box=810,2502,84,55]
+          - row "Selecionar INF23 INF23 10.20.150.189 Nenhum offline" [ref=e385] [box=272,2557,622,55]:
+            - cell "Selecionar INF23" [ref=e386] [box=272,2557,56,55]:
+              - checkbox "Selecionar INF23" [ref=e387] [cursor=pointer] [box=292,2575,16,16]
+            - cell "INF23" [ref=e388] [box=328,2557,156,55]:
+              - strong [ref=e389] [box=348,2576,36,17]: INF23
+            - cell "10.20.150.189" [ref=e390] [box=484,2557,231,55]
+            - cell "Nenhum" [ref=e391] [box=715,2557,95,55]
+            - cell "offline" [ref=e392] [box=810,2557,84,55]
+          - row "Selecionar INF27 INF27 10.20.50.112 Nenhum online" [ref=e393] [box=272,2612,622,55]:
+            - cell "Selecionar INF27" [ref=e394] [box=272,2612,56,55]:
+              - checkbox "Selecionar INF27" [ref=e395] [cursor=pointer] [box=292,2630,16,16]
+            - cell "INF27" [ref=e396] [box=328,2612,156,55]:
+              - strong [ref=e397] [box=348,2631,36,17]: INF27
+            - cell "10.20.50.112" [ref=e398] [box=484,2612,231,55]
+            - cell "Nenhum" [ref=e399] [box=715,2612,95,55]
+            - cell "online" [ref=e400] [box=810,2612,84,55]
+          - row "Selecionar INF33 INF33 10.20.2.33 Nenhum offline" [ref=e401] [box=272,2667,622,55]:
+            - cell "Selecionar INF33" [ref=e402] [box=272,2667,56,55]:
+              - checkbox "Selecionar INF33" [ref=e403] [cursor=pointer] [box=292,2685,16,16]
+            - cell "INF33" [ref=e404] [box=328,2667,156,55]:
+              - strong [ref=e405] [box=348,2686,36,17]: INF33
+            - cell "10.20.2.33" [ref=e406] [box=484,2667,231,55]
+            - cell "Nenhum" [ref=e407] [box=715,2667,95,55]
+            - cell "offline" [ref=e408] [box=810,2667,84,55]
+          - row "Selecionar INF11 INF11 10.20.2.11 Nenhum offline" [ref=e409] [box=272,2722,622,55]:
+            - cell "Selecionar INF11" [ref=e410] [box=272,2722,56,55]:
+              - checkbox "Selecionar INF11" [ref=e411] [cursor=pointer] [box=292,2740,16,16]
+            - cell "INF11" [ref=e412] [box=328,2722,156,55]:
+              - strong [ref=e413] [box=348,2741,36,17]: INF11
+            - cell "10.20.2.11" [ref=e414] [box=484,2722,231,55]
+            - cell "Nenhum" [ref=e415] [box=715,2722,95,55]
+            - cell "offline" [ref=e416] [box=810,2722,84,55]
+          - row "Selecionar VMWS-NEWGOB-P01 VMWS-NEWGOB-P01 10.20.1.22 Nenhum online" [ref=e417] [box=272,2777,622,55]:
+            - cell "Selecionar VMWS-NEWGOB-P01" [ref=e418] [box=272,2777,56,55]:
+              - checkbox "Selecionar VMWS-NEWGOB-P01" [ref=e419] [cursor=pointer] [box=292,2795,16,16]
+            - cell "VMWS-NEWGOB-P01" [ref=e420] [box=328,2777,156,55]:
+              - strong [ref=e421] [box=348,2787,110,34]: VMWS-NEWGOB-P01
+            - cell "10.20.1.22" [ref=e422] [box=484,2777,231,55]
+            - cell "Nenhum" [ref=e423] [box=715,2777,95,55]
+            - cell "online" [ref=e424] [box=810,2777,84,55]
+          - row "Selecionar PMW-HOST-H03 PMW-HOST-H03 PMW-HOST-H03.gob.local Nenhum offline" [ref=e425] [box=272,2832,622,55]:
+            - cell "Selecionar PMW-HOST-H03" [ref=e426] [box=272,2832,56,55]:
+              - checkbox "Selecionar PMW-HOST-H03" [ref=e427] [cursor=pointer] [box=292,2850,16,16]
+            - cell "PMW-HOST-H03" [ref=e428] [box=328,2832,156,55]:
+              - strong [ref=e429] [box=348,2851,104,17]: PMW-HOST-H03
+            - cell "PMW-HOST-H03.gob.local" [ref=e430] [box=484,2832,231,55]
+            - cell "Nenhum" [ref=e431] [box=715,2832,95,55]
+            - cell "offline" [ref=e432] [box=810,2832,84,55]
+          - row "Selecionar VMWS-NEWGOB-D01 VMWS-NEWGOB-D01 10.20.1.74 Nenhum offline" [ref=e433] [box=272,2887,622,55]:
+            - cell "Selecionar VMWS-NEWGOB-D01" [ref=e434] [box=272,2887,56,55]:
+              - checkbox "Selecionar VMWS-NEWGOB-D01" [ref=e435] [cursor=pointer] [box=292,2905,16,16]
+            - cell "VMWS-NEWGOB-D01" [ref=e436] [box=328,2887,156,55]:
+              - strong [ref=e437] [box=348,2897,110,34]: VMWS-NEWGOB-D01
+            - cell "10.20.1.74" [ref=e438] [box=484,2887,231,55]
+            - cell "Nenhum" [ref=e439] [box=715,2887,95,55]
+            - cell "offline" [ref=e440] [box=810,2887,84,55]
+          - row "Selecionar VMWS-NEWGOB-H01 VMWS-NEWGOB-H01 10.20.1.84 Nenhum offline" [ref=e441] [box=272,2942,622,55]:
+            - cell "Selecionar VMWS-NEWGOB-H01" [ref=e442] [box=272,2942,56,55]:
+              - checkbox "Selecionar VMWS-NEWGOB-H01" [ref=e443] [cursor=pointer] [box=292,2960,16,16]
+            - cell "VMWS-NEWGOB-H01" [ref=e444] [box=328,2942,156,55]:
+              - strong [ref=e445] [box=348,2952,110,34]: VMWS-NEWGOB-H01
+            - cell "10.20.1.84" [ref=e446] [box=484,2942,231,55]
+            - cell "Nenhum" [ref=e447] [box=715,2942,95,55]
+            - cell "offline" [ref=e448] [box=810,2942,84,55]
+          - row "Selecionar INF74 INF74 INF74.gob.local Nenhum offline" [ref=e449] [box=272,2997,622,55]:
+            - cell "Selecionar INF74" [ref=e450] [box=272,2997,56,55]:
+              - checkbox "Selecionar INF74" [ref=e451] [cursor=pointer] [box=292,3015,16,16]
+            - cell "INF74" [ref=e452] [box=328,2997,156,55]:
+              - strong [ref=e453] [box=348,3016,36,17]: INF74
+            - cell "INF74.gob.local" [ref=e454] [box=484,2997,231,55]
+            - cell "Nenhum" [ref=e455] [box=715,2997,95,55]
+            - cell "offline" [ref=e456] [box=810,2997,84,55]
+          - row "Selecionar INF39 INF39 10.20.50.142 Nenhum offline" [ref=e457] [box=272,3052,622,55]:
+            - cell "Selecionar INF39" [ref=e458] [box=272,3052,56,55]:
+              - checkbox "Selecionar INF39" [ref=e459] [cursor=pointer] [box=292,3070,16,16]
+            - cell "INF39" [ref=e460] [box=328,3052,156,55]:
+              - strong [ref=e461] [box=348,3071,36,17]: INF39
+            - cell "10.20.50.142" [ref=e462] [box=484,3052,231,55]
+            - cell "Nenhum" [ref=e463] [box=715,3052,95,55]
+            - cell "offline" [ref=e464] [box=810,3052,84,55]
+          - row "Selecionar INF61 INF61 10.20.2.61 Nenhum offline" [ref=e465] [box=272,3107,622,55]:
+            - cell "Selecionar INF61" [ref=e466] [box=272,3107,56,55]:
+              - checkbox "Selecionar INF61" [ref=e467] [cursor=pointer] [box=292,3125,16,16]
+            - cell "INF61" [ref=e468] [box=328,3107,156,55]:
+              - strong [ref=e469] [box=348,3126,36,17]: INF61
+            - cell "10.20.2.61" [ref=e470] [box=484,3107,231,55]
+            - cell "Nenhum" [ref=e471] [box=715,3107,95,55]
+            - cell "offline" [ref=e472] [box=810,3107,84,55]
+          - row "Selecionar VMWS-DBMSD01 VMWS-DBMSD01 10.20.1.70 Nenhum offline" [ref=e473] [box=272,3162,622,55]:
+            - cell "Selecionar VMWS-DBMSD01" [ref=e474] [box=272,3162,56,55]:
+              - checkbox "Selecionar VMWS-DBMSD01" [ref=e475] [cursor=pointer] [box=292,3180,16,16]
+            - cell "VMWS-DBMSD01" [ref=e476] [box=328,3162,156,55]:
+              - strong [ref=e477] [box=348,3181,109,17]: VMWS-DBMSD01
+            - cell "10.20.1.70" [ref=e478] [box=484,3162,231,55]
+            - cell "Nenhum" [ref=e479] [box=715,3162,95,55]
+            - cell "offline" [ref=e480] [box=810,3162,84,55]
+          - row "Selecionar VMWS-DBMSH01 VMWS-DBMSH01 10.20.1.80 Nenhum online" [ref=e481] [box=272,3217,622,55]:
+            - cell "Selecionar VMWS-DBMSH01" [ref=e482] [box=272,3217,56,55]:
+              - checkbox "Selecionar VMWS-DBMSH01" [ref=e483] [cursor=pointer] [box=292,3235,16,16]
+            - cell "VMWS-DBMSH01" [ref=e484] [box=328,3217,156,55]:
+              - strong [ref=e485] [box=348,3236,109,17]: VMWS-DBMSH01
+            - cell "10.20.1.80" [ref=e486] [box=484,3217,231,55]
+            - cell "Nenhum" [ref=e487] [box=715,3217,95,55]
+            - cell "online" [ref=e488] [box=810,3217,84,55]
+          - row "Selecionar INF200 INF200 INF200.gob.local Nenhum offline" [ref=e489] [box=272,3272,622,55]:
+            - cell "Selecionar INF200" [ref=e490] [box=272,3272,56,55]:
+              - checkbox "Selecionar INF200" [ref=e491] [cursor=pointer] [box=292,3290,16,16]
+            - cell "INF200" [ref=e492] [box=328,3272,156,55]:
+              - strong [ref=e493] [box=348,3291,44,17]: INF200
+            - cell "INF200.gob.local" [ref=e494] [box=484,3272,231,55]
+            - cell "Nenhum" [ref=e495] [box=715,3272,95,55]
+            - cell "offline" [ref=e496] [box=810,3272,84,55]
+          - row "Selecionar INF88 INF88 10.20.55.117 Nenhum offline" [ref=e497] [box=272,3327,622,55]:
+            - cell "Selecionar INF88" [ref=e498] [box=272,3327,56,55]:
+              - checkbox "Selecionar INF88" [ref=e499] [cursor=pointer] [box=292,3345,16,16]
+            - cell "INF88" [ref=e500] [box=328,3327,156,55]:
+              - strong [ref=e501] [box=348,3346,36,17]: INF88
+            - cell "10.20.55.117" [ref=e502] [box=484,3327,231,55]
+            - cell "Nenhum" [ref=e503] [box=715,3327,95,55]
+            - cell "offline" [ref=e504] [box=810,3327,84,55]
+          - row "Selecionar INF47 INF47 10.20.150.180 Nenhum offline" [ref=e505] [box=272,3382,622,55]:
+            - cell "Selecionar INF47" [ref=e506] [box=272,3382,56,55]:
+              - checkbox "Selecionar INF47" [ref=e507] [cursor=pointer] [box=292,3400,16,16]
+            - cell "INF47" [ref=e508] [box=328,3382,156,55]:
+              - strong [ref=e509] [box=348,3401,36,17]: INF47
+            - cell "10.20.150.180" [ref=e510] [box=484,3382,231,55]
+            - cell "Nenhum" [ref=e511] [box=715,3382,95,55]
+            - cell "offline" [ref=e512] [box=810,3382,84,55]
+          - row "Selecionar INF03 INF03 10.20.50.119 Nenhum offline" [ref=e513] [box=272,3437,622,55]:
+            - cell "Selecionar INF03" [ref=e514] [box=272,3437,56,55]:
+              - checkbox "Selecionar INF03" [ref=e515] [cursor=pointer] [box=292,3455,16,16]
+            - cell "INF03" [ref=e516] [box=328,3437,156,55]:
+              - strong [ref=e517] [box=348,3456,36,17]: INF03
+            - cell "10.20.50.119" [ref=e518] [box=484,3437,231,55]
+            - cell "Nenhum" [ref=e519] [box=715,3437,95,55]
+            - cell "offline" [ref=e520] [box=810,3437,84,55]
+          - row "Selecionar INF87 INF87 10.20.150.193 Nenhum offline" [ref=e521] [box=272,3492,622,55]:
+            - cell "Selecionar INF87" [ref=e522] [box=272,3492,56,55]:
+              - checkbox "Selecionar INF87" [ref=e523] [cursor=pointer] [box=292,3510,16,16]
+            - cell "INF87" [ref=e524] [box=328,3492,156,55]:
+              - strong [ref=e525] [box=348,3511,36,17]: INF87
+            - cell "10.20.150.193" [ref=e526] [box=484,3492,231,55]
+            - cell "Nenhum" [ref=e527] [box=715,3492,95,55]
+            - cell "offline" [ref=e528] [box=810,3492,84,55]
+          - row "Selecionar INF32 INF32 10.20.2.32 Nenhum offline" [ref=e529] [box=272,3547,622,55]:
+            - cell "Selecionar INF32" [ref=e530] [box=272,3547,56,55]:
+              - checkbox "Selecionar INF32" [ref=e531] [cursor=pointer] [box=292,3565,16,16]
+            - cell "INF32" [ref=e532] [box=328,3547,156,55]:
+              - strong [ref=e533] [box=348,3566,36,17]: INF32
+            - cell "10.20.2.32" [ref=e534] [box=484,3547,231,55]
+            - cell "Nenhum" [ref=e535] [box=715,3547,95,55]
+            - cell "offline" [ref=e536] [box=810,3547,84,55]
+          - row "Selecionar INF29 INF29 10.20.2.29 Nenhum offline" [ref=e537] [box=272,3602,622,55]:
+            - cell "Selecionar INF29" [ref=e538] [box=272,3602,56,55]:
+              - checkbox "Selecionar INF29" [ref=e539] [cursor=pointer] [box=292,3620,16,16]
+            - cell "INF29" [ref=e540] [box=328,3602,156,55]:
+              - strong [ref=e541] [box=348,3621,36,17]: INF29
+            - cell "10.20.2.29" [ref=e542] [box=484,3602,231,55]
+            - cell "Nenhum" [ref=e543] [box=715,3602,95,55]
+            - cell "offline" [ref=e544] [box=810,3602,84,55]
+          - row "Selecionar INF07 INF07 10.20.2.7 Nenhum online" [ref=e545] [box=272,3657,622,55]:
+            - cell "Selecionar INF07" [ref=e546] [box=272,3657,56,55]:
+              - checkbox "Selecionar INF07" [ref=e547] [cursor=pointer] [box=292,3675,16,16]
+            - cell "INF07" [ref=e548] [box=328,3657,156,55]:
+              - strong [ref=e549] [box=348,3676,36,17]: INF07
+            - cell "10.20.2.7" [ref=e550] [box=484,3657,231,55]
+            - cell "Nenhum" [ref=e551] [box=715,3657,95,55]
+            - cell "online" [ref=e552] [box=810,3657,84,55]
+          - row "Selecionar INF06 INF06 10.20.50.131 Nenhum offline" [ref=e553] [box=272,3712,622,55]:
+            - cell "Selecionar INF06" [ref=e554] [box=272,3712,56,55]:
+              - checkbox "Selecionar INF06" [ref=e555] [cursor=pointer] [box=292,3730,16,16]
+            - cell "INF06" [ref=e556] [box=328,3712,156,55]:
+              - strong [ref=e557] [box=348,3731,36,17]: INF06
+            - cell "10.20.50.131" [ref=e558] [box=484,3712,231,55]
+            - cell "Nenhum" [ref=e559] [box=715,3712,95,55]
+            - cell "offline" [ref=e560] [box=810,3712,84,55]
+          - row "Selecionar INF51 INF51 INF51.gob.local Nenhum offline" [ref=e561] [box=272,3767,622,55]:
+            - cell "Selecionar INF51" [ref=e562] [box=272,3767,56,55]:
+              - checkbox "Selecionar INF51" [ref=e563] [cursor=pointer] [box=292,3785,16,16]
+            - cell "INF51" [ref=e564] [box=328,3767,156,55]:
+              - strong [ref=e565] [box=348,3786,36,17]: INF51
+            - cell "INF51.gob.local" [ref=e566] [box=484,3767,231,55]
+            - cell "Nenhum" [ref=e567] [box=715,3767,95,55]
+            - cell "offline" [ref=e568] [box=810,3767,84,55]
+          - row "Selecionar DESKTOP-9RGMUEF DESKTOP-9RGMUEF 10.20.50.62 Nenhum online" [ref=e569] [box=272,3822,622,55]:
+            - cell "Selecionar DESKTOP-9RGMUEF" [ref=e570] [box=272,3822,56,55]:
+              - checkbox "Selecionar DESKTOP-9RGMUEF" [ref=e571] [cursor=pointer] [box=292,3840,16,16]
+            - cell "DESKTOP-9RGMUEF" [ref=e572] [box=328,3822,156,55]:
+              - strong [ref=e573] [box=348,3832,63,34]: DESKTOP-9RGMUEF
+            - cell "10.20.50.62" [ref=e574] [box=484,3822,231,55]
+            - cell "Nenhum" [ref=e575] [box=715,3822,95,55]
+            - cell "online" [ref=e576] [box=810,3822,84,55]
+          - row "Selecionar INF63 INF63 10.20.2.63 Nenhum offline" [ref=e577] [box=272,3877,622,55]:
+            - cell "Selecionar INF63" [ref=e578] [box=272,3877,56,55]:
+              - checkbox "Selecionar INF63" [ref=e579] [cursor=pointer] [box=292,3895,16,16]
+            - cell "INF63" [ref=e580] [box=328,3877,156,55]:
+              - strong [ref=e581] [box=348,3896,36,17]: INF63
+            - cell "10.20.2.63" [ref=e582] [box=484,3877,231,55]
+            - cell "Nenhum" [ref=e583] [box=715,3877,95,55]
+            - cell "offline" [ref=e584] [box=810,3877,84,55]
+          - row "Selecionar RITUALISTICA RITUALISTICA 10.20.30.173 Nenhum online" [ref=e585] [box=272,3932,622,55]:
+            - cell "Selecionar RITUALISTICA" [ref=e586] [box=272,3932,56,55]:
+              - checkbox "Selecionar RITUALISTICA" [ref=e587] [cursor=pointer] [box=292,3950,16,16]
+            - cell "RITUALISTICA" [ref=e588] [box=328,3932,156,55]:
+              - strong [ref=e589] [box=348,3951,86,17]: RITUALISTICA
+            - cell "10.20.30.173" [ref=e590] [box=484,3932,231,55]
+            - cell "Nenhum" [ref=e591] [box=715,3932,95,55]
+            - cell "online" [ref=e592] [box=810,3932,84,55]
+          - row "Selecionar DESKTOP-H4D98MU DESKTOP-H4D98MU DESKTOP-H4D98MU.gob.local Nenhum offline" [ref=e593] [box=272,3987,622,55]:
+            - cell "Selecionar DESKTOP-H4D98MU" [ref=e594] [box=272,3987,56,55]:
+              - checkbox "Selecionar DESKTOP-H4D98MU" [ref=e595] [cursor=pointer] [box=292,4005,16,16]
+            - cell "DESKTOP-H4D98MU" [ref=e596] [box=328,3987,156,55]:
+              - strong [ref=e597] [box=348,3997,64,34]: DESKTOP-H4D98MU
+            - cell "DESKTOP-H4D98MU.gob.local" [ref=e598] [box=484,3987,231,55]
+            - cell "Nenhum" [ref=e599] [box=715,3987,95,55]
+            - cell "offline" [ref=e600] [box=810,3987,84,55]
+          - row "Selecionar MANUTENCAO MANUTENCAO 10.20.50.30 Nenhum offline" [ref=e601] [box=272,4042,622,55]:
+            - cell "Selecionar MANUTENCAO" [ref=e602] [box=272,4042,56,55]:
+              - checkbox "Selecionar MANUTENCAO" [ref=e603] [cursor=pointer] [box=292,4060,16,16]
+            - cell "MANUTENCAO" [ref=e604] [box=328,4042,156,55]:
+              - strong [ref=e605] [box=348,4061,93,17]: MANUTENCAO
+            - cell "10.20.50.30" [ref=e606] [box=484,4042,231,55]
+            - cell "Nenhum" [ref=e607] [box=715,4042,95,55]
+            - cell "offline" [ref=e608] [box=810,4042,84,55]
+          - row "Selecionar INF18 INF18 10.20.150.156 Nenhum offline" [ref=e609] [box=272,4097,622,55]:
+            - cell "Selecionar INF18" [ref=e610] [box=272,4097,56,55]:
+              - checkbox "Selecionar INF18" [ref=e611] [cursor=pointer] [box=292,4115,16,16]
+            - cell "INF18" [ref=e612] [box=328,4097,156,55]:
+              - strong [ref=e613] [box=348,4116,36,17]: INF18
+            - cell "10.20.150.156" [ref=e614] [box=484,4097,231,55]
+            - cell "Nenhum" [ref=e615] [box=715,4097,95,55]
+            - cell "offline" [ref=e616] [box=810,4097,84,55]
+          - row "Selecionar INF INF 10.20.51.235 Nenhum offline" [ref=e617] [box=272,4152,622,55]:
+            - cell "Selecionar INF" [ref=e618] [box=272,4152,56,55]:
+              - checkbox "Selecionar INF" [ref=e619] [cursor=pointer] [box=292,4170,16,16]
+            - cell "INF" [ref=e620] [box=328,4152,156,55]:
+              - strong [ref=e621] [box=348,4171,21,17]: INF
+            - cell "10.20.51.235" [ref=e622] [box=484,4152,231,55]
+            - cell "Nenhum" [ref=e623] [box=715,4152,95,55]
+            - cell "offline" [ref=e624] [box=810,4152,84,55]
+          - row "Selecionar INF25 INF25 10.20.50.17 Nenhum online" [ref=e625] [box=272,4207,622,55]:
+            - cell "Selecionar INF25" [ref=e626] [box=272,4207,56,55]:
+              - checkbox "Selecionar INF25" [ref=e627] [cursor=pointer] [box=292,4225,16,16]
+            - cell "INF25" [ref=e628] [box=328,4207,156,55]:
+              - strong [ref=e629] [box=348,4226,36,17]: INF25
+            - cell "10.20.50.17" [ref=e630] [box=484,4207,231,55]
+            - cell "Nenhum" [ref=e631] [box=715,4207,95,55]
+            - cell "online" [ref=e632] [box=810,4207,84,55]
+          - row "Selecionar INF80 INF80 INF80.gob.local Nenhum offline" [ref=e633] [box=272,4262,622,55]:
+            - cell "Selecionar INF80" [ref=e634] [box=272,4262,56,55]:
+              - checkbox "Selecionar INF80" [ref=e635] [cursor=pointer] [box=292,4280,16,16]
+            - cell "INF80" [ref=e636] [box=328,4262,156,55]:
+              - strong [ref=e637] [box=348,4281,36,17]: INF80
+            - cell "INF80.gob.local" [ref=e638] [box=484,4262,231,55]
+            - cell "Nenhum" [ref=e639] [box=715,4262,95,55]
+            - cell "offline" [ref=e640] [box=810,4262,84,55]
+          - row "Selecionar GOB-HVH-P03 GOB-HVH-P03 10.20.0.12 Nenhum online" [ref=e641] [box=272,4317,622,55]:
+            - cell "Selecionar GOB-HVH-P03" [ref=e642] [box=272,4317,56,55]:
+              - checkbox "Selecionar GOB-HVH-P03" [ref=e643] [cursor=pointer] [box=292,4335,16,16]
+            - cell "GOB-HVH-P03" [ref=e644] [box=328,4317,156,55]:
+              - strong [ref=e645] [box=348,4336,89,17]: GOB-HVH-P03
+            - cell "10.20.0.12" [ref=e646] [box=484,4317,231,55]
+            - cell "Nenhum" [ref=e647] [box=715,4317,95,55]
+            - cell "online" [ref=e648] [box=810,4317,84,55]
+          - row "Selecionar INF15 INF15 10.20.50.13 Nenhum offline" [ref=e649] [box=272,4372,622,55]:
+            - cell "Selecionar INF15" [ref=e650] [box=272,4372,56,55]:
+              - checkbox "Selecionar INF15" [ref=e651] [cursor=pointer] [box=292,4390,16,16]
+            - cell "INF15" [ref=e652] [box=328,4372,156,55]:
+              - strong [ref=e653] [box=348,4391,36,17]: INF15
+            - cell "10.20.50.13" [ref=e654] [box=484,4372,231,55]
+            - cell "Nenhum" [ref=e655] [box=715,4372,95,55]
+            - cell "offline" [ref=e656] [box=810,4372,84,55]
+          - row "Selecionar INF14 INF14 10.20.2.14 Nenhum offline" [ref=e657] [box=272,4427,622,55]:
+            - cell "Selecionar INF14" [ref=e658] [box=272,4427,56,55]:
+              - checkbox "Selecionar INF14" [ref=e659] [cursor=pointer] [box=292,4445,16,16]
+            - cell "INF14" [ref=e660] [box=328,4427,156,55]:
+              - strong [ref=e661] [box=348,4446,36,17]: INF14
+            - cell "10.20.2.14" [ref=e662] [box=484,4427,231,55]
+            - cell "Nenhum" [ref=e663] [box=715,4427,95,55]
+            - cell "offline" [ref=e664] [box=810,4427,84,55]
+          - row "Selecionar INF49 INF49 10.20.50.81 Nenhum offline" [ref=e665] [box=272,4482,622,55]:
+            - cell "Selecionar INF49" [ref=e666] [box=272,4482,56,55]:
+              - checkbox "Selecionar INF49" [ref=e667] [cursor=pointer] [box=292,4500,16,16]
+            - cell "INF49" [ref=e668] [box=328,4482,156,55]:
+              - strong [ref=e669] [box=348,4501,36,17]: INF49
+            - cell "10.20.50.81" [ref=e670] [box=484,4482,231,55]
+            - cell "Nenhum" [ref=e671] [box=715,4482,95,55]
+            - cell "offline" [ref=e672] [box=810,4482,84,55]
+          - row "Selecionar INF01 INF01 10.20.50.79 Nenhum online" [ref=e673] [box=272,4537,622,55]:
+            - cell "Selecionar INF01" [ref=e674] [box=272,4537,56,55]:
+              - checkbox "Selecionar INF01" [ref=e675] [cursor=pointer] [box=292,4555,16,16]
+            - cell "INF01" [ref=e676] [box=328,4537,156,55]:
+              - strong [ref=e677] [box=348,4556,36,17]: INF01
+            - cell "10.20.50.79" [ref=e678] [box=484,4537,231,55]
+            - cell "Nenhum" [ref=e679] [box=715,4537,95,55]
+            - cell "online" [ref=e680] [box=810,4537,84,55]
+          - row "Selecionar GOB-HVH-H03 GOB-HVH-H03 10.20.0.16 Nenhum online" [ref=e681] [box=272,4592,622,55]:
+            - cell "Selecionar GOB-HVH-H03" [ref=e682] [box=272,4592,56,55]:
+              - checkbox "Selecionar GOB-HVH-H03" [ref=e683] [cursor=pointer] [box=292,4610,16,16]
+            - cell "GOB-HVH-H03" [ref=e684] [box=328,4592,156,55]:
+              - strong [ref=e685] [box=348,4611,91,17]: GOB-HVH-H03
+            - cell "10.20.0.16" [ref=e686] [box=484,4592,231,55]
+            - cell "Nenhum" [ref=e687] [box=715,4592,95,55]
+            - cell "online" [ref=e688] [box=810,4592,84,55]
+          - row "Selecionar GOB-HVH-P04 GOB-HVH-P04 10.20.0.15 Nenhum online" [ref=e689] [box=272,4647,622,55]:
+            - cell "Selecionar GOB-HVH-P04" [ref=e690] [box=272,4647,56,55]:
+              - checkbox "Selecionar GOB-HVH-P04" [ref=e691] [cursor=pointer] [box=292,4665,16,16]
+            - cell "GOB-HVH-P04" [ref=e692] [box=328,4647,156,55]:
+              - strong [ref=e693] [box=348,4666,89,17]: GOB-HVH-P04
+            - cell "10.20.0.15" [ref=e694] [box=484,4647,231,55]
+            - cell "Nenhum" [ref=e695] [box=715,4647,95,55]
+            - cell "online" [ref=e696] [box=810,4647,84,55]
+          - row "Selecionar GOB-HVH-P02 GOB-HVH-P02 10.20.0.11 Nenhum online" [ref=e697] [box=272,4702,622,55]:
+            - cell "Selecionar GOB-HVH-P02" [ref=e698] [box=272,4702,56,55]:
+              - checkbox "Selecionar GOB-HVH-P02" [ref=e699] [cursor=pointer] [box=292,4720,16,16]
+            - cell "GOB-HVH-P02" [ref=e700] [box=328,4702,156,55]:
+              - strong [ref=e701] [box=348,4721,89,17]: GOB-HVH-P02
+            - cell "10.20.0.11" [ref=e702] [box=484,4702,231,55]
+            - cell "Nenhum" [ref=e703] [box=715,4702,95,55]
+            - cell "online" [ref=e704] [box=810,4702,84,55]
+          - row "Selecionar ARQUIVOS ARQUIVOS arquivos.gob.local Nenhum offline" [ref=e705] [box=272,4757,622,55]:
+            - cell "Selecionar ARQUIVOS" [ref=e706] [box=272,4757,56,55]:
+              - checkbox "Selecionar ARQUIVOS" [ref=e707] [cursor=pointer] [box=292,4775,16,16]
+            - cell "ARQUIVOS" [ref=e708] [box=328,4757,156,55]:
+              - strong [ref=e709] [box=348,4776,67,17]: ARQUIVOS
+            - cell "arquivos.gob.local" [ref=e710] [box=484,4757,231,55]
+            - cell "Nenhum" [ref=e711] [box=715,4757,95,55]
+            - cell "offline" [ref=e712] [box=810,4757,84,55]
+          - row "Selecionar GOB-HVH-P01 GOB-HVH-P01 10.20.0.10 Nenhum online" [ref=e713] [box=272,4812,622,55]:
+            - cell "Selecionar GOB-HVH-P01" [ref=e714] [box=272,4812,56,55]:
+              - checkbox "Selecionar GOB-HVH-P01" [ref=e715] [cursor=pointer] [box=292,4830,16,16]
+            - cell "GOB-HVH-P01" [ref=e716] [box=328,4812,156,55]:
+              - strong [ref=e717] [box=348,4831,89,17]: GOB-HVH-P01
+            - cell "10.20.0.10" [ref=e718] [box=484,4812,231,55]
+            - cell "Nenhum" [ref=e719] [box=715,4812,95,55]
+            - cell "online" [ref=e720] [box=810,4812,84,55]
+          - row "Selecionar INF17 INF17 10.20.2.17 Nenhum offline" [ref=e721] [box=272,4867,622,55]:
+            - cell "Selecionar INF17" [ref=e722] [box=272,4867,56,55]:
+              - checkbox "Selecionar INF17" [ref=e723] [cursor=pointer] [box=292,4885,16,16]
+            - cell "INF17" [ref=e724] [box=328,4867,156,55]:
+              - strong [ref=e725] [box=348,4886,36,17]: INF17
+            - cell "10.20.2.17" [ref=e726] [box=484,4867,231,55]
+            - cell "Nenhum" [ref=e727] [box=715,4867,95,55]
+            - cell "offline" [ref=e728] [box=810,4867,84,55]
+          - row "Selecionar GOB-VL-ZIMBRA01 GOB-VL-ZIMBRA01 10.20.1.45 Nenhum offline" [ref=e729] [box=272,4922,622,55]:
+            - cell "Selecionar GOB-VL-ZIMBRA01" [ref=e730] [box=272,4922,56,55]:
+              - checkbox "Selecionar GOB-VL-ZIMBRA01" [ref=e731] [cursor=pointer] [box=292,4940,16,16]
+            - cell "GOB-VL-ZIMBRA01" [ref=e732] [box=328,4922,156,55]:
+              - strong [ref=e733] [box=348,4932,65,34]: GOB-VL-ZIMBRA01
+            - cell "10.20.1.45" [ref=e734] [box=484,4922,231,55]
+            - cell "Nenhum" [ref=e735] [box=715,4922,95,55]
+            - cell "offline" [ref=e736] [box=810,4922,84,55]
+          - row "Selecionar INF62 INF62 10.20.2.62 Nenhum offline" [ref=e737] [box=272,4977,622,55]:
+            - cell "Selecionar INF62" [ref=e738] [box=272,4977,56,55]:
+              - checkbox "Selecionar INF62" [ref=e739] [cursor=pointer] [box=292,4995,16,16]
+            - cell "INF62" [ref=e740] [box=328,4977,156,55]:
+              - strong [ref=e741] [box=348,4996,36,17]: INF62
+            - cell "10.20.2.62" [ref=e742] [box=484,4977,231,55]
+            - cell "Nenhum" [ref=e743] [box=715,4977,95,55]
+            - cell "offline" [ref=e744] [box=810,4977,84,55]
+          - row "Selecionar DESKTOP-114I5BR DESKTOP-114I5BR 10.20.50.222 Nenhum offline" [ref=e745] [box=272,5032,622,55]:
+            - cell "Selecionar DESKTOP-114I5BR" [ref=e746] [box=272,5032,56,55]:
+              - checkbox "Selecionar DESKTOP-114I5BR" [ref=e747] [cursor=pointer] [box=292,5050,16,16]
+            - cell "DESKTOP-114I5BR" [ref=e748] [box=328,5032,156,55]:
+              - strong [ref=e749] [box=348,5051,113,17]: DESKTOP-114I5BR
+            - cell "10.20.50.222" [ref=e750] [box=484,5032,231,55]
+            - cell "Nenhum" [ref=e751] [box=715,5032,95,55]
+            - cell "offline" [ref=e752] [box=810,5032,84,55]
+          - row "Selecionar INF75 INF75 10.20.50.78 Nenhum offline" [ref=e753] [box=272,5087,622,55]:
+            - cell "Selecionar INF75" [ref=e754] [box=272,5087,56,55]:
+              - checkbox "Selecionar INF75" [ref=e755] [cursor=pointer] [box=292,5105,16,16]
+            - cell "INF75" [ref=e756] [box=328,5087,156,55]:
+              - strong [ref=e757] [box=348,5106,36,17]: INF75
+            - cell "10.20.50.78" [ref=e758] [box=484,5087,231,55]
+            - cell "Nenhum" [ref=e759] [box=715,5087,95,55]
+            - cell "offline" [ref=e760] [box=810,5087,84,55]
+          - row "Selecionar GOB-VW-DBMSH01 GOB-VW-DBMSH01 10.20.1.85 Nenhum offline" [ref=e761] [box=272,5142,622,55]:
+            - cell "Selecionar GOB-VW-DBMSH01" [ref=e762] [box=272,5142,56,55]:
+              - checkbox "Selecionar GOB-VW-DBMSH01" [ref=e763] [cursor=pointer] [box=292,5160,16,16]
+            - cell "GOB-VW-DBMSH01" [ref=e764] [box=328,5142,156,55]:
+              - strong [ref=e765] [box=348,5152,63,34]: GOB-VW-DBMSH01
+            - cell "10.20.1.85" [ref=e766] [box=484,5142,231,55]
+            - cell "Nenhum" [ref=e767] [box=715,5142,95,55]
+            - cell "offline" [ref=e768] [box=810,5142,84,55]
+          - row "Selecionar GUARITA GUARITA 10.20.51.21 Nenhum offline" [ref=e769] [box=272,5197,622,55]:
+            - cell "Selecionar GUARITA" [ref=e770] [box=272,5197,56,55]:
+              - checkbox "Selecionar GUARITA" [ref=e771] [cursor=pointer] [box=292,5215,16,16]
+            - cell "GUARITA" [ref=e772] [box=328,5197,156,55]:
+              - strong [ref=e773] [box=348,5216,56,17]: GUARITA
+            - cell "10.20.51.21" [ref=e774] [box=484,5197,231,55]
+            - cell "Nenhum" [ref=e775] [box=715,5197,95,55]
+            - cell "offline" [ref=e776] [box=810,5197,84,55]
+          - row "Selecionar NOTE01 NOTE01 10.20.50.115 Nenhum offline" [ref=e777] [box=272,5252,622,55]:
+            - cell "Selecionar NOTE01" [ref=e778] [box=272,5252,56,55]:
+              - checkbox "Selecionar NOTE01" [ref=e779] [cursor=pointer] [box=292,5270,16,16]
+            - cell "NOTE01" [ref=e780] [box=328,5252,156,55]:
+              - strong [ref=e781] [box=348,5271,49,17]: NOTE01
+            - cell "10.20.50.115" [ref=e782] [box=484,5252,231,55]
+            - cell "Nenhum" [ref=e783] [box=715,5252,95,55]
+            - cell "offline" [ref=e784] [box=810,5252,84,55]
+          - row "Selecionar INF30 INF30 INF30.gob.local Nenhum offline" [ref=e785] [box=272,5307,622,55]:
+            - cell "Selecionar INF30" [ref=e786] [box=272,5307,56,55]:
+              - checkbox "Selecionar INF30" [ref=e787] [cursor=pointer] [box=292,5325,16,16]
+            - cell "INF30" [ref=e788] [box=328,5307,156,55]:
+              - strong [ref=e789] [box=348,5326,36,17]: INF30
+            - cell "INF30.gob.local" [ref=e790] [box=484,5307,231,55]
+            - cell "Nenhum" [ref=e791] [box=715,5307,95,55]
+            - cell "offline" [ref=e792] [box=810,5307,84,55]
+          - row "Selecionar DESKTOP-K5181DB DESKTOP-K5181DB 10.20.2.41 Nenhum online" [ref=e793] [box=272,5362,622,55]:
+            - cell "Selecionar DESKTOP-K5181DB" [ref=e794] [box=272,5362,56,55]:
+              - checkbox "Selecionar DESKTOP-K5181DB" [ref=e795] [cursor=pointer] [box=292,5380,16,16]
+            - cell "DESKTOP-K5181DB" [ref=e796] [box=328,5362,156,55]:
+              - strong [ref=e797] [box=348,5372,63,34]: DESKTOP-K5181DB
+            - cell "10.20.2.41" [ref=e798] [box=484,5362,231,55]
+            - cell "Nenhum" [ref=e799] [box=715,5362,95,55]
+            - cell "online" [ref=e800] [box=810,5362,84,55]
+          - row "Selecionar DESKTOP-ROLFRP3 DESKTOP-ROLFRP3 10.20.50.28 Nenhum offline" [ref=e801] [box=272,5417,622,55]:
+            - cell "Selecionar DESKTOP-ROLFRP3" [ref=e802] [box=272,5417,56,55]:
+              - checkbox "Selecionar DESKTOP-ROLFRP3" [ref=e803] [cursor=pointer] [box=292,5435,16,16]
+            - cell "DESKTOP-ROLFRP3" [ref=e804] [box=328,5417,156,55]:
+              - strong [ref=e805] [box=348,5427,63,34]: DESKTOP-ROLFRP3
+            - cell "10.20.50.28" [ref=e806] [box=484,5417,231,55]
+            - cell "Nenhum" [ref=e807] [box=715,5417,95,55]
+            - cell "offline" [ref=e808] [box=810,5417,84,55]
+          - row "Selecionar INF56 INF56 10.20.2.56 Nenhum offline" [ref=e809] [box=272,5472,622,55]:
+            - cell "Selecionar INF56" [ref=e810] [box=272,5472,56,55]:
+              - checkbox "Selecionar INF56" [ref=e811] [cursor=pointer] [box=292,5490,16,16]
+            - cell "INF56" [ref=e812] [box=328,5472,156,55]:
+              - strong [ref=e813] [box=348,5491,36,17]: INF56
+            - cell "10.20.2.56" [ref=e814] [box=484,5472,231,55]
+            - cell "Nenhum" [ref=e815] [box=715,5472,95,55]
+            - cell "offline" [ref=e816] [box=810,5472,84,55]
+          - row "Selecionar INF19 INF19 10.20.2.19 Nenhum offline" [ref=e817] [box=272,5527,622,55]:
+            - cell "Selecionar INF19" [ref=e818] [box=272,5527,56,55]:
+              - checkbox "Selecionar INF19" [ref=e819] [cursor=pointer] [box=292,5545,16,16]
+            - cell "INF19" [ref=e820] [box=328,5527,156,55]:
+              - strong [ref=e821] [box=348,5546,36,17]: INF19
+            - cell "10.20.2.19" [ref=e822] [box=484,5527,231,55]
+            - cell "Nenhum" [ref=e823] [box=715,5527,95,55]
+            - cell "offline" [ref=e824] [box=810,5527,84,55]
+          - row "Selecionar INF20 INF20 10.20.2.20 Nenhum offline" [ref=e825] [box=272,5582,622,55]:
+            - cell "Selecionar INF20" [ref=e826] [box=272,5582,56,55]:
+              - checkbox "Selecionar INF20" [ref=e827] [cursor=pointer] [box=292,5600,16,16]
+            - cell "INF20" [ref=e828] [box=328,5582,156,55]:
+              - strong [ref=e829] [box=348,5601,36,17]: INF20
+            - cell "10.20.2.20" [ref=e830] [box=484,5582,231,55]
+            - cell "Nenhum" [ref=e831] [box=715,5582,95,55]
+            - cell "offline" [ref=e832] [box=810,5582,84,55]
+          - row "Selecionar INF37 INF37 10.20.2.37 Nenhum offline" [ref=e833] [box=272,5637,622,55]:
+            - cell "Selecionar INF37" [ref=e834] [box=272,5637,56,55]:
+              - checkbox "Selecionar INF37" [ref=e835] [cursor=pointer] [box=292,5655,16,16]
+            - cell "INF37" [ref=e836] [box=328,5637,156,55]:
+              - strong [ref=e837] [box=348,5656,36,17]: INF37
+            - cell "10.20.2.37" [ref=e838] [box=484,5637,231,55]
+            - cell "Nenhum" [ref=e839] [box=715,5637,95,55]
+            - cell "offline" [ref=e840] [box=810,5637,84,55]
+          - row "Selecionar INF81 INF81 10.20.50.33 Nenhum offline" [ref=e841] [box=272,5692,622,55]:
+            - cell "Selecionar INF81" [ref=e842] [box=272,5692,56,55]:
+              - checkbox "Selecionar INF81" [ref=e843] [cursor=pointer] [box=292,5710,16,16]
+            - cell "INF81" [ref=e844] [box=328,5692,156,55]:
+              - strong [ref=e845] [box=348,5711,36,17]: INF81
+            - cell "10.20.50.33" [ref=e846] [box=484,5692,231,55]
+            - cell "Nenhum" [ref=e847] [box=715,5692,95,55]
+            - cell "offline" [ref=e848] [box=810,5692,84,55]
+          - row "Selecionar INF59 INF59 10.20.50.16 Nenhum offline" [ref=e849] [box=272,5747,622,55]:
+            - cell "Selecionar INF59" [ref=e850] [box=272,5747,56,55]:
+              - checkbox "Selecionar INF59" [ref=e851] [cursor=pointer] [box=292,5765,16,16]
+            - cell "INF59" [ref=e852] [box=328,5747,156,55]:
+              - strong [ref=e853] [box=348,5766,36,17]: INF59
+            - cell "10.20.50.16" [ref=e854] [box=484,5747,231,55]
+            - cell "Nenhum" [ref=e855] [box=715,5747,95,55]
+            - cell "offline" [ref=e856] [box=810,5747,84,55]
+          - row "Selecionar INF08 INF08 10.20.2.8 Nenhum offline" [ref=e857] [box=272,5802,622,55]:
+            - cell "Selecionar INF08" [ref=e858] [box=272,5802,56,55]:
+              - checkbox "Selecionar INF08" [ref=e859] [cursor=pointer] [box=292,5820,16,16]
+            - cell "INF08" [ref=e860] [box=328,5802,156,55]:
+              - strong [ref=e861] [box=348,5821,36,17]: INF08
+            - cell "10.20.2.8" [ref=e862] [box=484,5802,231,55]
+            - cell "Nenhum" [ref=e863] [box=715,5802,95,55]
+            - cell "offline" [ref=e864] [box=810,5802,84,55]
+          - row "Selecionar INF21 INF21 10.20.2.18 Nenhum offline" [ref=e865] [box=272,5857,622,55]:
+            - cell "Selecionar INF21" [ref=e866] [box=272,5857,56,55]:
+              - checkbox "Selecionar INF21" [ref=e867] [cursor=pointer] [box=292,5875,16,16]
+            - cell "INF21" [ref=e868] [box=328,5857,156,55]:
+              - strong [ref=e869] [box=348,5876,36,17]: INF21
+            - cell "10.20.2.18" [ref=e870] [box=484,5857,231,55]
+            - cell "Nenhum" [ref=e871] [box=715,5857,95,55]
+            - cell "offline" [ref=e872] [box=810,5857,84,55]
+          - row "Selecionar INF60 INF60 10.20.2.60 Nenhum offline" [ref=e873] [box=272,5912,622,55]:
+            - cell "Selecionar INF60" [ref=e874] [box=272,5912,56,55]:
+              - checkbox "Selecionar INF60" [ref=e875] [cursor=pointer] [box=292,5930,16,16]
+            - cell "INF60" [ref=e876] [box=328,5912,156,55]:
+              - strong [ref=e877] [box=348,5931,36,17]: INF60
+            - cell "10.20.2.60" [ref=e878] [box=484,5912,231,55]
+            - cell "Nenhum" [ref=e879] [box=715,5912,95,55]
+            - cell "offline" [ref=e880] [box=810,5912,84,55]
+          - row "Selecionar INF09 INF09 10.20.50.44 Nenhum online" [ref=e881] [box=272,5967,622,55]:
+            - cell "Selecionar INF09" [ref=e882] [box=272,5967,56,55]:
+              - checkbox "Selecionar INF09" [ref=e883] [cursor=pointer] [box=292,5985,16,16]
+            - cell "INF09" [ref=e884] [box=328,5967,156,55]:
+              - strong [ref=e885] [box=348,5986,36,17]: INF09
+            - cell "10.20.50.44" [ref=e886] [box=484,5967,231,55]
+            - cell "Nenhum" [ref=e887] [box=715,5967,95,55]
+            - cell "online" [ref=e888] [box=810,5967,84,55]
+          - row "Selecionar INF13 INF13 10.20.2.13 Nenhum online" [ref=e889] [box=272,6022,622,55]:
+            - cell "Selecionar INF13" [ref=e890] [box=272,6022,56,55]:
+              - checkbox "Selecionar INF13" [ref=e891] [cursor=pointer] [box=292,6040,16,16]
+            - cell "INF13" [ref=e892] [box=328,6022,156,55]:
+              - strong [ref=e893] [box=348,6041,36,17]: INF13
+            - cell "10.20.2.13" [ref=e894] [box=484,6022,231,55]
+            - cell "Nenhum" [ref=e895] [box=715,6022,95,55]
+            - cell "online" [ref=e896] [box=810,6022,84,55]
+          - row "Selecionar INF91 INF91 10.20.2.91 Nenhum offline" [ref=e897] [box=272,6077,622,55]:
+            - cell "Selecionar INF91" [ref=e898] [box=272,6077,56,55]:
+              - checkbox "Selecionar INF91" [ref=e899] [cursor=pointer] [box=292,6095,16,16]
+            - cell "INF91" [ref=e900] [box=328,6077,156,55]:
+              - strong [ref=e901] [box=348,6096,36,17]: INF91
+            - cell "10.20.2.91" [ref=e902] [box=484,6077,231,55]
+            - cell "Nenhum" [ref=e903] [box=715,6077,95,55]
+            - cell "offline" [ref=e904] [box=810,6077,84,55]
+          - row "Selecionar INF93 INF93 INF93.gob.local Nenhum offline" [ref=e905] [box=272,6132,622,55]:
+            - cell "Selecionar INF93" [ref=e906] [box=272,6132,56,55]:
+              - checkbox "Selecionar INF93" [ref=e907] [cursor=pointer] [box=292,6150,16,16]
+            - cell "INF93" [ref=e908] [box=328,6132,156,55]:
+              - strong [ref=e909] [box=348,6151,36,17]: INF93
+            - cell "INF93.gob.local" [ref=e910] [box=484,6132,231,55]
+            - cell "Nenhum" [ref=e911] [box=715,6132,95,55]
+            - cell "offline" [ref=e912] [box=810,6132,84,55]
+          - row "Selecionar INF54 INF54 10.20.2.54 Nenhum offline" [ref=e913] [box=272,6187,622,55]:
+            - cell "Selecionar INF54" [ref=e914] [box=272,6187,56,55]:
+              - checkbox "Selecionar INF54" [ref=e915] [cursor=pointer] [box=292,6205,16,16]
+            - cell "INF54" [ref=e916] [box=328,6187,156,55]:
+              - strong [ref=e917] [box=348,6206,36,17]: INF54
+            - cell "10.20.2.54" [ref=e918] [box=484,6187,231,55]
+            - cell "Nenhum" [ref=e919] [box=715,6187,95,55]
+            - cell "offline" [ref=e920] [box=810,6187,84,55]
+          - row "Selecionar INF05 INF05 10.20.50.129 Nenhum offline" [ref=e921] [box=272,6242,622,55]:
+            - cell "Selecionar INF05" [ref=e922] [box=272,6242,56,55]:
+              - checkbox "Selecionar INF05" [ref=e923] [cursor=pointer] [box=292,6260,16,16]
+            - cell "INF05" [ref=e924] [box=328,6242,156,55]:
+              - strong [ref=e925] [box=348,6261,36,17]: INF05
+            - cell "10.20.50.129" [ref=e926] [box=484,6242,231,55]
+            - cell "Nenhum" [ref=e927] [box=715,6242,95,55]
+            - cell "offline" [ref=e928] [box=810,6242,84,55]
+          - row "Selecionar INF04 INF04 10.20.50.5 Nenhum offline" [ref=e929] [box=272,6297,622,55]:
+            - cell "Selecionar INF04" [ref=e930] [box=272,6297,56,55]:
+              - checkbox "Selecionar INF04" [ref=e931] [cursor=pointer] [box=292,6315,16,16]
+            - cell "INF04" [ref=e932] [box=328,6297,156,55]:
+              - strong [ref=e933] [box=348,6316,36,17]: INF04
+            - cell "10.20.50.5" [ref=e934] [box=484,6297,231,55]
+            - cell "Nenhum" [ref=e935] [box=715,6297,95,55]
+            - cell "offline" [ref=e936] [box=810,6297,84,55]
+          - row "Selecionar GOB01 GOB01 10.20.50.135 Nenhum offline" [ref=e937] [box=272,6352,622,55]:
+            - cell "Selecionar GOB01" [ref=e938] [box=272,6352,56,55]:
+              - checkbox "Selecionar GOB01" [ref=e939] [cursor=pointer] [box=292,6370,16,16]
+            - cell "GOB01" [ref=e940] [box=328,6352,156,55]:
+              - strong [ref=e941] [box=348,6371,42,17]: GOB01
+            - cell "10.20.50.135" [ref=e942] [box=484,6352,231,55]
+            - cell "Nenhum" [ref=e943] [box=715,6352,95,55]
+            - cell "offline" [ref=e944] [box=810,6352,84,55]
+          - row "Selecionar GOB02 GOB02 10.20.50.57 Nenhum online" [ref=e945] [box=272,6407,622,55]:
+            - cell "Selecionar GOB02" [ref=e946] [box=272,6407,56,55]:
+              - checkbox "Selecionar GOB02" [ref=e947] [cursor=pointer] [box=292,6425,16,16]
+            - cell "GOB02" [ref=e948] [box=328,6407,156,55]:
+              - strong [ref=e949] [box=348,6426,42,17]: GOB02
+            - cell "10.20.50.57" [ref=e950] [box=484,6407,231,55]
+            - cell "Nenhum" [ref=e951] [box=715,6407,95,55]
+            - cell "online" [ref=e952] [box=810,6407,84,55]
+          - row "Selecionar GOB03 GOB03 10.20.50.102 Nenhum offline" [ref=e953] [box=272,6462,622,55]:
+            - cell "Selecionar GOB03" [ref=e954] [box=272,6462,56,55]:
+              - checkbox "Selecionar GOB03" [ref=e955] [cursor=pointer] [box=292,6480,16,16]
+            - cell "GOB03" [ref=e956] [box=328,6462,156,55]:
+              - strong [ref=e957] [box=348,6481,42,17]: GOB03
+            - cell "10.20.50.102" [ref=e958] [box=484,6462,231,55]
+            - cell "Nenhum" [ref=e959] [box=715,6462,95,55]
+            - cell "offline" [ref=e960] [box=810,6462,84,55]

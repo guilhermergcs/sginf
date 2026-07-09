@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-09T09:04:00-03:00",
+  "title": "Design System: Gestão TI",
+  "extensions": {
+    "colorMeta": {
+      "azul-noite-profunda": {
+        "role": "neutral",
+        "displayName": "Azul-Noite Profunda",
+        "canonical": "oklch(0.2 0.04 260)",
+        "tonalRamp": ["oklch(0.12 0.03 260)", "oklch(0.16 0.035 260)", "oklch(0.2 0.04 260)", "oklch(0.28 0.045 260)", "oklch(0.38 0.04 260)", "oklch(0.5 0.035 260)", "oklch(0.65 0.03 260)", "oklch(0.85 0.015 260)"]
+      },
+      "azul-noite-hover": {
+        "role": "neutral",
+        "displayName": "Azul-Noite Hover",
+        "canonical": "oklch(0.15 0.035 260)",
+        "tonalRamp": []
+      },
+      "azul-noite-ativo": {
+        "role": "neutral",
+        "displayName": "Azul-Noite Ativo",
+        "canonical": "oklch(0.22 0.06 260)",
+        "tonalRamp": []
+      },
+      "azul-tecnico": {
+        "role": "primary",
+        "displayName": "Azul Técnico",
+        "canonical": "oklch(0.55 0.17 250)",
+        "tonalRamp": ["oklch(0.25 0.12 250)", "oklch(0.33 0.14 250)", "oklch(0.42 0.16 250)", "oklch(0.55 0.17 250)", "oklch(0.64 0.14 250)", "oklch(0.72 0.1 250)", "oklch(0.82 0.06 250)", "oklch(0.93 0.03 250)"]
+      },
+      "azul-tecnico-claro": {
+        "role": "primary",
+        "displayName": "Azul Técnico Claro",
+        "canonical": "oklch(0.68 0.12 240)",
+        "tonalRamp": []
+      },
+      "cinza-sistema": {
+        "role": "neutral",
+        "displayName": "Cinza Sistema",
+        "canonical": "oklch(0.95 0.005 250)",
+        "tonalRamp": []
+      },
+      "branco-painel": {
+        "role": "neutral",
+        "displayName": "Branco Painel",
+        "canonical": "oklch(1 0 0)",
+        "tonalRamp": []
+      },
+      "texto-primario": {
+        "role": "neutral",
+        "displayName": "Texto Primário",
+        "canonical": "oklch(0.25 0.01 250)",
+        "tonalRamp": []
+      },
+      "texto-secundario": {
+        "role": "neutral",
+        "displayName": "Texto Secundário",
+        "canonical": "oklch(0.5 0.015 250)",
+        "tonalRamp": []
+      },
+      "borda-fina": {
+        "role": "neutral",
+        "displayName": "Borda Fina",
+        "canonical": "oklch(0.92 0.005 250)",
+        "tonalRamp": []
+      },
+      "verde-status": {
+        "role": "semantic",
+        "displayName": "Verde Status",
+        "canonical": "oklch(0.55 0.18 155)",
+        "tonalRamp": []
+      },
+      "vermelho-status": {
+        "role": "semantic",
+        "displayName": "Vermelho Status",
+        "canonical": "oklch(0.5 0.2 30)",
+        "tonalRamp": []
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Sidebar — nome do sistema."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Título da página."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Cabeçalho de card."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Conteúdo principal, células de tabela, descrições."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Cabeçalhos de coluna, metadados, subtítulo da sidebar."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card",
+        "value": "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+        "purpose": "Sombra única para todas as superfícies elevadas (cards, estatísticas)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-hover",
+        "value": "all 0.15s ease",
+        "purpose": "Transições de hover em botões, links da sidebar, linhas de tabela."
+      },
+      {
+        "name": "ease-spin",
+        "value": "spin 0.6s linear infinite",
+        "purpose": "Animação de loading spinner."
+      }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "700px", "purpose": "Ponto onde a sidebar colapsa para 60px." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação principal — sincronizar, carregar, testar.",
+      "html": "<button class=\"ds-btn-primary\">🔄 Sincronizar</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; background: #3b82f6; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; } .ds-btn-primary:hover { background: #2563eb; } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Success Button",
+      "kind": "button",
+      "refersTo": "button-success",
+      "description": "Ação de adição/criação.",
+      "html": "<button class=\"ds-btn-success\">+ Adicionar</button>",
+      "css": ".ds-btn-success { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; background: #059669; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; } .ds-btn-success:hover { background: #047857; } .ds-btn-success:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Ação destrutiva (remover). Versão small.",
+      "html": "<button class=\"ds-btn-danger\">Remover</button>",
+      "css": ".ds-btn-danger { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; background: #dc2626; color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; } .ds-btn-danger:hover { background: #b91c1c; } .ds-btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo de texto padrão.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"digite aqui...\">",
+      "css": ".ds-input { width: 100%; padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.15s; box-sizing: border-box; } .ds-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Container padrão de conteúdo.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-header\"><h3>Título do Card</h3></div><div class=\"ds-card-body\">Conteúdo do card aqui.</div></div>",
+      "css": ".ds-card { background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); overflow: hidden; } .ds-card-header { padding: 16px 20px; border-bottom: 1px solid #e5e7eb; } .ds-card-header h3 { font-size: 15px; font-weight: 600; margin: 0; } .ds-card-body { padding: 20px; }"
+    },
+    {
+      "name": "Stat Card",
+      "kind": "card",
+      "refersTo": "stat-card",
+      "description": "Card de estatística com número grande e label.",
+      "html": "<div class=\"ds-stat\"><div class=\"ds-stat-num\" style=\"color:#059669\">42</div><div class=\"ds-stat-label\">Online</div></div>",
+      "css": ".ds-stat { background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); padding: 16px 20px; flex: 1; } .ds-stat-num { font-size: 24px; font-weight: 700; line-height: 1.2; } .ds-stat-label { font-size: 12px; color: #6b7280; margin-top: 4px; }"
+    },
+    {
+      "name": "Sidebar Nav Item",
+      "kind": "nav",
+      "refersTo": "sidebar-nav",
+      "description": "Item de navegação na sidebar.",
+      "html": "<nav class=\"ds-sidebar\"><div class=\"ds-sidebar-header\"><h1>Gestão TI</h1><span>PAINEL ADMINISTRATIVO</span></div><div class=\"ds-sidebar-nav\"><a class=\"ds-nav-item ds-nav-active\"><span>🖥️</span><span>Computadores</span></a><a class=\"ds-nav-item\"><span>🖨️</span><span>Impressoras</span></a><a class=\"ds-nav-item\"><span>👤</span><span>Usuários</span></a></div></nav>",
+      "css": ".ds-sidebar { width: 240px; background: #1a1a2e; color: #fff; display: flex; flex-direction: column; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; } .ds-sidebar-header { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); } .ds-sidebar-header h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; margin: 0; } .ds-sidebar-header span { display: block; font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; } .ds-sidebar-nav { padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; } .ds-nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.15s; } .ds-nav-item:hover { background: #16213e; color: #fff; } .ds-nav-active { background: #0f3460; color: #60a5fa; }"
+    },
+    {
+      "name": "Status Indicator (Online)",
+      "kind": "chip",
+      "refersTo": "status-online",
+      "description": "Indicador de status online / ativo.",
+      "html": "<span class=\"ds-status-online\">online</span>",
+      "css": ".ds-status-online { color: #059669; font-weight: 600; font-size: 13px; } .ds-status-online::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #059669; margin-right: 6px; vertical-align: middle; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "A Central de Comando",
+    "overview": "Este é o painel de controle do administrador de TI — um ambiente preciso, técnico e confiável onde cada elemento existe para tornar o monitoramento da infraestrutura mais rápido e claro. A estética é de uma central de operações: limpa, organizada, sem condecoração. O admin chega, lê o estado da rede em um relance e age. A paleta é intencionalmente contida: um fundo cinza claro para destacar os dados, sidebar escura que ancora a navegação, e um azul técnico reservado exclusivamente para ações e estados ativos.",
+    "keyCharacteristics": [
+      "Preciso: dados técnicos apresentados de forma direta, sem ruído visual",
+      "Consistente: cada página segue os mesmos padrões de layout e interação",
+      "Ágil: feedback imediato para toda ação do usuário",
+      "Sóbrio: zero decoração — cores e espaçamentos têm função"
+    ],
+    "rules": [
+      { "name": "A Regra do Azul Técnico", "body": "O azul de acento aparece exclusivamente em ações primárias (botões) e no estado ativo da navegação. Nunca é usado decorativamente.", "section": "colors" },
+      { "name": "A Regra do Status em Tempo Real", "body": "Verde e vermelho são os únicos pontos de alta saturação no sistema. Eles existem para serem lidos em 200ms.", "section": "colors" },
+      { "name": "A Regra da Sombra Única", "body": "Todas as superfícies elevadas usam exatamente a mesma sombra. Não há hierarquia de elevação.", "section": "elevation" }
+    ],
+    "dos": [
+      "usar o Azul Técnico exclusivamente para ações e navegação ativa",
+      "usar as cores de status (verde/vermelho) apenas para indicar online/offline ou ativo/inativo",
+      "manter a sombra de card consistente em todas as superfícies elevadas",
+      "dar feedback imediato para toda ação do admin (loading state, mensagem de sucesso/erro)",
+      "usar a sidebar colapsada em telas ≤700px"
+    ],
+    "donts": [
+      "usar o azul de acento como decoração ou em elementos não interativos",
+      "adicionar segundas sombras ou elevações diferentes da padrão",
+      "usar gradientes, glassmorphism, ou texturas decorativas",
+      "misturar estilos de botão entre páginas — todos seguem o mesmo padrão",
+      "remover o indicador de loading durante operações assíncronas",
+      "usar verde/vermelho para funções não relacionadas a status",
+      "aplicar bordas laterais coloridas como acento decorativo em cards"
+    ]
+  }
+}

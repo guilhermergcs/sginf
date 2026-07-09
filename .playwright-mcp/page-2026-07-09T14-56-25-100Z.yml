@@ -1,0 +1,62 @@
+- generic [active] [ref=f16e1]:
+  - navigation [ref=f16e2]:
+    - generic [ref=f16e3]:
+      - heading "Gestão TI" [level=1] [ref=f16e4]
+      - generic [ref=f16e5]: Painel Administrativo
+    - generic [ref=f16e6]:
+      - link "Computadores" [ref=f16e7] [cursor=pointer]:
+        - /url: /computadores
+        - img [ref=f16e9]
+        - generic [ref=f16e11]: Computadores
+      - link "Impressoras" [ref=f16e12] [cursor=pointer]:
+        - /url: /impressoras
+        - img [ref=f16e14]
+        - generic [ref=f16e18]: Impressoras
+      - link "Usuários AD" [ref=f16e19] [cursor=pointer]:
+        - /url: /usuarios
+        - img [ref=f16e21]
+        - generic [ref=f16e24]: Usuários AD
+      - link "Configuração AD" [ref=f16e25] [cursor=pointer]:
+        - /url: /config
+        - img [ref=f16e27]
+        - generic [ref=f16e30]: Configuração AD
+  - generic [ref=f16e32]:
+    - heading "Configuração do Active Directory" [level=2] [ref=f16e34]
+    - generic [ref=f16e35]:
+      - paragraph [ref=f16e36]: Configure os parâmetros de conexão com o servidor AD
+      - generic [ref=f16e37]:
+        - generic [ref=f16e38]:
+          - generic [ref=f16e39]: Servidor AD
+          - textbox "Servidor AD" [ref=f16e40]:
+            - /placeholder: dc.exemplo.local
+        - generic [ref=f16e41]:
+          - generic [ref=f16e42]: IP do AD
+          - textbox "IP do AD" [ref=f16e43]:
+            - /placeholder: 192.168.1.10
+        - generic [ref=f16e44]:
+          - generic [ref=f16e45]: Base DN
+          - textbox "Base DN" [ref=f16e46]:
+            - /placeholder: dc=exemplo,dc=local
+        - generic [ref=f16e47]:
+          - generic [ref=f16e48]: Usuário
+          - textbox "Usuário" [ref=f16e49]:
+            - /placeholder: admin@exemplo.local
+        - generic [ref=f16e50]:
+          - generic [ref=f16e51]: OU de Usuários
+          - textbox "OU de Usuários" [ref=f16e52]:
+            - /placeholder: CN=Users
+            - text: OU=DomainUsers,OU=ManagedUsers
+        - generic [ref=f16e53]:
+          - generic [ref=f16e54]: Senha
+          - generic [ref=f16e55]:
+            - textbox "Senha" [ref=f16e56]:
+              - /placeholder: ••••••••
+            - button "Mostrar senha" [ref=f16e57] [cursor=pointer]:
+              - img [ref=f16e58]
+        - generic [ref=f16e61]:
+          - button "Testar Conexão" [ref=f16e62] [cursor=pointer]:
+            - img [ref=f16e63]
+            - text: Testar Conexão
+          - button "Salvar" [ref=f16e65] [cursor=pointer]:
+            - img [ref=f16e66]
+            - text: Salvar

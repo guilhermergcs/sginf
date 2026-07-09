@@ -1,0 +1,62 @@
+- generic [active] [ref=f3e1]:
+  - navigation [ref=f3e2]:
+    - generic [ref=f3e3]:
+      - heading "Gestão TI" [level=1] [ref=f3e4]
+      - generic [ref=f3e5]: Painel Administrativo
+    - generic [ref=f3e6]:
+      - link "Computadores" [ref=f3e7] [cursor=pointer]:
+        - /url: /computadores
+        - img [ref=f3e9]
+        - generic [ref=f3e11]: Computadores
+      - link "Impressoras" [ref=f3e12] [cursor=pointer]:
+        - /url: /impressoras
+        - img [ref=f3e14]
+        - generic [ref=f3e18]: Impressoras
+      - link "Usuários AD" [ref=f3e19] [cursor=pointer]:
+        - /url: /usuarios
+        - img [ref=f3e21]
+        - generic [ref=f3e24]: Usuários AD
+      - link "Configuração AD" [ref=f3e25] [cursor=pointer]:
+        - /url: /config
+        - img [ref=f3e27]
+        - generic [ref=f3e30]: Configuração AD
+  - generic [ref=f3e32]:
+    - heading "Configuração do Active Directory" [level=2] [ref=f3e34]
+    - generic [ref=f3e35]:
+      - paragraph [ref=f3e36]: Configure os parâmetros de conexão com o servidor AD
+      - generic [ref=f3e37]:
+        - generic [ref=f3e38]:
+          - generic [ref=f3e39]: Servidor AD
+          - textbox "Servidor AD" [ref=f3e40]:
+            - /placeholder: dc.exemplo.local
+        - generic [ref=f3e41]:
+          - generic [ref=f3e42]: IP do AD
+          - textbox "IP do AD" [ref=f3e43]:
+            - /placeholder: 192.168.1.10
+        - generic [ref=f3e44]:
+          - generic [ref=f3e45]: Base DN
+          - textbox "Base DN" [ref=f3e46]:
+            - /placeholder: dc=exemplo,dc=local
+        - generic [ref=f3e47]:
+          - generic [ref=f3e48]: Usuário
+          - textbox "Usuário" [ref=f3e49]:
+            - /placeholder: admin@exemplo.local
+        - generic [ref=f3e50]:
+          - generic [ref=f3e51]: OU de Usuários
+          - textbox "OU de Usuários" [ref=f3e52]:
+            - /placeholder: CN=Users
+            - text: OU=DomainUsers,OU=ManagedUsers
+        - generic [ref=f3e53]:
+          - generic [ref=f3e54]: Senha
+          - generic [ref=f3e55]:
+            - textbox "Senha" [ref=f3e56]:
+              - /placeholder: ••••••••
+            - button "Mostrar senha" [ref=f3e57] [cursor=pointer]:
+              - img [ref=f3e58]
+        - generic [ref=f3e61]:
+          - button "Testar Conexão" [ref=f3e62] [cursor=pointer]:
+            - img [ref=f3e63]
+            - text: Testar Conexão
+          - button "Salvar" [ref=f3e65] [cursor=pointer]:
+            - img [ref=f3e66]
+            - text: Salvar

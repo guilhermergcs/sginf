@@ -1,0 +1,66 @@
+- generic [active] [ref=f3e1] [box=0,0,929,917]:
+  - navigation [ref=f3e2] [box=0,0,240,917]:
+    - generic [ref=f3e3] [box=0,0,240,87]:
+      - heading "Gestão TI" [level=1] [ref=f3e4] [box=20,24,200,21]
+      - generic [ref=f3e5] [box=20,47,200,15]: Painel Administrativo
+    - generic [ref=f3e6] [box=0,87,240,830]:
+      - link "Computadores" [ref=f3e7] [cursor=pointer] [box=10,99,220,39]:
+        - /url: /computadores
+        - img [ref=f3e9] [box=26,110,18,18]
+        - generic [ref=f3e11] [box=58,109,94,19]: Computadores
+      - link "Impressoras" [ref=f3e12] [cursor=pointer] [box=10,140,220,39]:
+        - /url: /impressoras
+        - img [ref=f3e14] [box=26,151,18,18]
+        - generic [ref=f3e18] [box=58,150,76,19]: Impressoras
+      - link "Usuários AD" [ref=f3e19] [cursor=pointer] [box=10,181,220,39]:
+        - /url: /usuarios
+        - img [ref=f3e21] [box=26,192,18,18]
+        - generic [ref=f3e24] [box=58,191,78,19]: Usuários AD
+      - link "Configuração AD" [ref=f3e25] [cursor=pointer] [box=10,222,220,39]:
+        - /url: /config
+        - img [ref=f3e27] [box=26,233,18,18]
+        - generic [ref=f3e30] [box=58,232,108,19]: Configuração AD
+  - generic [ref=f3e32] [box=325,32,520,702]:
+    - heading "Configuração do Active Directory" [level=2] [ref=f3e34] [box=345,48,377,32]
+    - generic [ref=f3e35] [box=325,97,520,637]:
+      - paragraph [ref=f3e36] [box=345,117,480,19]: Configure os parâmetros de conexão com o servidor AD
+      - generic [ref=f3e37] [box=345,164,480,550]:
+        - generic [ref=f3e38] [box=345,164,480,64]:
+          - generic [ref=f3e39] [box=345,164,480,17]: Servidor AD
+          - textbox "Servidor AD" [ref=f3e40] [box=345,187,480,41]:
+            - /placeholder: dc.exemplo.local
+            - text: GOB-VW-AD01.gob.local
+        - generic [ref=f3e41] [box=345,248,480,64]:
+          - generic [ref=f3e42] [box=345,248,480,17]: IP do AD
+          - textbox "IP do AD" [ref=f3e43] [box=345,271,480,41]:
+            - /placeholder: 192.168.1.10
+            - text: 10.20.1.19
+        - generic [ref=f3e44] [box=345,332,480,64]:
+          - generic [ref=f3e45] [box=345,332,480,17]: Base DN
+          - textbox "Base DN" [ref=f3e46] [box=345,355,480,41]:
+            - /placeholder: dc=exemplo,dc=local
+            - text: dc=gob,dc=local
+        - generic [ref=f3e47] [box=345,416,480,64]:
+          - generic [ref=f3e48] [box=345,416,480,17]: Usuário
+          - textbox "Usuário" [ref=f3e49] [box=345,439,480,41]:
+            - /placeholder: admin@exemplo.local
+            - text: gob\guilherme.ribeiro
+        - generic [ref=f3e50] [box=345,500,480,64]:
+          - generic [ref=f3e51] [box=345,500,480,17]: OU de Usuários
+          - textbox "OU de Usuários" [ref=f3e52] [box=345,523,480,41]:
+            - /placeholder: CN=Users
+            - text: OU=DomainUsers,OU=ManagedUsers
+        - generic [ref=f3e53] [box=345,584,480,64]:
+          - generic [ref=f3e54] [box=345,584,480,17]: Senha
+          - generic [ref=f3e55] [box=345,607,480,41]:
+            - textbox "Senha" [ref=f3e56] [box=345,607,480,41]:
+              - /placeholder: ••••••••
+            - button "Mostrar senha" [ref=f3e57] [cursor=pointer] [box=787,613,26,29]:
+              - img [ref=f3e58] [box=791,619,18,18]
+        - generic [ref=f3e61] [box=345,676,480,38]:
+          - button "Testar Conexão" [ref=f3e62] [cursor=pointer] [box=345,676,235,38]:
+            - img [ref=f3e63] [box=398,686,18,18]
+            - text: Testar Conexão
+          - button "Salvar" [ref=f3e65] [cursor=pointer] [box=590,676,235,38]:
+            - img [ref=f3e66] [box=674,686,18,18]
+            - text: Salvar

@@ -1,0 +1,60 @@
+- generic [active] [ref=f5e1]:
+  - navigation [ref=f5e2]:
+    - generic [ref=f5e3]:
+      - heading "Gestão TI" [level=1] [ref=f5e4]
+      - generic [ref=f5e5]: Painel Administrativo
+    - generic [ref=f5e6]:
+      - link "Computadores" [ref=f5e7] [cursor=pointer]:
+        - /url: /computadores
+        - img [ref=f5e9]
+        - generic [ref=f5e11]: Computadores
+      - link "Impressoras" [ref=f5e12] [cursor=pointer]:
+        - /url: /impressoras
+        - img [ref=f5e14]
+        - generic [ref=f5e18]: Impressoras
+      - link "Usuários AD" [ref=f5e19] [cursor=pointer]:
+        - /url: /usuarios
+        - img [ref=f5e21]
+        - generic [ref=f5e24]: Usuários AD
+      - link "Configuração AD" [ref=f5e25] [cursor=pointer]:
+        - /url: /config
+        - img [ref=f5e27]
+        - generic [ref=f5e30]: Configuração AD
+  - generic [ref=f5e31]:
+    - generic [ref=f5e32]:
+      - heading "Computadores" [level=2] [ref=f5e33]
+      - paragraph [ref=f5e34]: Lista de computadores sincronizados do Active Directory
+    - generic [ref=f5e35]:
+      - generic [ref=f5e36]:
+        - generic [ref=f5e37]: "-"
+        - generic [ref=f5e38]: Total
+      - generic [ref=f5e39]:
+        - generic [ref=f5e40]: "-"
+        - generic [ref=f5e41]: Online
+      - generic [ref=f5e42]:
+        - generic [ref=f5e43]: "-"
+        - generic [ref=f5e44]: Offline
+    - generic [ref=f5e45]:
+      - button "Sincronizar do AD Ctrl+Shift+S" [ref=f5e46] [cursor=pointer]:
+        - img [ref=f5e47]
+        - text: Sincronizar do AD
+        - generic [ref=f5e51]: Ctrl+Shift+S
+      - button "Verificar Status" [ref=f5e52] [cursor=pointer]:
+        - img [ref=f5e53]
+        - text: Verificar Status
+      - textbox "Buscar computador" [ref=f5e55]:
+        - /placeholder: Buscar computador...
+    - generic [ref=f5e56]:
+      - heading "Computadores" [level=3] [ref=f5e58]
+      - table [ref=f5e60]:
+        - rowgroup [ref=f5e61]:
+          - row "Selecionar todos Nome IP Usuário Logado Status" [ref=f5e62]:
+            - columnheader "Selecionar todos" [ref=f5e63]:
+              - checkbox "Selecionar todos" [ref=f5e64] [cursor=pointer]
+            - columnheader "Nome" [ref=f5e65]
+            - columnheader "IP" [ref=f5e66]
+            - columnheader "Usuário Logado" [ref=f5e67]
+            - columnheader "Status" [ref=f5e68]
+        - rowgroup [ref=f5e69]:
+          - row "Carregando..." [ref=f5e70]:
+            - cell "Carregando..." [ref=f5e71]: Carregando...

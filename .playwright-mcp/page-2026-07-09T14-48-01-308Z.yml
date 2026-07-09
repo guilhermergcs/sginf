@@ -1,0 +1,58 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Gestão TI" [level=1] [ref=e4]
+      - generic [ref=e5]: Painel Administrativo
+    - generic [ref=e6]:
+      - link "Computadores" [ref=e7] [cursor=pointer]:
+        - /url: /computadores
+        - img [ref=e9]
+        - generic [ref=e11]: Computadores
+      - link "Impressoras" [ref=e12] [cursor=pointer]:
+        - /url: /impressoras
+        - img [ref=e14]
+        - generic [ref=e18]: Impressoras
+      - link "Usuários AD" [ref=e19] [cursor=pointer]:
+        - /url: /usuarios
+        - img [ref=e21]
+        - generic [ref=e24]: Usuários AD
+      - link "Configuração AD" [ref=e25] [cursor=pointer]:
+        - /url: /config
+        - img [ref=e27]
+        - generic [ref=e30]: Configuração AD
+  - generic [ref=e31]:
+    - generic [ref=e32]:
+      - heading "Computadores" [level=2] [ref=e33]
+      - paragraph [ref=e34]: Lista de computadores sincronizados do Active Directory
+    - generic [ref=e35]:
+      - generic [ref=e36]:
+        - generic [ref=e37]: "-"
+        - generic [ref=e38]: Total
+      - generic [ref=e39]:
+        - generic [ref=e40]: "-"
+        - generic [ref=e41]: Online
+      - generic [ref=e42]:
+        - generic [ref=e43]: "-"
+        - generic [ref=e44]: Offline
+    - generic [ref=e45]:
+      - button "Sincronizar do AD Ctrl+Shift+S" [ref=e46] [cursor=pointer]:
+        - img [ref=e47]
+        - text: Sincronizar do AD
+        - generic [ref=e51]: Ctrl+Shift+S
+      - button "Verificar Status" [ref=e52] [cursor=pointer]:
+        - img [ref=e53]
+        - text: Verificar Status
+    - generic [ref=e55]:
+      - heading "Computadores" [level=3] [ref=e57]
+      - table [ref=e59]:
+        - rowgroup [ref=e60]:
+          - row "Selecionar todos Nome IP Usuário Logado Status" [ref=e61]:
+            - columnheader "Selecionar todos" [ref=e62]:
+              - checkbox "Selecionar todos" [ref=e63] [cursor=pointer]
+            - columnheader "Nome" [ref=e64]
+            - columnheader "IP" [ref=e65]
+            - columnheader "Usuário Logado" [ref=e66]
+            - columnheader "Status" [ref=e67]
+        - rowgroup [ref=e68]:
+          - row "Carregando..." [ref=e69]:
+            - cell "Carregando..." [ref=e70]: Carregando...

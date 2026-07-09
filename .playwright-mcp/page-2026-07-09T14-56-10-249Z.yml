@@ -1,0 +1,72 @@
+- generic [active] [ref=f14e1]:
+  - navigation [ref=f14e2]:
+    - generic [ref=f14e3]:
+      - heading "Gestão TI" [level=1] [ref=f14e4]
+      - generic [ref=f14e5]: Painel Administrativo
+    - generic [ref=f14e6]:
+      - link "Computadores" [ref=f14e7] [cursor=pointer]:
+        - /url: /computadores
+        - img [ref=f14e9]
+        - generic [ref=f14e11]: Computadores
+      - link "Impressoras" [ref=f14e12] [cursor=pointer]:
+        - /url: /impressoras
+        - img [ref=f14e14]
+        - generic [ref=f14e18]: Impressoras
+      - link "Usuários AD" [ref=f14e19] [cursor=pointer]:
+        - /url: /usuarios
+        - img [ref=f14e21]
+        - generic [ref=f14e24]: Usuários AD
+      - link "Configuração AD" [ref=f14e25] [cursor=pointer]:
+        - /url: /config
+        - img [ref=f14e27]
+        - generic [ref=f14e30]: Configuração AD
+  - generic [ref=f14e31]:
+    - generic [ref=f14e32]:
+      - heading "Impressoras" [level=2] [ref=f14e33]
+      - paragraph [ref=f14e34]: Monitoramento de impressoras via SNMP
+    - generic [ref=f14e35]:
+      - generic [ref=f14e36]:
+        - generic [ref=f14e37]: "-"
+        - generic [ref=f14e38]: Total
+      - generic [ref=f14e39]:
+        - generic [ref=f14e40]: "-"
+        - generic [ref=f14e41]: OK
+      - generic [ref=f14e42]:
+        - generic [ref=f14e43]: "-"
+        - generic [ref=f14e44]: Offline
+    - generic [ref=f14e45]:
+      - heading "Adicionar Impressora" [level=3] [ref=f14e47]
+      - generic [ref=f14e49]:
+        - generic [ref=f14e50]:
+          - generic [ref=f14e51]: Nome
+          - 'textbox "Ex: HP Laserjet 1" [ref=f14e52]'
+        - generic [ref=f14e53]:
+          - generic [ref=f14e54]: IP
+          - 'textbox "Formato: 192.168.1.100" [ref=f14e55]':
+            - /placeholder: 192.168.1.100
+        - generic [ref=f14e56]:
+          - generic [ref=f14e57]: Comunidade SNMP
+          - 'textbox "Comunidade SNMP para consulta (default: public)" [ref=f14e58]':
+            - /placeholder: public
+            - text: public
+        - button "+ Adicionar" [ref=f14e59] [cursor=pointer]
+    - button "Verificar via SNMP Ctrl+Shift+S" [ref=f14e61] [cursor=pointer]:
+      - img [ref=f14e62]
+      - text: Verificar via SNMP
+      - generic [ref=f14e65]: Ctrl+Shift+S
+    - generic [ref=f14e66]:
+      - heading "Impressoras Cadastradas" [level=3] [ref=f14e68]
+      - table [ref=f14e70]:
+        - rowgroup [ref=f14e71]:
+          - row "Selecionar todos Nome IP Modelo Status Última Verif." [ref=f14e72]:
+            - columnheader "Selecionar todos" [ref=f14e73]:
+              - checkbox "Selecionar todos" [ref=f14e74] [cursor=pointer]
+            - columnheader "Nome" [ref=f14e75]
+            - columnheader "IP" [ref=f14e76]
+            - columnheader "Modelo" [ref=f14e77]
+            - columnheader "Status" [ref=f14e78]
+            - columnheader "Última Verif." [ref=f14e79]
+            - columnheader [ref=f14e80]
+        - rowgroup [ref=f14e81]:
+          - row "Carregando..." [ref=f14e82]:
+            - cell "Carregando..." [ref=f14e83]: Carregando...

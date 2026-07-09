@@ -1,0 +1,66 @@
+- generic [active] [ref=f5e1]:
+  - navigation [ref=f5e2]:
+    - generic [ref=f5e3]:
+      - heading "Gestão TI" [level=1] [ref=f5e4]
+      - generic [ref=f5e5]: Painel Administrativo
+    - generic [ref=f5e6]:
+      - link "Computadores" [ref=f5e7] [cursor=pointer]:
+        - /url: /computadores
+        - img [ref=f5e9]
+        - generic [ref=f5e11]: Computadores
+      - link "Impressoras" [ref=f5e12] [cursor=pointer]:
+        - /url: /impressoras
+        - img [ref=f5e14]
+        - generic [ref=f5e18]: Impressoras
+      - link "Usuários AD" [ref=f5e19] [cursor=pointer]:
+        - /url: /usuarios
+        - img [ref=f5e21]
+        - generic [ref=f5e24]: Usuários AD
+      - link "Configuração AD" [ref=f5e25] [cursor=pointer]:
+        - /url: /config
+        - img [ref=f5e27]
+        - generic [ref=f5e30]: Configuração AD
+  - generic [ref=f5e32]:
+    - heading "Configuração do Active Directory" [level=2] [ref=f5e34]
+    - generic [ref=f5e35]:
+      - paragraph [ref=f5e36]: Configure os parâmetros de conexão com o servidor AD
+      - generic [ref=f5e37]:
+        - generic [ref=f5e38]:
+          - generic [ref=f5e39]: Servidor AD
+          - textbox "Servidor AD" [ref=f5e40]:
+            - /placeholder: dc.exemplo.local
+        - generic [ref=f5e41]:
+          - generic [ref=f5e42]: IP do AD
+          - textbox "IP do AD" [ref=f5e43]:
+            - /placeholder: 192.168.1.10
+        - generic [ref=f5e44]:
+          - generic [ref=f5e45]:
+            - text: Base DN
+            - button "Ajuda" [ref=f5e46] [cursor=pointer]: "?"
+          - textbox "Base DN Ajuda" [ref=f5e47]:
+            - /placeholder: dc=exemplo,dc=local
+        - generic [ref=f5e48]:
+          - generic [ref=f5e49]: Usuário
+          - textbox "Usuário" [ref=f5e50]:
+            - /placeholder: admin@exemplo.local
+        - generic [ref=f5e51]:
+          - generic [ref=f5e52]:
+            - text: OU de Usuários
+            - button "Ajuda" [ref=f5e53] [cursor=pointer]: "?"
+          - textbox "OU de Usuários Ajuda" [ref=f5e54]:
+            - /placeholder: CN=Users
+            - text: OU=DomainUsers,OU=ManagedUsers
+        - generic [ref=f5e55]:
+          - generic [ref=f5e56]: Senha
+          - generic [ref=f5e57]:
+            - textbox "Senha" [ref=f5e58]:
+              - /placeholder: ••••••••
+            - button "Mostrar senha" [ref=f5e59] [cursor=pointer]:
+              - img [ref=f5e60]
+        - generic [ref=f5e63]:
+          - button "Testar Conexão" [ref=f5e64] [cursor=pointer]:
+            - img [ref=f5e65]
+            - text: Testar Conexão
+          - button "Salvar" [ref=f5e67] [cursor=pointer]:
+            - img [ref=f5e68]
+            - text: Salvar

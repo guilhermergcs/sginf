@@ -1,0 +1,11 @@
+[     717ms] [LOG] [impeccable] Live variant mode ready. Hover over elements to pick one. @ http://localhost:8400/live.js:11427
+[    1024ms] [LOG] [impeccable] Live mode connected. @ http://localhost:8400/live.js:6367
+[  143147ms] [LOG] [impeccable] Live variant mode ready. Hover over elements to pick one. @ http://localhost:8400/live.js:11427
+[  143155ms] [LOG] [impeccable] Live mode connected. @ http://localhost:8400/live.js:6367
+[  195047ms] [LOG] [impeccable] Resumed active variant session 02bb6da9 (0/3 variants). @ http://localhost:8400/live.js:11441
+[  195052ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:5000/usuarios:0
+[  195052ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:5000/usuarios:0
+[  195058ms] [LOG] [impeccable] Live mode connected. @ http://localhost:8400/live.js:6367
+[  239484ms] [LOG] [impeccable] Resumed active variant session 02bb6da9 (0/3 variants). @ http://localhost:8400/live.js:11441
+[  239494ms] [LOG] [impeccable] Live mode connected. @ http://localhost:8400/live.js:6367
+[  292011ms] [LOG] [impeccable] Live mode exited. @ http://localhost:8400/live.js:10269

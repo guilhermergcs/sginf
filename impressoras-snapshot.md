@@ -1,0 +1,116 @@
+- generic [active] [ref=f1e1]:
+  - navigation [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - heading "Gestão TI" [level=1] [ref=f1e4]
+      - generic [ref=f1e5]: Painel Administrativo
+    - generic [ref=f1e6]:
+      - link "Computadores" [ref=f1e7] [cursor=pointer]:
+        - /url: /computadores
+        - img [ref=f1e9]
+        - generic [ref=f1e11]: Computadores
+      - link "Impressoras" [ref=f1e12] [cursor=pointer]:
+        - /url: /impressoras
+        - img [ref=f1e14]
+        - generic [ref=f1e18]: Impressoras
+      - link "Usuários AD" [ref=f1e19] [cursor=pointer]:
+        - /url: /usuarios
+        - img [ref=f1e21]
+        - generic [ref=f1e24]: Usuários AD
+      - link "Configuração AD" [ref=f1e25] [cursor=pointer]:
+        - /url: /config
+        - img [ref=f1e27]
+        - generic [ref=f1e30]: Configuração AD
+  - generic [ref=f1e31]:
+    - generic [ref=f1e32]:
+      - heading "Impressoras" [level=2] [ref=f1e33]
+      - paragraph [ref=f1e34]: Monitoramento de impressoras via SNMP
+    - generic [ref=f1e35]:
+      - generic [ref=f1e36]:
+        - generic [ref=f1e37]: "4"
+        - generic [ref=f1e38]: Total
+      - generic [ref=f1e39]:
+        - generic [ref=f1e40]: "4"
+        - generic [ref=f1e41]: OK
+      - generic [ref=f1e42]:
+        - generic [ref=f1e43]: "0"
+        - generic [ref=f1e44]: Offline
+    - generic [ref=f1e45]:
+      - heading "Adicionar Impressora" [level=3] [ref=f1e47]
+      - generic [ref=f1e49]:
+        - generic [ref=f1e50]:
+          - generic [ref=f1e51]: Nome
+          - 'textbox "Ex: HP Laserjet 1" [ref=f1e52]'
+        - generic [ref=f1e53]:
+          - generic [ref=f1e54]: IP
+          - 'textbox "Formato: 192.168.1.100" [ref=f1e55]':
+            - /placeholder: 192.168.1.100
+        - generic [ref=f1e56]:
+          - generic [ref=f1e57]: Comunidade SNMP
+          - textbox "public" [ref=f1e58]
+        - button "+ Adicionar" [ref=f1e59] [cursor=pointer]
+    - button "Verificar via SNMP Ctrl+Shift+S" [ref=f1e61] [cursor=pointer]:
+      - img [ref=f1e62]
+      - text: Verificar via SNMP
+      - generic [ref=f1e65]: Ctrl+Shift+S
+    - generic [ref=f1e66]:
+      - heading "Impressoras Cadastradas" [level=3] [ref=f1e68]
+      - table [ref=f1e70]:
+        - rowgroup [ref=f1e71]:
+          - row "Selecionar todos Nome IP Modelo Status Última Verif." [ref=f1e72]:
+            - columnheader "Selecionar todos" [ref=f1e73]:
+              - checkbox "Selecionar todos" [ref=f1e74] [cursor=pointer]
+            - columnheader "Nome" [ref=f1e75]
+            - columnheader "IP" [ref=f1e76]
+            - columnheader "Modelo" [ref=f1e77]
+            - columnheader "Status" [ref=f1e78]
+            - columnheader "Última Verif." [ref=f1e79]
+            - columnheader [ref=f1e80]
+        - rowgroup [ref=f1e81]:
+          - row "Selecionar PLANEJAMENTO PLANEJAMENTO 10.20.40.19 Brother NC-420h, Firmware Ver.R ,MID 8CH-143-001 ok 09/07/2026 11:37 Remover" [ref=f1e85]:
+            - cell "Selecionar PLANEJAMENTO" [ref=f1e86]:
+              - checkbox "Selecionar PLANEJAMENTO" [ref=f1e87] [cursor=pointer]
+            - cell "PLANEJAMENTO" [ref=f1e88]:
+              - strong [ref=f1e89]: PLANEJAMENTO
+            - cell "10.20.40.19" [ref=f1e90]
+            - cell "Brother NC-420h, Firmware Ver.R ,MID 8CH-143-001" [ref=f1e91]:
+              - generic [ref=f1e92]: Brother NC-420h, Firmware Ver.R ,MID 8CH-143-001
+            - cell "ok" [ref=f1e93]
+            - cell "09/07/2026 11:37" [ref=f1e94]
+            - cell "Remover" [ref=f1e95]:
+              - button "Remover" [ref=f1e96] [cursor=pointer]
+          - row "Selecionar GABINETE GABINETE 10.20.30.171 Brother NC-420h, Firmware Ver.R ,MID 8CH-143-001 ok 09/07/2026 11:37 Remover" [ref=f1e97]:
+            - cell "Selecionar GABINETE" [ref=f1e98]:
+              - checkbox "Selecionar GABINETE" [ref=f1e99] [cursor=pointer]
+            - cell "GABINETE" [ref=f1e100]:
+              - strong [ref=f1e101]: GABINETE
+            - cell "10.20.30.171" [ref=f1e102]
+            - cell "Brother NC-420h, Firmware Ver.R ,MID 8CH-143-001" [ref=f1e103]:
+              - generic [ref=f1e104]: Brother NC-420h, Firmware Ver.R ,MID 8CH-143-001
+            - cell "ok" [ref=f1e105]
+            - cell "09/07/2026 11:37" [ref=f1e106]
+            - cell "Remover" [ref=f1e107]:
+              - button "Remover" [ref=f1e108] [cursor=pointer]
+          - row "Selecionar SGGS COLORIDA SGGS COLORIDA 10.20.30.1 Brother NC-420h, Firmware Ver.R ,MID 8CH-143-001 ok 09/07/2026 11:37 Remover" [ref=f1e109]:
+            - cell "Selecionar SGGS COLORIDA" [ref=f1e110]:
+              - checkbox "Selecionar SGGS COLORIDA" [ref=f1e111] [cursor=pointer]
+            - cell "SGGS COLORIDA" [ref=f1e112]:
+              - strong [ref=f1e113]: SGGS COLORIDA
+            - cell "10.20.30.1" [ref=f1e114]
+            - cell "Brother NC-420h, Firmware Ver.R ,MID 8CH-143-001" [ref=f1e115]:
+              - generic [ref=f1e116]: Brother NC-420h, Firmware Ver.R ,MID 8CH-143-001
+            - cell "ok" [ref=f1e117]
+            - cell "09/07/2026 11:37" [ref=f1e118]
+            - cell "Remover" [ref=f1e119]:
+              - button "Remover" [ref=f1e120] [cursor=pointer]
+          - row "Selecionar STEM STEM 10.20.30.13 Brother NC-6800h, Firmware Ver.1.05 (11.02.16),MID 8C5-D41,FID 2 ok 09/07/2026 11:37 Remover" [ref=f1e121]:
+            - cell "Selecionar STEM" [ref=f1e122]:
+              - checkbox "Selecionar STEM" [ref=f1e123] [cursor=pointer]
+            - cell "STEM" [ref=f1e124]:
+              - strong [ref=f1e125]: STEM
+            - cell "10.20.30.13" [ref=f1e126]
+            - cell "Brother NC-6800h, Firmware Ver.1.05 (11.02.16),MID 8C5-D41,FID 2" [ref=f1e127]:
+              - generic [ref=f1e128]: Brother NC-6800h, Firmware Ver.1.05 (11.02.16),MID 8C5-D41,FID 2
+            - cell "ok" [ref=f1e129]
+            - cell "09/07/2026 11:37" [ref=f1e130]
+            - cell "Remover" [ref=f1e131]:
+              - button "Remover" [ref=f1e132] [cursor=pointer]
