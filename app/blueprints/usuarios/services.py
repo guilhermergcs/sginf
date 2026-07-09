@@ -9,7 +9,7 @@ def _conectar(config, use_ssl=False):
     ad_conn = Connection(ad_server, user=config['username'], password=config['password'], auto_bind=True)
     return ad_conn
 
-def _set_password(config, sam_account_name, nova_senha):
+def _set_password(config, sam_account_name, nova_senha, trocar_senha_proximo_login=False):
     search_base = _search_base(config)
     ad_conn = _conectar(config, use_ssl=True)
     ad_conn.search(
@@ -23,6 +23,8 @@ def _set_password(config, sam_account_name, nova_senha):
     dn = ad_conn.entries[0].entry_dn
     nova_senha_encoded = f'"{nova_senha}"'.encode('utf-16-le')
     ad_conn.modify(dn, {'unicodePwd': [(MODIFY_REPLACE, [nova_senha_encoded])]})
+    if trocar_senha_proximo_login:
+        ad_conn.modify(dn, {'pwdLastSet': [(MODIFY_REPLACE, [0])]})
     ad_conn.unbind()
     target = config['ad_ip'] or config['server']
     ad_server = Server(target, get_info=ALL)
@@ -131,7 +133,7 @@ def _delete_user(config, sam_account_name):
     ad_conn.unbind()
     raise Exception(f"Falha ao excluir usuário: {ad_conn.result.get('message', 'erro desconhecido')}")
 
-def _create_user(config, login, nome_completo, senha, email='', departamento='', cargo=''):
+def _create_user(config, login, nome_completo, senha, email='', departamento='', cargo='', trocar_senha_proximo_login=False):
     base_dn = config['base_dn']
     target_ou = f'OU=DomainUsers,OU=ManagedUsers,{base_dn}'
     dn = f'CN={nome_completo},{target_ou}'
@@ -168,5 +170,7 @@ def _create_user(config, login, nome_completo, senha, email='', departamento='',
         raise Exception(f"Usuário criado, mas falha ao definir senha. Exclua manualmente no AD. Erro: {str(e)}")
 
     ad_conn.modify(dn, {'userAccountControl': [(MODIFY_REPLACE, [512])]})
+    if trocar_senha_proximo_login:
+        ad_conn.modify(dn, {'pwdLastSet': [(MODIFY_REPLACE, [0])]})
     ad_conn.unbind()
     return login

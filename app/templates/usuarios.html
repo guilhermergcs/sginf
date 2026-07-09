@@ -61,6 +61,12 @@
           <button type="button" class="toggle-password" id="toggle-confirmar-senha" aria-label="Mostrar senha"><svg class="icon-lg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
         </div>
       </div>
+      <div class="form-group-checkbox">
+        <label class="checkbox-label">
+          <input type="checkbox" id="password-trocar-senha">
+          <span>Usuário deve trocar a senha no próximo login</span>
+        </label>
+      </div>
       <p class="dialog-message" id="password-feedback"></p>
       <div class="dialog-actions">
         <button class="btn btn-secondary" id="password-cancel" autofocus>Cancelar</button>
@@ -131,6 +137,12 @@
           <input type="password" id="create-senha" placeholder="Mínimo 6 caracteres" minlength="6" required>
           <button type="button" class="toggle-password" id="toggle-create-senha" aria-label="Mostrar senha"><svg class="icon-lg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
         </div>
+      </div>
+      <div class="form-group-checkbox">
+        <label class="checkbox-label">
+          <input type="checkbox" id="create-trocar-senha">
+          <span>Usuário deve trocar a senha no próximo login</span>
+        </label>
       </div>
       <p class="dialog-message" id="create-feedback"></p>
       <div class="dialog-actions">
@@ -309,6 +321,7 @@
     document.getElementById('password-dialog-user').textContent = 'Usuário: ' + login;
     senhaInput.value = '';
     confirmarInput.value = '';
+    document.getElementById('password-trocar-senha').checked = false;
     senhaFeedback.textContent = '';
     senhaFeedback.className = 'dialog-message';
     var okBtn = document.getElementById('password-ok');
@@ -342,7 +355,7 @@
       var resp = await fetch('/api/usuarios/trocar-senha', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({login: senhaLogin, nova_senha: nova})
+        body: JSON.stringify({login: senhaLogin, nova_senha: nova, trocar_senha_proximo_login: document.getElementById('password-trocar-senha').checked})
       });
       var r = await resp.json();
       if (resp.ok) {
@@ -382,12 +395,13 @@
     email: document.getElementById('create-email'),
     departamento: document.getElementById('create-departamento'),
     cargo: document.getElementById('create-cargo'),
-    senha: document.getElementById('create-senha')
+    senha: document.getElementById('create-senha'),
+    trocar_senha: document.getElementById('create-trocar-senha')
   };
   var createFeedback = document.getElementById('create-feedback');
 
   document.getElementById('btn-criar').addEventListener('click', function() {
-    for (var k in createInputs) createInputs[k].value = '';
+    for (var k in createInputs) { var el = createInputs[k]; if (el.type === 'checkbox') el.checked = false; else el.value = ''; }
     createFeedback.textContent = '';
     createFeedback.className = 'dialog-message';
     var okBtn = document.getElementById('create-ok');
@@ -426,7 +440,8 @@
           email: createInputs.email.value.trim(),
           departamento: createInputs.departamento.value.trim(),
           cargo: createInputs.cargo.value.trim(),
-          senha: senha
+          senha: senha,
+          trocar_senha_proximo_login: createInputs.trocar_senha.checked
         })
       });
       var r = await resp.json();

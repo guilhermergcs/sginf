@@ -44,7 +44,8 @@ def trocar_senha():
     if not config:
         return jsonify({"status": "error", "message": "Configuração AD não encontrada"}), 400
     try:
-        _set_password(dict(config), login, nova_senha)
+        trocar_senha = dados.get('trocar_senha_proximo_login', False)
+        _set_password(dict(config), login, nova_senha, trocar_senha)
         return jsonify({"status": "success", "message": f"Senha do usuário {login} alterada com sucesso!"})
     except ValueError as e:
         return jsonify({"status": "error", "message": str(e)}), 404
@@ -106,13 +107,14 @@ def criar_usuario():
     email = dados.get('email', '').strip()
     departamento = dados.get('departamento', '').strip()
     cargo = dados.get('cargo', '').strip()
+    trocar_senha = dados.get('trocar_senha_proximo_login', False)
     conn_db = get_db_connection()
     config = conn_db.execute('SELECT * FROM config_ad WHERE id=1').fetchone()
     conn_db.close()
     if not config:
         return jsonify({"status": "error", "message": "Configuração AD não encontrada"}), 400
     try:
-        _create_user(dict(config), login, nome, senha, email, departamento, cargo)
+        _create_user(dict(config), login, nome, senha, email, departamento, cargo, trocar_senha)
         return jsonify({"status": "success", "message": f"Usuário {login} criado com sucesso!"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
