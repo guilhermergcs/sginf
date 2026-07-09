@@ -42,7 +42,7 @@ def listar_usuarios_ad(config):
     ad_conn.search(
         search_base=search_base,
         search_filter='(objectClass=user)',
-        attributes=['cn', 'sAMAccountName', 'userAccountControl']
+        attributes=['cn', 'sAMAccountName', 'userAccountControl', 'displayName', 'mail', 'department', 'title']
     )
     usuarios = []
     for entry in ad_conn.entries:
@@ -50,9 +50,16 @@ def listar_usuarios_ad(config):
         login = str(entry.sAMAccountName) if hasattr(entry, 'sAMAccountName') and entry.sAMAccountName else ''
         uac = int(str(entry.userAccountControl)) if hasattr(entry, 'userAccountControl') and entry.userAccountControl else 0
         ativo = not (uac & 2)
+        def _attr(e, a):
+            v = getattr(e, a, None)
+            return str(v) if v else ''
         usuarios.append({
             'nome': nome,
             'login': login,
+            'displayName': _attr(entry, 'displayName'),
+            'email': _attr(entry, 'mail'),
+            'departamento': _attr(entry, 'department'),
+            'cargo': _attr(entry, 'title'),
             'status': 'ativo' if ativo else 'inativo'
         })
     ad_conn.unbind()
@@ -74,4 +81,32 @@ def _set_user_status(config, sam_account_name, ativo):
     uac = int(str(entry.userAccountControl)) if hasattr(entry, 'userAccountControl') and entry.userAccountControl else 0
     novo_uac = uac & ~2 if ativo else uac | 2
     ad_conn.modify(dn, {'userAccountControl': [(MODIFY_REPLACE, [novo_uac])]})
+    ad_conn.unbind()
+
+def _update_user(config, sam_account_name, campos):
+    search_base = _search_base(config)
+    ad_conn = _conectar(config)
+    ad_conn.search(
+        search_base=search_base,
+        search_filter=f'(sAMAccountName={sam_account_name})',
+        attributes=['distinguishedName']
+    )
+    if not ad_conn.entries:
+        ad_conn.unbind()
+        raise ValueError(f"Usuário {sam_account_name} não encontrado")
+    dn = ad_conn.entries[0].entry_dn
+    mapeamento = {
+        'nome': 'cn',
+        'displayName': 'displayName',
+        'email': 'mail',
+        'departamento': 'department',
+        'cargo': 'title'
+    }
+    modificacoes = {}
+    for chave, valor in campos.items():
+        attr_ad = mapeamento.get(chave)
+        if attr_ad:
+            modificacoes[attr_ad] = [(MODIFY_REPLACE, [valor])]
+    if modificacoes:
+        ad_conn.modify(dn, modificacoes)
     ad_conn.unbind()

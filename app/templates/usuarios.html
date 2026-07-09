@@ -67,6 +67,34 @@
       </div>
     </div>
   </dialog>
+
+  <dialog id="edit-dialog" class="dialog">
+    <div class="dialog-body">
+      <h3 class="dialog-title">Editar Usuário</h3>
+      <p class="dialog-subtitle" id="edit-dialog-user"></p>
+      <div class="form-group">
+        <label for="edit-nome">Nome</label>
+        <input type="text" id="edit-nome" placeholder="Nome completo">
+      </div>
+      <div class="form-group">
+        <label for="edit-email">E-mail</label>
+        <input type="email" id="edit-email" placeholder="email@dominio.com">
+      </div>
+      <div class="form-group">
+        <label for="edit-departamento">Departamento</label>
+        <input type="text" id="edit-departamento" placeholder="Departamento">
+      </div>
+      <div class="form-group">
+        <label for="edit-cargo">Cargo</label>
+        <input type="text" id="edit-cargo" placeholder="Cargo">
+      </div>
+      <p class="dialog-message" id="edit-feedback"></p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="edit-cancel" autofocus>Cancelar</button>
+        <button class="btn btn-primary" id="edit-ok">Salvar</button>
+      </div>
+    </div>
+  </dialog>
 {% endblock %}
 
 {% block scripts %}
@@ -96,6 +124,7 @@
         const acao = (u.status === 'ativo'
           ? `<button class="btn btn-success btn-sm" onclick="desativar('${u.login}')" title="Desativar"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></button>`
           : `<button class="btn btn-warning btn-sm" onclick="ativar('${u.login}')" title="Ativar"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>`)
+          + `<button class="btn btn-sm btn-secondary" onclick="abrirEditar(this)" title="Editar usuário" data-login="${u.login}" data-nome="${u.nome.replace(/"/g,'&quot;')}" data-email="${(u.email||'').replace(/"/g,'&quot;')}" data-departamento="${(u.departamento||'').replace(/"/g,'&quot;')}" data-cargo="${(u.cargo||'').replace(/"/g,'&quot;')}"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`
           + `<button class="btn btn-sm btn-secondary" onclick="abrirTrocarSenha('${u.login}')" title="Trocar senha"><img src="/static/key-icon.png" width="14" height="14" alt="" style="vertical-align:middle"></button>`;
         linha.innerHTML = `
           <td class="select-col"><input type="checkbox" class="row-select" value="${u.login}" data-status="${u.status}" aria-label="Selecionar ${u.nome}"></td>
@@ -287,6 +316,88 @@
     confirmarInput.value = '';
     senhaFeedback.textContent = '';
     senhaFeedback.className = 'dialog-message';
+  });
+
+  var editDialog = document.getElementById('edit-dialog');
+  var editLogin = '';
+  var editInputs = {
+    nome: document.getElementById('edit-nome'),
+    email: document.getElementById('edit-email'),
+    departamento: document.getElementById('edit-departamento'),
+    cargo: document.getElementById('edit-cargo')
+  };
+  var editFeedback = document.getElementById('edit-feedback');
+
+  function abrirEditar(btn) {
+    editLogin = btn.dataset.login;
+    document.getElementById('edit-dialog-user').textContent = 'Login: ' + editLogin;
+    editInputs.nome.value = btn.dataset.nome || '';
+    editInputs.email.value = btn.dataset.email || '';
+    editInputs.departamento.value = btn.dataset.departamento || '';
+    editInputs.cargo.value = btn.dataset.cargo || '';
+    editFeedback.textContent = '';
+    editFeedback.className = 'dialog-message';
+    var okBtn = document.getElementById('edit-ok');
+    okBtn.disabled = false;
+    okBtn.innerHTML = 'Salvar';
+    document.getElementById('edit-cancel').disabled = false;
+    editDialog.showModal();
+    editInputs.nome.focus();
+  }
+
+  document.getElementById('edit-ok').addEventListener('click', async function() {
+    var campos = {};
+    if (editInputs.nome.value.trim()) campos.nome = editInputs.nome.value.trim();
+    if (editInputs.email.value.trim()) campos.email = editInputs.email.value.trim();
+    if (editInputs.departamento.value.trim()) campos.departamento = editInputs.departamento.value.trim();
+    if (editInputs.cargo.value.trim()) campos.cargo = editInputs.cargo.value.trim();
+    if (Object.keys(campos).length === 0) {
+      editFeedback.textContent = 'Preencha pelo menos um campo.';
+      editFeedback.className = 'dialog-message feedback-error';
+      return;
+    }
+    var btn = this;
+    btn.disabled = true;
+    btn.innerHTML = 'Salvando...';
+    document.getElementById('edit-cancel').disabled = true;
+    try {
+      var resp = await fetch('/api/usuarios/editar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({login: editLogin, ...campos})
+      });
+      var r = await resp.json();
+      if (resp.ok) {
+        editDialog.close();
+        showStatus(r.message, true);
+        carregar();
+      } else {
+        editFeedback.textContent = r.message || 'Erro ao atualizar usuário.';
+        editFeedback.className = 'dialog-message feedback-error';
+        btn.disabled = false;
+        btn.innerHTML = 'Salvar';
+        document.getElementById('edit-cancel').disabled = false;
+      }
+    } catch {
+      editFeedback.textContent = 'Erro de rede. Verifique a conexão com o servidor.';
+      editFeedback.className = 'dialog-message feedback-error';
+      btn.disabled = false;
+      btn.innerHTML = 'Salvar';
+      document.getElementById('edit-cancel').disabled = false;
+    }
+  });
+
+  document.getElementById('edit-cancel').addEventListener('click', function() {
+    editDialog.close();
+  });
+
+  editDialog.addEventListener('close', function() {
+    editInputs.nome.value = '';
+    editInputs.email.value = '';
+    editInputs.departamento.value = '';
+    editInputs.cargo.value = '';
+    editFeedback.textContent = '';
+    editFeedback.className = 'dialog-message';
   });
 
   $('btn-carregar').addEventListener('click', carregar);

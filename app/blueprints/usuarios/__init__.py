@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, render_template, request
 from app.db import get_db_connection
-from app.blueprints.usuarios.services import listar_usuarios_ad, _set_user_status, _set_password
+from app.blueprints.usuarios.services import listar_usuarios_ad, _set_user_status, _set_password, _update_user
 
 usuarios_bp = Blueprint('usuarios', __name__)
 
@@ -50,6 +50,31 @@ def trocar_senha():
         return jsonify({"status": "error", "message": str(e)}), 404
     except Exception as e:
         return jsonify({"status": "error", "message": f"Erro ao alterar senha: {str(e)}"}), 500
+
+@usuarios_bp.route('/api/usuarios/editar', methods=['POST'])
+def editar_usuario():
+    dados = request.json
+    login = dados.get('login')
+    if not login:
+        return jsonify({"status": "error", "message": "Login é obrigatório"}), 400
+    campos = {}
+    for k in ('nome', 'displayName', 'email', 'departamento', 'cargo'):
+        if k in dados:
+            campos[k] = dados[k]
+    if not campos:
+        return jsonify({"status": "error", "message": "Nenhum campo para alterar"}), 400
+    conn_db = get_db_connection()
+    config = conn_db.execute('SELECT * FROM config_ad WHERE id=1').fetchone()
+    conn_db.close()
+    if not config:
+        return jsonify({"status": "error", "message": "Configuração AD não encontrada"}), 400
+    try:
+        _update_user(dict(config), login, campos)
+        return jsonify({"status": "success", "message": f"Usuário {login} atualizado com sucesso!"})
+    except ValueError as e:
+        return jsonify({"status": "error", "message": str(e)}), 404
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Erro ao atualizar usuário: {str(e)}"}), 500
 
 def _alterar_status(ativo):
     dados = request.json
