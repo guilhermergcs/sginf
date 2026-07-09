@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% block title %}Grupos AD - Gerenciamento de TI{% endblock %}
+{% block nav_grupos %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Grupos AD</h2>
+  <p>Gerenciar grupos em OU=ManagedGroups</p>
+</div>
+
+<div class="toolbar">
+  <button class="btn btn-primary" id="btn-carregar"><svg class="icon-lg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Carregar Grupos <span class="kbd-hint">Ctrl+Shift+S</span></button>
+  <span class="status-msg" id="sync-status"></span>
+  <input type="text" class="search-input" placeholder="Buscar grupo..." oninput="filterTable('tab-grupos', this.value)" aria-label="Buscar grupo">
+</div>
+
+<div class="card">
+  <div class="card-header"><h3>Grupos</h3></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortTable('tab-grupos',0)" aria-sort="none">Nome</th>
+          <th onclick="sortTable('tab-grupos',1)" aria-sort="none">Descrição</th>
+          <th onclick="sortTable('tab-grupos',2)" aria-sort="none">Membros</th>
+        </tr>
+      </thead>
+      <tbody id="tab-grupos">
+        <tr><td colspan="3" class="loading"><span class="spinner"></span>Carregando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="tab-grupos-pagination"></div>
+</div>
+
+<div class="card" id="membros-card" style="display:none">
+  <div class="card-header">
+    <h3>Membros de <span id="grupo-selecionado"></span></h3>
+    <button class="btn btn-success btn-sm" id="btn-adicionar-membro"><svg class="icon-lg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Adicionar Membro</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Login</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tab-membros">
+        <tr><td colspan="3" class="loading">Selecione um grupo.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="tab-membros-pagination"></div>
+</div>
+
+{% set membro_search_id = 'membro-search-field' %}
+<dialog id="add-member-dialog" class="dialog">
+  <div class="dialog-body">
+    <h3 class="dialog-title">Adicionar Membro</h3>
+    <p class="dialog-subtitle">Adicionar usuário ao grupo <strong id="add-member-group-name"></strong></p>
+    <div class="form-group">
+      <label for="{{ membro_search_id }}">Buscar usuário (login ou nome)</label>
+      <input type="text" id="{{ membro_search_id }}" placeholder="Digite para buscar..." autocomplete="off">
+      <div id="membro-search-results" class="search-results"></div>
+    </div>
+    <p class="dialog-message" id="add-member-feedback"></p>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" id="add-member-cancel" autofocus>Cancelar</button>
+    </div>
+  </div>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  var tbodyGrupos = document.getElementById('tab-grupos');
+  var tbodyMembros = document.getElementById('tab-membros');
+  var membrosCard = document.getElementById('membros-card');
+  var grupoSelecionado = document.getElementById('grupo-selecionado');
+  var grupoAtual = '';
+  var statusMsg = document.getElementById('sync-status');
+
+  function showStatus(msg, ok) {
+    statusMsg.textContent = msg;
+    statusMsg.className = 'status-msg' + (ok !== undefined ? (ok ? ' success' : ' error') : '');
+  }
+
+  async function carregarGrupos() {
+    var btn = document.getElementById('btn-carregar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-inline visible"></span> Carregando...';
+    showStatus('Carregando grupos...');
+    try {
+      var resp = await fetch('/api/grupos');
+      var r = await resp.json();
+      if (!resp.ok) { showStatus(r.message, false); return; }
+      var dados = r.dados;
+      tbodyGrupos.innerHTML = dados.length ? '' : '<tr><td colspan="3" class="loading">Nenhum grupo encontrado.</td></tr>';
+      dados.forEach(function(g) {
+        var tr = document.createElement('tr');
+        tr.style.cursor = 'pointer';
+        tr.addEventListener('click', function() { selecionarGrupo(g.cn); });
+        tr.innerHTML = '<td><strong>' + g.cn + '</strong></td><td>' + (g.description || '') + '</td><td>' + g.member_count + '</td>';
+        tbodyGrupos.appendChild(tr);
+      });
+      initPagination('tab-grupos', 25);
+      showStatus(dados.length + ' grupos carregados', true);
+    } catch {
+      tbodyGrupos.innerHTML = '<tr><td colspan="3" class="loading loading-error">Erro ao carregar <button class="retry-link" onclick="carregarGrupos()">Tentar novamente</button></td></tr>';
+      showStatus('Falha ao carregar grupos. Verifique a conexão.', false);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<svg class="icon-lg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Carregar Grupos';
+    }
+  }
+
+  async function selecionarGrupo(cn) {
+    grupoAtual = cn;
+    grupoSelecionado.textContent = cn;
+    membrosCard.style.display = '';
+    tbodyMembros.innerHTML = '<tr><td colspan="3" class="loading"><span class="spinner"></span> Carregando...</td></tr>';
+    try {
+      var resp = await fetch('/api/grupos/membros?group=' + encodeURIComponent(cn));
+      var r = await resp.json();
+      if (!resp.ok) { tbodyMembros.innerHTML = '<tr><td colspan="3" class="loading loading-error">' + r.message + '</td></tr>'; return; }
+      var dados = r.dados;
+      tbodyMembros.innerHTML = dados.length ? '' : '<tr><td colspan="3" class="loading">Nenhum membro.</td></tr>';
+      dados.forEach(function(m) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td><strong>' + m.cn + '</strong></td><td class="cell-mono">' + m.sAMAccountName + '</td>'
+          + '<td><button class="btn btn-danger btn-sm" onclick="removerMembro(\'' + cn.replace(/'/g,"\\'") + '\',\'' + m.sAMAccountName.replace(/'/g,"\\'") + '\')" title="Remover"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></td>';
+        tbodyMembros.appendChild(tr);
+      });
+      initPagination('tab-membros', 25);
+    } catch {
+      tbodyMembros.innerHTML = '<tr><td colspan="3" class="loading loading-error">Erro ao carregar membros.</td></tr>';
+    }
+  }
+
+  async function removerMembro(group, user) {
+    if (!await confirmDialog('Remover usuário <strong>' + user + '</strong> do grupo <strong>' + group + '</strong>?')) return;
+    try {
+      var resp = await fetch('/api/grupos/remover-membro', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({group: group, user: user})
+      });
+      var r = await resp.json();
+      showStatus(r.message, resp.ok);
+      if (resp.ok) { selecionarGrupo(group); carregarGrupos(); }
+    } catch { showStatus('Falha ao remover membro.', false); }
+  }
+
+  var addDialog = document.getElementById('add-member-dialog');
+  var addSearchField = document.getElementById('membro-search-field');
+  var addResults = document.getElementById('membro-search-results');
+  var addFeedback = document.getElementById('add-member-feedback');
+  var addGroupName = document.getElementById('add-member-group-name');
+
+  document.getElementById('btn-adicionar-membro').addEventListener('click', function() {
+    if (!grupoAtual) return;
+    addGroupName.textContent = grupoAtual;
+    addSearchField.value = '';
+    addResults.innerHTML = '';
+    addFeedback.textContent = '';
+    addFeedback.className = 'dialog-message';
+    addDialog.showModal();
+    addSearchField.focus();
+  });
+
+  document.getElementById('add-member-cancel').addEventListener('click', function() {
+    addDialog.close();
+  });
+
+  addDialog.addEventListener('close', function() {
+    addSearchField.value = '';
+    addResults.innerHTML = '';
+    addFeedback.textContent = '';
+    addFeedback.className = 'dialog-message';
+  });
+
+  var searchTimer = null;
+  addSearchField.addEventListener('input', function() {
+    clearTimeout(searchTimer);
+    var q = this.value.trim();
+    if (q.length < 2) { addResults.innerHTML = ''; return; }
+    searchTimer = setTimeout(function() {
+      fetch('/api/usuarios')
+        .then(function(resp) { return resp.json(); })
+        .then(function(r) {
+          if (!r.dados) { addResults.innerHTML = '<div class="search-result-item empty">Erro ao buscar</div>'; return; }
+          var filtered = r.dados.filter(function(u) {
+            return u.login.toLowerCase().includes(q.toLowerCase()) || u.nome.toLowerCase().includes(q.toLowerCase());
+          });
+          if (!filtered.length) { addResults.innerHTML = '<div class="search-result-item empty">Nenhum resultado</div>'; return; }
+          addResults.innerHTML = filtered.slice(0, 15).map(function(u) {
+            return '<div class="search-result-item" data-login="' + u.login + '"><strong>' + u.nome + '</strong> <span class="cell-mono">' + u.login + '</span></div>';
+          }).join('');
+          addResults.querySelectorAll('.search-result-item').forEach(function(el) {
+            el.addEventListener('click', function() {
+              var login = this.dataset.login;
+              adicionarMembro(grupoAtual, login);
+            });
+          });
+        });
+    }, 300);
+  });
+
+  async function adicionarMembro(group, user) {
+    addFeedback.textContent = 'Adicionando...';
+    addFeedback.className = 'dialog-message';
+    try {
+      var resp = await fetch('/api/grupos/adicionar-membro', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({group: group, user: user})
+      });
+      var r = await resp.json();
+      if (resp.ok) {
+        addDialog.close();
+        showStatus(r.message, true);
+        selecionarGrupo(group);
+        carregarGrupos();
+      } else {
+        addFeedback.textContent = r.message;
+        addFeedback.className = 'dialog-message feedback-error';
+      }
+    } catch {
+      addFeedback.textContent = 'Erro de rede.';
+      addFeedback.className = 'dialog-message feedback-error';
+    }
+  }
+
+  document.getElementById('btn-carregar').addEventListener('click', carregarGrupos);
+  window.addEventListener('DOMContentLoaded', function() {
+    carregarGrupos();
+    bindRowSelection('tab-grupos');
+  });
+</script>
+{% endblock %}
