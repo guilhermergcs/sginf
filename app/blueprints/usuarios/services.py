@@ -111,3 +111,22 @@ def _update_user(config, sam_account_name, campos):
     if modificacoes:
         ad_conn.modify(dn, modificacoes)
     ad_conn.unbind()
+
+def _delete_user(config, sam_account_name):
+    search_base = _search_base(config)
+    ad_conn = _conectar(config)
+    ad_conn.search(
+        search_base=search_base,
+        search_filter=f'(sAMAccountName={sam_account_name})',
+        attributes=['distinguishedName']
+    )
+    if not ad_conn.entries:
+        ad_conn.unbind()
+        raise ValueError(f"Usuário {sam_account_name} não encontrado")
+    dn = ad_conn.entries[0].entry_dn
+    ad_conn.delete(dn)
+    if ad_conn.result['description'] == 'success':
+        ad_conn.unbind()
+        return
+    ad_conn.unbind()
+    raise Exception(f"Falha ao excluir usuário: {ad_conn.result.get('message', 'erro desconhecido')}")

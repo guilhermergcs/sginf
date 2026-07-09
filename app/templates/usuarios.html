@@ -129,7 +129,8 @@
           ? `<button class="btn btn-success btn-sm" onclick="desativar('${u.login}')" title="Desativar"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></button>`
           : `<button class="btn btn-warning btn-sm" onclick="ativar('${u.login}')" title="Ativar"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>`)
           + `<button class="btn btn-sm btn-secondary" onclick="abrirEditar(this)" title="Editar usuário" data-login="${u.login}" data-nome="${u.nome.replace(/"/g,'&quot;')}" data-email="${(u.email||'').replace(/"/g,'&quot;')}" data-departamento="${(u.departamento||'').replace(/"/g,'&quot;')}" data-cargo="${(u.cargo||'').replace(/"/g,'&quot;')}"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`
-          + `<button class="btn btn-sm btn-secondary" onclick="abrirTrocarSenha('${u.login}')" title="Trocar senha"><img src="/static/key-icon.png" width="14" height="14" alt="" style="vertical-align:middle"></button>`;
+           + `<button class="btn btn-sm btn-secondary" onclick="abrirTrocarSenha('${u.login}')" title="Trocar senha"><img src="/static/key-icon.png" width="14" height="14" alt="" style="vertical-align:middle"></button>`
+           + `<button class="btn btn-sm btn-danger" onclick="excluirUsuario(event,'${u.login}')" title="Excluir usuário"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>`;
         linha.innerHTML = `
           <td class="select-col"><input type="checkbox" class="row-select" value="${u.login}" data-status="${u.status}" aria-label="Selecionar ${u.nome}"></td>
           <td><strong>${u.nome}</strong></td>
@@ -204,6 +205,18 @@
     }
     carregar();
   });
+
+  async function excluirUsuario(evt, login) {
+    if (!await confirmDialog('Tem certeza que deseja excluir permanentemente o usuário <strong>' + login + '</strong> do AD? Esta ação não pode ser desfeita.')) return;
+    var btn = evt.target.closest('button');
+    btn.disabled = true;
+    try {
+      var resp = await fetch('/api/usuarios/excluir', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({login: login}) });
+      var r = await resp.json();
+      showStatus(r.message, resp.ok);
+    } catch { showStatus('Falha ao excluir usuário. Verifique a conexão.', false); }
+    carregar();
+  }
 
   desativarBtn.addEventListener('click', async function() {
     var ids = getSelectedIds('tab-usuarios').filter(function(id) { return document.querySelector('#tab-usuarios .row-select[value="' + id + '"]').dataset.status === 'ativo'; });

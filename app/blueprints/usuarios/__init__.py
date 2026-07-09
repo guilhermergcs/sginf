@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, render_template, request
 from app.db import get_db_connection
-from app.blueprints.usuarios.services import listar_usuarios_ad, _set_user_status, _set_password, _update_user
+from app.blueprints.usuarios.services import listar_usuarios_ad, _set_user_status, _set_password, _update_user, _delete_user
 
 usuarios_bp = Blueprint('usuarios', __name__)
 
@@ -73,6 +73,25 @@ def editar_usuario():
         return jsonify({"status": "error", "message": str(e)}), 404
     except Exception as e:
         return jsonify({"status": "error", "message": f"Erro ao atualizar usuário: {str(e)}"}), 500
+
+@usuarios_bp.route('/api/usuarios/excluir', methods=['POST'])
+def excluir_usuario():
+    dados = request.json
+    login = dados.get('login')
+    if not login:
+        return jsonify({"status": "error", "message": "Login é obrigatório"}), 400
+    conn_db = get_db_connection()
+    config = conn_db.execute('SELECT * FROM config_ad WHERE id=1').fetchone()
+    conn_db.close()
+    if not config:
+        return jsonify({"status": "error", "message": "Configuração AD não encontrada"}), 400
+    try:
+        _delete_user(dict(config), login)
+        return jsonify({"status": "success", "message": f"Usuário {login} excluído do AD com sucesso!"})
+    except ValueError as e:
+        return jsonify({"status": "error", "message": str(e)}), 404
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Erro ao excluir usuário: {str(e)}"}), 500
 
 def _alterar_status(ativo):
     dados = request.json
