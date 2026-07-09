@@ -9,6 +9,7 @@
 </div>
 
 <div class="toolbar">
+  <button class="btn btn-success" id="btn-criar-grupo"><svg class="icon-lg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo Grupo</button>
   <button class="btn btn-primary" id="btn-carregar"><svg class="icon-lg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Carregar Grupos <span class="kbd-hint">Ctrl+Shift+S</span></button>
   <span class="status-msg" id="sync-status"></span>
   <input type="text" class="search-input" placeholder="Buscar grupo..." oninput="filterTable('tab-grupos', this.value)" aria-label="Buscar grupo">
@@ -23,10 +24,11 @@
           <th onclick="sortTable('tab-grupos',0)" aria-sort="none">Nome</th>
           <th onclick="sortTable('tab-grupos',1)" aria-sort="none">Descrição</th>
           <th onclick="sortTable('tab-grupos',2)" aria-sort="none">Membros</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody id="tab-grupos">
-        <tr><td colspan="3" class="loading"><span class="spinner"></span>Carregando...</td></tr>
+        <tr><td colspan="4" class="loading"><span class="spinner"></span>Carregando...</td></tr>
       </tbody>
     </table>
   </div>
@@ -76,6 +78,46 @@
     </div>
   </div>
 </dialog>
+
+<dialog id="create-group-dialog" class="dialog">
+  <div class="dialog-body">
+    <h3 class="dialog-title">Novo Grupo</h3>
+    <p class="dialog-subtitle">Criar grupo em OU=ManagedGroups</p>
+    <div class="form-group">
+      <label for="create-group-cn">Nome do grupo *</label>
+      <input type="text" id="create-group-cn" placeholder="Nome do grupo" required>
+    </div>
+    <div class="form-group">
+      <label for="create-group-desc">Descrição</label>
+      <input type="text" id="create-group-desc" placeholder="Descrição opcional">
+    </div>
+    <p class="dialog-message" id="create-group-feedback"></p>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" id="create-group-cancel" autofocus>Cancelar</button>
+      <button class="btn btn-success" id="create-group-ok">Criar Grupo</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="edit-group-dialog" class="dialog">
+  <div class="dialog-body">
+    <h3 class="dialog-title">Editar Grupo</h3>
+    <p class="dialog-subtitle" id="edit-group-subtitle"></p>
+    <div class="form-group">
+      <label for="edit-group-cn">Nome do grupo</label>
+      <input type="text" id="edit-group-cn" placeholder="Novo nome">
+    </div>
+    <div class="form-group">
+      <label for="edit-group-desc">Descrição</label>
+      <input type="text" id="edit-group-desc" placeholder="Nova descrição">
+    </div>
+    <p class="dialog-message" id="edit-group-feedback"></p>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" id="edit-group-cancel" autofocus>Cancelar</button>
+      <button class="btn btn-primary" id="edit-group-ok">Salvar</button>
+    </div>
+  </div>
+</dialog>
 {% endblock %}
 
 {% block scripts %}
@@ -102,18 +144,21 @@
       var r = await resp.json();
       if (!resp.ok) { showStatus(r.message, false); return; }
       var dados = r.dados;
-      tbodyGrupos.innerHTML = dados.length ? '' : '<tr><td colspan="3" class="loading">Nenhum grupo encontrado.</td></tr>';
+      tbodyGrupos.innerHTML = dados.length ? '' : '<tr><td colspan="4" class="loading">Nenhum grupo encontrado.</td></tr>';
       dados.forEach(function(g) {
         var tr = document.createElement('tr');
-        tr.style.cursor = 'pointer';
-        tr.addEventListener('click', function() { selecionarGrupo(g.cn); });
-        tr.innerHTML = '<td><strong>' + g.cn + '</strong></td><td>' + (g.description || '') + '</td><td>' + g.member_count + '</td>';
+          tr.innerHTML = '<td><strong>' + g.cn + '</strong></td><td>' + (g.description || '') + '</td><td>' + g.member_count + '</td>'
+          + '<td><div class="actions">'
+          + '<button class="btn btn-sm btn-secondary" onclick="abrirEditarGrupo(event,\'' + g.cn.replace(/'/g,"\\'") + '\',\'' + (g.description||'').replace(/'/g,"\\'") + '\')" title="Editar grupo"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'
+          + '<button class="btn btn-sm btn-danger" onclick="excluirGrupo(event,\'' + g.cn.replace(/'/g,"\\'") + '\')" title="Excluir grupo"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>'
+          + '</div></td>';
+        tr.addEventListener('click', function(e) { if (e.target.closest('button')) return; selecionarGrupo(g.cn); });
         tbodyGrupos.appendChild(tr);
       });
       initPagination('tab-grupos', 25);
       showStatus(dados.length + ' grupos carregados', true);
     } catch {
-      tbodyGrupos.innerHTML = '<tr><td colspan="3" class="loading loading-error">Erro ao carregar <button class="retry-link" onclick="carregarGrupos()">Tentar novamente</button></td></tr>';
+      tbodyGrupos.innerHTML = '<tr><td colspan="4" class="loading loading-error">Erro ao carregar <button class="retry-link" onclick="carregarGrupos()">Tentar novamente</button></td></tr>';
       showStatus('Falha ao carregar grupos. Verifique a conexão.', false);
     } finally {
       btn.disabled = false;
@@ -243,6 +288,117 @@
   }
 
   document.getElementById('btn-carregar').addEventListener('click', carregarGrupos);
+
+  var createGroupDialog = document.getElementById('create-group-dialog');
+  var createGroupCn = document.getElementById('create-group-cn');
+  var createGroupDesc = document.getElementById('create-group-desc');
+  var createGroupFeedback = document.getElementById('create-group-feedback');
+
+  document.getElementById('btn-criar-grupo').addEventListener('click', function() {
+    createGroupCn.value = '';
+    createGroupDesc.value = '';
+    createGroupFeedback.textContent = '';
+    createGroupFeedback.className = 'dialog-message';
+    document.getElementById('create-group-ok').disabled = false;
+    document.getElementById('create-group-ok').innerHTML = 'Criar Grupo';
+    document.getElementById('create-group-cancel').disabled = false;
+    createGroupDialog.showModal();
+    createGroupCn.focus();
+  });
+
+  document.getElementById('create-group-cancel').addEventListener('click', function() { createGroupDialog.close(); });
+  createGroupDialog.addEventListener('close', function() {
+    createGroupCn.value = '';
+    createGroupDesc.value = '';
+    createGroupFeedback.textContent = '';
+    createGroupFeedback.className = 'dialog-message';
+  });
+
+  document.getElementById('create-group-ok').addEventListener('click', async function() {
+    var cn = createGroupCn.value.trim();
+    if (!cn) { createGroupFeedback.textContent = 'Nome do grupo é obrigatório.'; createGroupFeedback.className = 'dialog-message feedback-error'; return; }
+    var btn = this;
+    btn.disabled = true;
+    btn.innerHTML = 'Criando...';
+    document.getElementById('create-group-cancel').disabled = true;
+    try {
+      var resp = await fetch('/api/grupos/criar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({cn: cn, description: createGroupDesc.value.trim()})
+      });
+      var r = await resp.json();
+      if (resp.ok) { createGroupDialog.close(); showStatus(r.message, true); carregarGrupos(); }
+      else { createGroupFeedback.textContent = r.message; createGroupFeedback.className = 'dialog-message feedback-error'; btn.disabled = false; btn.innerHTML = 'Criar Grupo'; document.getElementById('create-group-cancel').disabled = false; }
+    } catch { createGroupFeedback.textContent = 'Erro de rede.'; createGroupFeedback.className = 'dialog-message feedback-error'; btn.disabled = false; btn.innerHTML = 'Criar Grupo'; document.getElementById('create-group-cancel').disabled = false; }
+  });
+
+  var editGroupDialog = document.getElementById('edit-group-dialog');
+  var editGroupCn = document.getElementById('edit-group-cn');
+  var editGroupDesc = document.getElementById('edit-group-desc');
+  var editGroupFeedback = document.getElementById('edit-group-feedback');
+  var editGroupAntigo = '';
+
+  function abrirEditarGrupo(evt, cn, desc) {
+    evt.stopPropagation();
+    editGroupAntigo = cn;
+    document.getElementById('edit-group-subtitle').textContent = 'Editando: ' + cn;
+    editGroupCn.value = cn;
+    editGroupDesc.value = desc;
+    editGroupFeedback.textContent = '';
+    editGroupFeedback.className = 'dialog-message';
+    document.getElementById('edit-group-ok').disabled = false;
+    document.getElementById('edit-group-ok').innerHTML = 'Salvar';
+    document.getElementById('edit-group-cancel').disabled = false;
+    editGroupDialog.showModal();
+    editGroupCn.focus();
+  }
+
+  document.getElementById('edit-group-cancel').addEventListener('click', function() { editGroupDialog.close(); });
+  editGroupDialog.addEventListener('close', function() {
+    editGroupCn.value = '';
+    editGroupDesc.value = '';
+    editGroupFeedback.textContent = '';
+    editGroupFeedback.className = 'dialog-message';
+  });
+
+  document.getElementById('edit-group-ok').addEventListener('click', async function() {
+    var novoCn = editGroupCn.value.trim();
+    var desc = editGroupDesc.value.trim();
+    if (!novoCn && !desc) { editGroupFeedback.textContent = 'Preencha pelo menos um campo.'; editGroupFeedback.className = 'dialog-message feedback-error'; return; }
+    var btn = this;
+    btn.disabled = true;
+    btn.innerHTML = 'Salvando...';
+    document.getElementById('edit-group-cancel').disabled = true;
+    try {
+      var resp = await fetch('/api/grupos/editar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({group_antigo: editGroupAntigo, novo_cn: novoCn, description: desc})
+      });
+      var r = await resp.json();
+      if (resp.ok) { editGroupDialog.close(); showStatus(r.message, true); carregarGrupos(); }
+      else { editGroupFeedback.textContent = r.message; editGroupFeedback.className = 'dialog-message feedback-error'; btn.disabled = false; btn.innerHTML = 'Salvar'; document.getElementById('edit-group-cancel').disabled = false; }
+    } catch { editGroupFeedback.textContent = 'Erro de rede.'; editGroupFeedback.className = 'dialog-message feedback-error'; btn.disabled = false; btn.innerHTML = 'Salvar'; document.getElementById('edit-group-cancel').disabled = false; }
+  });
+
+  async function excluirGrupo(evt, cn) {
+    evt.stopPropagation();
+    if (!await confirmDialog('Tem certeza que deseja excluir permanentemente o grupo <strong>' + cn + '</strong>?')) return;
+    var btn = evt.target.closest('button');
+    btn.disabled = true;
+    try {
+      var resp = await fetch('/api/grupos/excluir', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({group: cn})
+      });
+      var r = await resp.json();
+      showStatus(r.message, resp.ok);
+      if (resp.ok) carregarGrupos();
+    } catch { showStatus('Falha ao excluir grupo.', false); btn.disabled = false; }
+  }
+
   window.addEventListener('DOMContentLoaded', function() {
     carregarGrupos();
     bindRowSelection('tab-grupos');

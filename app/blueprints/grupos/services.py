@@ -120,3 +120,65 @@ def remover_membro_grupo(config, group_cn, user_login):
         ad_conn.unbind()
         raise Exception(f'Falha ao remover membro: {error_msg}')
     ad_conn.unbind()
+
+def _create_group(config, cn, description=''):
+    target_ou = _grupos_ou(config)
+    dn = f'CN={cn},{target_ou}'
+    ad_conn = _conectar(config)
+    attrs = {
+        'cn': cn,
+        'sAMAccountName': cn,
+        'objectClass': ['top', 'group'],
+        'groupType': -2147483646,
+    }
+    if description:
+        attrs['description'] = description
+    ad_conn.add(dn, attrs.pop('objectClass'), attrs)
+    if ad_conn.result['description'] != 'success':
+        msg = ad_conn.result.get('message', 'erro desconhecido')
+        ad_conn.unbind()
+        raise Exception(f'Falha ao criar grupo: {msg}')
+    ad_conn.unbind()
+    return cn
+
+def _update_group(config, group_cn, novo_cn='', description=''):
+    target_ou = _grupos_ou(config)
+    ad_conn = _conectar(config)
+    ad_conn.search(
+        search_base=target_ou,
+        search_filter=f'(cn={group_cn})',
+        attributes=['distinguishedName', 'cn']
+    )
+    if not ad_conn.entries:
+        ad_conn.unbind()
+        raise ValueError(f'Grupo {group_cn} não encontrado')
+    dn = ad_conn.entries[0].entry_dn
+    modificacoes = {}
+    if description:
+        modificacoes['description'] = [(MODIFY_REPLACE, [description])]
+    if novo_cn and novo_cn != group_cn:
+        ad_conn.modify_dn(dn, novo_cn)
+        dn = f'CN={novo_cn},{target_ou}'
+        modificacoes['sAMAccountName'] = [(MODIFY_REPLACE, [novo_cn])]
+    if modificacoes:
+        ad_conn.modify(dn, modificacoes)
+    ad_conn.unbind()
+
+def _delete_group(config, group_cn):
+    target_ou = _grupos_ou(config)
+    ad_conn = _conectar(config)
+    ad_conn.search(
+        search_base=target_ou,
+        search_filter=f'(cn={group_cn})',
+        attributes=['distinguishedName']
+    )
+    if not ad_conn.entries:
+        ad_conn.unbind()
+        raise ValueError(f'Grupo {group_cn} não encontrado')
+    dn = ad_conn.entries[0].entry_dn
+    ad_conn.delete(dn)
+    if ad_conn.result['description'] != 'success':
+        msg = ad_conn.result.get('message', 'erro desconhecido')
+        ad_conn.unbind()
+        raise Exception(f'Falha ao excluir grupo: {msg}')
+    ad_conn.unbind()
