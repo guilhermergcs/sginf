@@ -130,3 +130,43 @@ def _delete_user(config, sam_account_name):
         return
     ad_conn.unbind()
     raise Exception(f"Falha ao excluir usuário: {ad_conn.result.get('message', 'erro desconhecido')}")
+
+def _create_user(config, login, nome_completo, senha, email='', departamento='', cargo=''):
+    base_dn = config['base_dn']
+    target_ou = f'OU=DomainUsers,OU=ManagedUsers,{base_dn}'
+    dn = f'CN={nome_completo},{target_ou}'
+
+    ad_conn = _conectar(config)
+    attrs = {
+        'cn': nome_completo,
+        'sAMAccountName': login,
+        'userAccountControl': 514,
+        'displayName': nome_completo,
+        'givenName': nome_completo.split(' ', 1)[0],
+        'sn': nome_completo.split(' ', 1)[1] if ' ' in nome_completo else nome_completo,
+    }
+    if email:
+        attrs['mail'] = email
+    if departamento:
+        attrs['department'] = departamento
+    if cargo:
+        attrs['title'] = cargo
+
+    ad_conn.add(dn, ['user', 'person', 'organizationalPerson', 'top'], attrs)
+    if ad_conn.result['description'] != 'success':
+        msg = ad_conn.result.get('message', 'erro desconhecido')
+        ad_conn.unbind()
+        raise Exception(f"Falha ao criar usuário: {msg}")
+    ad_conn.unbind()
+
+    ad_conn = _conectar(config, use_ssl=True)
+    try:
+        nova_senha_encoded = f'"{senha}"'.encode('utf-16-le')
+        ad_conn.modify(dn, {'unicodePwd': [(MODIFY_REPLACE, [nova_senha_encoded])]})
+    except Exception as e:
+        ad_conn.unbind()
+        raise Exception(f"Usuário criado, mas falha ao definir senha. Exclua manualmente no AD. Erro: {str(e)}")
+
+    ad_conn.modify(dn, {'userAccountControl': [(MODIFY_REPLACE, [512])]})
+    ad_conn.unbind()
+    return login

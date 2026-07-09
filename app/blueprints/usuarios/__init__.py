@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, render_template, request
 from app.db import get_db_connection
-from app.blueprints.usuarios.services import listar_usuarios_ad, _set_user_status, _set_password, _update_user, _delete_user
+from app.blueprints.usuarios.services import listar_usuarios_ad, _set_user_status, _set_password, _update_user, _delete_user, _create_user
 
 usuarios_bp = Blueprint('usuarios', __name__)
 
@@ -92,6 +92,30 @@ def excluir_usuario():
         return jsonify({"status": "error", "message": str(e)}), 404
     except Exception as e:
         return jsonify({"status": "error", "message": f"Erro ao excluir usuário: {str(e)}"}), 500
+
+@usuarios_bp.route('/api/usuarios/criar', methods=['POST'])
+def criar_usuario():
+    dados = request.json
+    login = dados.get('login', '').strip()
+    nome = dados.get('nome', '').strip()
+    senha = dados.get('senha', '')
+    if not login or not nome:
+        return jsonify({"status": "error", "message": "Login e nome são obrigatórios"}), 400
+    if len(senha) < 6:
+        return jsonify({"status": "error", "message": "A senha deve ter no mínimo 6 caracteres"}), 400
+    email = dados.get('email', '').strip()
+    departamento = dados.get('departamento', '').strip()
+    cargo = dados.get('cargo', '').strip()
+    conn_db = get_db_connection()
+    config = conn_db.execute('SELECT * FROM config_ad WHERE id=1').fetchone()
+    conn_db.close()
+    if not config:
+        return jsonify({"status": "error", "message": "Configuração AD não encontrada"}), 400
+    try:
+        _create_user(dict(config), login, nome, senha, email, departamento, cargo)
+        return jsonify({"status": "success", "message": f"Usuário {login} criado com sucesso!"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 def _alterar_status(ativo):
     dados = request.json
