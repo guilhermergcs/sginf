@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Ajustes{% endblock %}
+{% block nav_settings %}active{% endblock %}
+{% block content %}
+<div style="max-width:600px;margin:2rem auto">
+  <div class="card">
+    <h2>Ajustes da Conta</h2>
+    <p><strong>Usuário:</strong> <span id="currentUsername"></span></p>
+
+    <h3 style="margin-top:2rem">Alterar Senha</h3>
+    <form id="passwordForm">
+      <div class="form-group">
+        <label>Senha atual</label>
+        <input type="password" id="oldPassword" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label>Nova senha</label>
+        <input type="password" id="newPassword" class="form-control" required minlength="4">
+      </div>
+      <button type="submit" class="btn btn-primary">Salvar Senha</button>
+    </form>
+    <p id="pwMsg" style="margin-top:0.5rem"></p>
+
+    <h3 style="margin-top:2rem">Windows Hello</h3>
+    <div id="webauthnSection">
+      <p id="webauthnStatus">Verificando...</p>
+      <button id="registerWebauthn" class="btn btn-primary" style="display:none">Registrar Windows Hello</button>
+      <button id="removeWebauthn" class="btn btn-danger" style="display:none">Remover</button>
+    </div>
+
+    <h3 style="margin-top:2rem">Telegram</h3>
+    <div id="telegramSection">
+      <p id="telegramStatus">Verificando...</p>
+      <button id="linkTelegram" class="btn btn-primary" style="display:none">Vincular Telegram</button>
+      <button id="unlinkTelegram" class="btn btn-danger" style="display:none">Desvincular</button>
+      <div id="telegramLinkQR" style="display:none;text-align:center;margin-top:1rem">
+        <p>Escaneie com Telegram e envie o codigo:</p>
+        <img id="telegramQrImg" style="width:200px;height:200px;background:#fff;padding:8px;border-radius:8px">
+        <p id="telegramLinkStatus" style="margin-top:0.5rem"></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function loadProfile() {
+  const r = await fetch('/api/auth/me');
+  if (!r.ok) return window.location.href = '/login';
+  const data = await r.json();
+  document.getElementById('currentUsername').textContent = data.username;
+}
+loadProfile();
+
+document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const r = await fetch('/api/auth/change-password', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'X-CSRF-Token': getCookie('csrf_token')},
+    body: JSON.stringify({
+      old_password: document.getElementById('oldPassword').value,
+      new_password: document.getElementById('newPassword').value,
+    }),
+  });
+  const res = await r.json();
+  const msg = document.getElementById('pwMsg');
+  if (r.ok) {
+    msg.className = 'text-success';
+    msg.textContent = 'Senha alterada com sucesso!';
+    document.getElementById('passwordForm').reset();
+  } else {
+    msg.className = 'text-danger';
+    msg.textContent = res.error;
+  }
+});
+
+// WebAuthn
+async function loadWebAuthn() {
+  if (!window.PublicKeyCredential) {
+    document.getElementById('webauthnStatus').textContent = 'Windows Hello não disponível neste navegador.';
+    return;
+  }
+  const r = await fetch('/api/auth/webauthn/credentials');
+  const creds = await r.json();
+  const status = document.getElementById('webauthnStatus');
+  const registerBtn = document.getElementById('registerWebauthn');
+  const removeBtn = document.getElementById('removeWebauthn');
+  if (creds.length > 0) {
+    status.textContent = 'Windows Hello registrado.';
+    removeBtn.style.display = 'block';
+    registerBtn.style.display = 'none';
+  } else {
+    status.textContent = 'Nenhum cadastro.';
+    registerBtn.style.display = 'block';
+    removeBtn.style.display = 'none';
+  }
+  registerBtn.onclick = async () => {
+    try {
+      const r1 = await fetch('/api/auth/webauthn/register/begin', {
+        method: 'POST', headers: {'X-CSRF-Token': getCookie('csrf_token')}
+      });
+      const data1 = await r1.json();
+      if (!r1.ok) throw new Error(data1.error);
+      const cred = await navigator.credentials.create({ publicKey: data1.options });
+      const r2 = await fetch('/api/auth/webauthn/register/complete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRF-Token': getCookie('csrf_token')},
+        body: JSON.stringify(cred),
+      });
+      const data2 = await r2.json();
+      if (r2.ok) { alert('Windows Hello registrado!'); loadWebAuthn(); }
+      else throw new Error(data2.error);
+    } catch(e) { alert('Erro: ' + e.message); }
+  };
+  removeBtn.onclick = async () => {
+    if (!confirm('Remover Windows Hello?')) return;
+    const r = await fetch('/api/auth/webauthn/credentials/' + creds[0].id, {
+      method: 'DELETE', headers: {'X-CSRF-Token': getCookie('csrf_token')}
+    });
+    if (r.ok) loadWebAuthn();
+  };
+}
+loadWebAuthn();
+
+// Telegram
+async function loadTelegramStatus() {
+  const r = await fetch('/api/auth/me');
+  const me = await r.json();
+  const status = document.getElementById('telegramStatus');
+  const linkBtn = document.getElementById('linkTelegram');
+  const unlinkBtn = document.getElementById('unlinkTelegram');
+  document.getElementById('telegramLinkQR').style.display = 'none';
+  if (me.telegram_linked) {
+    status.textContent = 'Telegram vinculado.';
+    linkBtn.style.display = 'none';
+    unlinkBtn.style.display = 'inline-block';
+  } else {
+    status.textContent = 'Nao vinculado.';
+    linkBtn.style.display = 'inline-block';
+    unlinkBtn.style.display = 'none';
+  }
+}
+loadTelegramStatus();
+
+document.getElementById('linkTelegram').addEventListener('click', async () => {
+  const qrDiv = document.getElementById('telegramLinkQR');
+  qrDiv.style.display = 'block';
+  try {
+    const r = await fetch('/api/auth/telegram/qrcode?purpose=link');
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error);
+    document.getElementById('telegramQrImg').src = 'data:image/png;base64,' + data.qr_base64;
+    document.getElementById('telegramLinkStatus').textContent = 'Codigo: ' + data.token;
+  } catch(e) {
+    document.getElementById('telegramLinkStatus').textContent = 'Erro: ' + e.message;
+  }
+});
+
+document.getElementById('unlinkTelegram').addEventListener('click', async () => {
+  if (!confirm('Desvincular Telegram?')) return;
+  alert('Funcionalidade de desvincular será implementada em breve.');
+});
+
+function getCookie(name) { return document.cookie.split('; ').find(r=>r.startsWith(name+'='))?.split('=')[1]||''; }
+</script>
+{% endblock %}
