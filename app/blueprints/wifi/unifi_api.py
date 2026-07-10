@@ -31,9 +31,9 @@ class UnifiController:
         for d in data.get('data', []):
             if d.get('type', '').lower() in ('uap', 'ap'):
                 n2 = n5 = n6 = 0
-                for radio in d.get('radio_table', []):
-                    band = radio.get('radio', '')
-                    sta = radio.get('num_sta', 0) or 0
+                for vap in d.get('vap_table', []):
+                    band = vap.get('radio', '')
+                    sta = vap.get('num_sta', 0) or 0
                     if band == 'ng':
                         n2 += sta
                     elif band == 'na':
