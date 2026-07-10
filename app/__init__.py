@@ -22,8 +22,9 @@ def create_app():
     app.register_blueprint(config_ad_bp)
     app.register_blueprint(wifi_bp)
 
-    @app.teardown_appcontext
-    def shutdown_teardown(exc=None):
-        pass
+    from app.blueprints.auth.telegram_bot import TelegramBot
+    bot = TelegramBot(app.config.get('TELEGRAM_BOT_TOKEN', ''))
+    bot.start(app)
+    app.config['TELEGRAM_BOT'] = bot
 
     return app

@@ -17,6 +17,15 @@
       <button type="submit" class="btn btn-primary" style="width:100%;margin-top:1rem">Entrar</button>
     </form>
     <p id="loginError" class="text-danger" style="margin-top:0.5rem;display:none"></p>
+    <hr style="margin:1.5rem 0">
+    <button id="webauthnBtn" class="btn btn-secondary" style="width:100%;display:none">Entrar com Windows Hello</button>
+    <button id="telegramBtn" class="btn btn-secondary" style="width:100%;margin-top:0.5rem">Entrar com Telegram</button>
+    <div id="telegramQR" style="display:none;text-align:center;margin-top:1rem">
+      <h4>Escaneie com Telegram</h4>
+      <img id="qrImage" style="width:200px;height:200px;background:#fff;padding:8px;border-radius:8px">
+      <p id="qrStatus" style="margin-top:0.5rem">Aguardando leitura...</p>
+      <button id="cancelTelegram" class="btn btn-sm btn-secondary">Cancelar</button>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -38,6 +47,69 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     document.getElementById('loginError').textContent = data.error;
     document.getElementById('loginError').style.display = 'block';
   }
+});
+
+// WebAuthn
+if (window.PublicKeyCredential) {
+  document.getElementById('webauthnBtn').style.display = 'block';
+  document.getElementById('webauthnBtn').addEventListener('click', async () => {
+    try {
+      const r1 = await fetch('/api/auth/webauthn/login/begin', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({}),
+      });
+      const data1 = await r1.json();
+      if (!r1.ok) throw new Error(data1.error);
+      const cred = await navigator.credentials.get({ publicKey: data1.options });
+      const r2 = await fetch('/api/auth/webauthn/login/complete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ credential: cred, credential_id: data1.options.allowCredentials?.[0]?.id || '' }),
+      });
+      const data2 = await r2.json();
+      if (r2.ok) window.location.href = data2.redirect;
+      else throw new Error(data2.error);
+    } catch (e) {
+      document.getElementById('loginError').textContent = e.message;
+      document.getElementById('loginError').style.display = 'block';
+    }
+  });
+}
+
+// Telegram QR
+let telegramToken = null;
+let telegramPoll = null;
+document.getElementById('telegramBtn').addEventListener('click', async () => {
+  document.getElementById('telegramBtn').style.display = 'none';
+  document.getElementById('telegramQR').style.display = 'block';
+  try {
+    const r = await fetch('/api/auth/telegram/qrcode?purpose=login');
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error);
+    telegramToken = data.token;
+    document.getElementById('qrImage').src = 'data:image/png;base64,' + data.qr_base64;
+    telegramPoll = setInterval(async () => {
+      const r2 = await fetch('/api/auth/telegram/check', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ token: telegramToken }),
+      });
+      const d2 = await r2.json();
+      if (d2.consumed) {
+        clearInterval(telegramPoll);
+        if (d2.redirect) window.location.href = d2.redirect;
+        else document.getElementById('qrStatus').textContent = 'Login confirmado!';
+      }
+    }, 2000);
+  } catch(e) {
+    document.getElementById('qrStatus').textContent = 'Erro: ' + e.message;
+  }
+});
+document.getElementById('cancelTelegram').addEventListener('click', () => {
+  clearInterval(telegramPoll);
+  document.getElementById('telegramQR').style.display = 'none';
+  document.getElementById('telegramBtn').style.display = 'block';
 });
 </script>
 {% endblock %}
