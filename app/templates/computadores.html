@@ -65,8 +65,8 @@
           <td class="select-col"><input type="checkbox" class="row-select" value="${pc.nome}" aria-label="Selecionar ${pc.nome}"></td>
           <td><strong>${pc.nome}</strong></td>
           <td class="cell-mono">${pc.ip || 'N/A'}</td>
-          <td>${pc.usuario_logado || '<span class="text-muted">Nenhum</span>'}</td>
-          <td><span class="${pc.status}">${pc.status}</span></td>
+           <td>${pc.usuario_logado ? pc.usuario_logado.split('; ').map(u => `<span class="user-badge">${u.split('\\').pop()}</span>`).join(' ') : '<span class="text-muted">Nenhum</span>'}</td>
+           <td><span class="status-badge ${pc.status}">${pc.status}</span></td>
         `;
         tbody.appendChild(linha);
       });

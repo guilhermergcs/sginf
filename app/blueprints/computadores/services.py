@@ -4,18 +4,45 @@ from ldap3 import Server, Connection, ALL, core
 from app.db import get_db_connection
 
 PS_SCRIPT_WMI = '''
-param($ip, $user, $pass)
+$ip = '_IP_'
+$user = '_USER_'
+$pass = '_PASS_'
 try {
     $secpass = ConvertTo-SecureString $pass -AsPlainText -Force
     $cred = New-Object System.Management.Automation.PSCredential($user, $secpass)
-    $u = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ip -Credential $cred -ErrorAction Stop
-    Write-Output $u.UserName
+    $loggedOn = Get-WmiObject -Class Win32_LoggedOnUser -ComputerName $ip -Credential $cred -ErrorAction Stop
+    $sessions = Get-WmiObject -Query "SELECT * FROM Win32_LogonSession WHERE LogonType = 2 OR LogonType = 10" -ComputerName $ip -Credential $cred -ErrorAction Stop
+    $adDomain = ($user -split '\\')[0]
+    $users = @()
+    foreach ($session in $sessions) {
+        $related = $loggedOn | Where-Object { $_.Dependent -match "LogonId=\""$($session.LogonId)\""" }
+        foreach ($rel in $related) {
+            if ($rel.Antecedent -match 'Domain="([^"]+)".*Name="([^"]+)"') {
+                $d = $matches[1]
+                $n = $matches[2]
+                if ($d -eq $adDomain) {
+                    $users += $d + '\' + $n
+                }
+            }
+        }
+    }
+    if ($users.Count -gt 0) {
+        Write-Output (($users | Select-Object -Unique) -join '; ')
+    } else {
+        $u = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ip -Credential $cred -ErrorAction Stop
+        Write-Output $u.UserName
+    }
 } catch {
     try {
-        $u = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ip -ErrorAction Stop
+        $u = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ip -Credential $cred -ErrorAction Stop
         Write-Output $u.UserName
     } catch {
-        Write-Output ''
+        try {
+            $u = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ip
+            Write-Output $u.UserName
+        } catch {
+            Write-Output ''
+        }
     }
 }
 '''
@@ -64,13 +91,17 @@ def verificar_ping(ip):
 
 def buscar_usuario_wmi(ip, ad_user, ad_pass):
     try:
+        def esc(s):
+            return s.replace("'", "''")
+        script = PS_SCRIPT_WMI.replace('_IP_', esc(ip)).replace('_USER_', esc(ad_user)).replace('_PASS_', esc(ad_pass))
         ps = subprocess.run(
-            ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', PS_SCRIPT_WMI,
-             '-ip', ip, '-user', ad_user, '-pass', ad_pass],
+            ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', script],
             capture_output=True, text=True, timeout=15
         )
         saida = ps.stdout.strip()
         if saida and 'Access Denied' not in saida and not saida.startswith('Error'):
+            if '; ' in saida:
+                return saida
             return saida.split('\\')[-1] if '\\' in saida else saida
     except:
         pass
