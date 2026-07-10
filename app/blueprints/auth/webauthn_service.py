@@ -89,18 +89,18 @@ def login_begin(username=None):
         allow_credentials=allow_credentials,
         user_verification=UserVerificationRequirement.PREFERRED,
     )
+    challenge_id = secrets.token_urlsafe(16)
     if 'webauthn_challenges' not in current_app.config:
         current_app.config['webauthn_challenges'] = {}
-    current_app.config['webauthn_challenges'][f'login:{request.remote_addr}'] = {
+    current_app.config['webauthn_challenges'][challenge_id] = {
         'challenge': challenge,
         'type': 'authentication',
         'allow_credentials': [c['credential_id'] for c in creds],
     }
-    return options_to_json(options), creds[0]['credential_id']
+    return options_to_json(options), creds[0]['credential_id'], challenge_id
 
-def login_complete(credential, credential_id_hex):
-    challenge_data = current_app.config.get('webauthn_challenges', {}).pop(
-        f'login:{request.remote_addr}', None)
+def login_complete(credential, credential_id_hex, challenge_id):
+    challenge_data = current_app.config.get('webauthn_challenges', {}).pop(challenge_id, None)
     if not challenge_data or challenge_data['type'] != 'authentication':
         raise ValueError('No pending authentication challenge')
     conn = get_db_connection()

@@ -31,7 +31,8 @@ def set_csrf_cookie(response):
     if request.path.startswith('/api/auth/') or request.path == '/login':
         if CSRF_COOKIE not in request.cookies:
             response.set_cookie(CSRF_COOKIE, generate_csrf(),
-                               httponly=False, samesite='Lax')
+                               httponly=False, samesite='Lax',
+                               secure=not current_app.debug)
     return response
 
 @auth_bp.route('/login')
@@ -65,6 +66,7 @@ def api_login():
     resp = make_response(jsonify({'ok': True, 'redirect': '/'}))
     resp.set_cookie('session_token', token,
                    httponly=True, samesite='Lax',
+                   secure=not current_app.debug,
                    max_age=8*3600)
     return resp
 
@@ -160,8 +162,8 @@ def api_webauthn_register_complete():
 def api_webauthn_login_begin():
     try:
         data = request.get_json(silent=True) or {}
-        options, cred_id = login_begin(data.get('username'))
-        return jsonify({'ok': True, 'options': json.loads(options)})
+        options, cred_id, challenge_id = login_begin(data.get('username'))
+        return jsonify({'ok': True, 'options': json.loads(options), 'challenge_id': challenge_id})
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)}), 400
 
@@ -169,11 +171,13 @@ def api_webauthn_login_begin():
 def api_webauthn_login_complete():
     try:
         data = request.get_json(silent=True)
-        user = login_complete(data['credential'], data['credential_id'])
+        user = login_complete(data['credential'], data['credential_id'], data['challenge_id'])
         token = make_jwt(user)
         resp = make_response(jsonify({'ok': True, 'redirect': '/'}))
         resp.set_cookie('session_token', token,
-                       httponly=True, samesite='Lax', max_age=8*3600)
+                       httponly=True, samesite='Lax',
+                       secure=not current_app.debug,
+                       max_age=8*3600)
         return resp
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)}), 400
@@ -240,6 +244,8 @@ def api_telegram_check():
         jwt_token = mk_jwt(user)
         resp = make_response(jsonify({'ok': True, 'consumed': True, 'redirect': '/'}))
         resp.set_cookie('session_token', jwt_token,
-                       httponly=True, samesite='Lax', max_age=8*3600)
+                       httponly=True, samesite='Lax',
+                       secure=not current_app.debug,
+                       max_age=8*3600)
         return resp
     return jsonify({'ok': True, 'consumed': True})

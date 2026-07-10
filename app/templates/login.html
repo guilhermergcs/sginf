@@ -65,7 +65,7 @@ if (window.PublicKeyCredential) {
       const r2 = await fetch('/api/auth/webauthn/login/complete', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ credential: cred, credential_id: data1.options.allowCredentials?.[0]?.id || '' }),
+        body: JSON.stringify({ credential: cred, credential_id: cred.id, challenge_id: data1.challenge_id }),
       });
       const data2 = await r2.json();
       if (r2.ok) window.location.href = data2.redirect;

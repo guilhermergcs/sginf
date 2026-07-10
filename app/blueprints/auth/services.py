@@ -49,6 +49,9 @@ def require_auth(f):
         return f(*args, **kwargs)
     return decorated
 
+def secure_cookie():
+    return not current_app.debug
+
 def require_admin(f):
     from functools import wraps
     @wraps(f)
