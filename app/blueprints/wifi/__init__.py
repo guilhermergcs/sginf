@@ -59,9 +59,10 @@ def sync_wifi():
         agora = datetime.now().strftime('%d/%m/%Y %H:%M')
         clientes_total = clientes_2g + clientes_5g
         conn_db = get_db_connection()
+        snmp_nome = nome or None
         conn_db.execute(
-            'UPDATE dispositivos_wifi SET status=?, modelo=?, clientes_2g=?, clientes_5g=?, clientes_total=?, ultima_verificacao=? WHERE id=?',
-            ('online' if online else 'offline', modelo, clientes_2g, clientes_5g, clientes_total, agora, d['id'])
+            'UPDATE dispositivos_wifi SET status=?, modelo=?, clientes_2g=?, clientes_5g=?, clientes_total=?, ultima_verificacao=?, nome=COALESCE(?, nome) WHERE id=?',
+            ('online' if online else 'offline', modelo, clientes_2g, clientes_5g, clientes_total, agora, snmp_nome, d['id'])
         )
         conn_db.commit()
         conn_db.close()
