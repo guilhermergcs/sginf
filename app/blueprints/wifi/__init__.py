@@ -97,14 +97,18 @@ def sync_wifi():
             resultados = []
             for d in devices:
                 num_sta = d['num_sta'] or 0
+                n2 = d['clientes_2g'] or 0
+                n5 = d['clientes_5g'] or 0
+                n6 = d['clientes_6g'] or 0
                 online = d['state'] == 1
                 conn_db.execute(
-                    'INSERT INTO dispositivos_wifi (nome, ip, modelo, clientes_total, status, ultima_verificacao) VALUES (?, ?, ?, ?, ?, ?)',
-                    (d['name'], d['ip'], d['model'], num_sta, 'online' if online else 'offline', agora)
+                    'INSERT INTO dispositivos_wifi (nome, ip, modelo, clientes_2g, clientes_5g, clientes_6g, clientes_total, status, ultima_verificacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    (d['name'], d['ip'], d['model'], n2, n5, n6, num_sta, 'online' if online else 'offline', agora)
                 )
                 resultados.append({
                     'nome': d['name'], 'ip': d['ip'], 'modelo': d['model'],
-                    'clientes_2g': 0, 'clientes_5g': 0, 'clientes_total': num_sta,
+                    'clientes_2g': n2, 'clientes_5g': n5, 'clientes_6g': n6,
+                    'clientes_total': num_sta,
                     'status': 'online' if online else 'offline',
                     'ultima_verificacao': agora
                 })

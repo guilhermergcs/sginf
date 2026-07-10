@@ -76,6 +76,7 @@ if __name__ == '__main__':
             modelo TEXT DEFAULT '',
             clientes_2g INTEGER DEFAULT 0,
             clientes_5g INTEGER DEFAULT 0,
+            clientes_6g INTEGER DEFAULT 0,
             clientes_total INTEGER DEFAULT 0,
             status TEXT DEFAULT 'offline',
             ultima_verificacao TEXT DEFAULT ''

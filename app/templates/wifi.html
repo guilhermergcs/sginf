@@ -79,14 +79,17 @@
           <th onclick="sortTable('tab-wifi',1)" aria-sort="none">Nome</th>
           <th onclick="sortTable('tab-wifi',2)" aria-sort="none">IP</th>
           <th onclick="sortTable('tab-wifi',3)" aria-sort="none">Modelo</th>
-          <th onclick="sortTable('tab-wifi',4)" aria-sort="none">Clientes</th>
-          <th onclick="sortTable('tab-wifi',5)" aria-sort="none">Status</th>
-          <th onclick="sortTable('tab-wifi',6)" aria-sort="none">Ultima Verif.</th>
+          <th onclick="sortTable('tab-wifi',4)" aria-sort="none">2.4GHz</th>
+          <th onclick="sortTable('tab-wifi',5)" aria-sort="none">5GHz</th>
+          <th onclick="sortTable('tab-wifi',6)" aria-sort="none">6GHz</th>
+          <th onclick="sortTable('tab-wifi',7)" aria-sort="none">Total</th>
+          <th onclick="sortTable('tab-wifi',8)" aria-sort="none">Status</th>
+          <th onclick="sortTable('tab-wifi',9)" aria-sort="none">Ultima Verif.</th>
           <th aria-label="Acoes"></th>
         </tr>
       </thead>
       <tbody id="tab-wifi">
-        <tr><td colspan="8" class="loading"><span class="spinner"></span>Carregando...</td></tr>
+        <tr><td colspan="11" class="loading"><span class="spinner"></span>Carregando...</td></tr>
       </tbody>
     </table>
   </div>
@@ -123,7 +126,7 @@
       $('offline-wifi').textContent = total - online;
       $('clientes-wifi').textContent = totalClientes;
 
-      tbody.innerHTML = total ? '' : '<tr><td colspan="8" class="loading">Nenhum dispositivo.</td></tr>';
+      tbody.innerHTML = total ? '' : '<tr><td colspan="11" class="loading">Nenhum dispositivo.</td></tr>';
       dados.forEach(d => {
         const linha = document.createElement('tr');
         linha.innerHTML = `
@@ -131,6 +134,9 @@
           <td><strong>${d.nome}</strong></td>
           <td class="cell-mono">${d.ip}</td>
           <td><span title="${d.modelo || '-'}">${(d.modelo || '-').substring(0, 40)}</span></td>
+          <td class="cell-mono">${d.clientes_2g ?? '-'}</td>
+          <td class="cell-mono">${d.clientes_5g ?? '-'}</td>
+          <td class="cell-mono">${d.clientes_6g ?? '-'}</td>
           <td><strong>${d.clientes_total ?? '-'}</strong></td>
           <td><span class="status-badge ${d.status}">${d.status}</span></td>
           <td class="ult-verif">${d.ultima_verificacao || '-'}</td>
@@ -150,7 +156,7 @@
       });
       initPagination('tab-wifi', 25);
     } catch {
-      tbody.innerHTML = '<tr><td colspan="8" class="loading loading-error">Erro ao carregar <button class="retry-link" onclick="carregar()">Tentar novamente</button></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" class="loading loading-error">Erro ao carregar <button class="retry-link" onclick="carregar()">Tentar novamente</button></td></tr>';
     }
   }
 

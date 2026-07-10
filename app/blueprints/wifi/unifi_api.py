@@ -30,11 +30,24 @@ class UnifiController:
         devices = []
         for d in data.get('data', []):
             if d.get('type', '').lower() in ('uap', 'ap'):
+                n2 = n5 = n6 = 0
+                for radio in d.get('radio_table', []):
+                    band = radio.get('radio', '')
+                    sta = radio.get('num_sta', 0) or 0
+                    if band == 'ng':
+                        n2 += sta
+                    elif band == 'na':
+                        n5 += sta
+                    elif band in ('6e', '6g'):
+                        n6 += sta
                 devices.append({
                     'name': d.get('name') or d.get('device_id', ''),
                     'model': d.get('model', ''),
                     'ip': d.get('ip', ''),
                     'num_sta': d.get('num_sta', 0),
+                    'clientes_2g': n2,
+                    'clientes_5g': n5,
+                    'clientes_6g': n6,
                     'state': d.get('state', 0),
                     'mac': d.get('mac', ''),
                     'version': d.get('version', ''),
