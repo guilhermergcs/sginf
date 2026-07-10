@@ -1,98 +1,97 @@
 import sqlite3
 
-def conectar():
-    return sqlite3.connect('gestao_ti.db')
+def get_db_connection():
+    conn = sqlite3.connect('gestao_ti.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def criar_tabelas():
-    conn = conectar()
-    cursor = conn.cursor()
-
-    # 1. Tabela de Usuários do Sistema
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS usuarios_sistema (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            senha TEXT NOT NULL,
-            tipo TEXT DEFAULT 'admin'
-        )
-    ''')
-
-    # 2. Tabela de Computadores (Gerenciados)
-    cursor.execute('''
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.executescript('''
         CREATE TABLE IF NOT EXISTS computadores (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT UNIQUE NOT NULL,
             ip TEXT,
             usuario_logado TEXT,
             status TEXT DEFAULT 'offline'
-        )
-    ''')
+        );
 
-    # 3. Tabela de Impressoras
-    cursor.execute('''
         CREATE TABLE IF NOT EXISTS impressoras (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT UNIQUE NOT NULL,
-            status STRING DEFAULT 'ok'
-        )
-    ''')
+            ip TEXT,
+            comunidade_snmp TEXT,
+            modelo TEXT,
+            status TEXT,
+            ultima_verificacao TIMESTAMP
+        );
 
-    conn.commit()
-    conn.close()
-    print("Banco de dados e tabelas criados com sucesso!")
-
-if __name__ == '__main__':
-    criar_tabelas()
-
-    # ... código anterior ...
-
-    # 4. Tabela de Impressoras (Monitoramento SNMP)
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS impressoras (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT UNIQUE NOT NULL,
-            status STRING DEFAULT 'ok'
-        )
-    ''')
-
-    # 5. Tabela de Configuração do AD
-    cursor.execute('''
         CREATE TABLE IF NOT EXISTS config_ad (
-            id INTEGER PRIMARY KEY,
-            server TEXT,          -- Servidor do AD (ex: dc.suaempresa.local)
-            base_dn TEXT,         -- Base Distinguished Name (ex: dc=suaempresa,dc=local)
-            username TEXT,        -- Usuário do AD (comum: admin)
-            password TEXT         -- Senha do AD
-        )
-    ''')
+            id INTEGER PRIMARY KEY CHECK(id = 1),
+            server TEXT,
+            ad_ip TEXT,
+            base_dn TEXT,
+            username TEXT,
+            password TEXT,
+            ou_usuarios TEXT
+        );
 
-    # 6. Tabela de Dispositivos Wi-Fi (Ubiquiti UniFi)
-    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios_sistema (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            senha_hash TEXT NOT NULL,
+            tipo TEXT DEFAULT 'admin',
+            telegram_id INTEGER,
+            telegram_linked INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS webauthn_credentials (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES usuarios_sistema(id) ON DELETE CASCADE,
+            credential_id TEXT UNIQUE NOT NULL,
+            public_key TEXT NOT NULL,
+            sign_count INTEGER DEFAULT 0,
+            name TEXT DEFAULT 'Windows Hello',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS auth_tokens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            token TEXT UNIQUE NOT NULL,
+            user_id INTEGER REFERENCES usuarios_sistema(id),
+            telegram_chat_id INTEGER,
+            purpose TEXT NOT NULL CHECK(purpose IN ('telegram_link', 'telegram_login')),
+            consumed INTEGER DEFAULT 0,
+            expires_at TIMESTAMP NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
         CREATE TABLE IF NOT EXISTS dispositivos_wifi (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            ip TEXT NOT NULL,
-            comunidade_snmp TEXT DEFAULT 'public',
-            modelo TEXT DEFAULT '',
+            nome TEXT,
+            ip TEXT,
+            comunidade_snmp TEXT,
+            modelo TEXT,
             clientes_2g INTEGER DEFAULT 0,
             clientes_5g INTEGER DEFAULT 0,
             clientes_6g INTEGER DEFAULT 0,
             clientes_total INTEGER DEFAULT 0,
             status TEXT DEFAULT 'offline',
-            ultima_verificacao TEXT DEFAULT ''
-        )
-    ''')
+            ultima_verificacao TIMESTAMP
+        );
 
-    # 7. Tabela de Configuração do UniFi Controller
-    cursor.execute('''
         CREATE TABLE IF NOT EXISTS config_unifi (
-            id INTEGER PRIMARY KEY,
-            host TEXT DEFAULT '',
-            username TEXT DEFAULT '',
-            password TEXT DEFAULT ''
-        )
+            id INTEGER PRIMARY KEY CHECK(id = 1),
+            host TEXT,
+            username TEXT,
+            password TEXT
+        );
     ''')
-
     conn.commit()
     conn.close()
-    print("Banco de dados atualizado com tabela de configuração!")
+
+if __name__ == '__main__':
+    criar_tabelas()
+    print('Tabelas criadas/verificadas com sucesso.')
