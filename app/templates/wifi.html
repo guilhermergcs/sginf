@@ -5,7 +5,7 @@
 {% block content %}
 <div class="page-header">
   <h2>Dispositivos Wi-Fi</h2>
-  <p>Monitoramento de Access Points Ubiquiti via SNMP</p>
+  <p>Monitoramento de Access Points Ubiquiti via UniFi Controller</p>
 </div>
 
 <div class="summary" id="summary">
@@ -16,16 +16,42 @@
 </div>
 
 <div class="card">
-  <div class="card-header"><h3>Adicionar Dispositivo</h3></div>
+  <div class="card-header" style="cursor:pointer" onclick="toggleCard('card-controller')">
+    <h3>UniFi Controller <span id="controller-badge"></span></h3>
+    <span class="collapse-arrow" id="ctrl-arrow">&#9660;</span>
+  </div>
+  <div class="card-body" id="card-controller">
+    <form class="form-cadastro" id="form-controller">
+      <div class="form-group">
+        <label>Host (IP ou dominio)</label>
+        <input type="text" id="ctrl-host" placeholder="10.20.10.1" value="{{ controller_host }}">
+      </div>
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" id="ctrl-user" placeholder="admin">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="ctrl-pass" placeholder="Senha do Controller">
+      </div>
+      <button type="button" class="btn btn-secondary" id="btn-ctrl-testar">Testar Conexao</button>
+      <button type="submit" class="btn btn-success" id="btn-ctrl-salvar">Salvar</button>
+      <span class="status-msg" id="ctrl-status"></span>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><h3>Adicionar Manualmente (fallback SNMP)</h3></div>
   <div class="card-body">
     <form class="form-cadastro" id="form-add">
       <div class="form-group">
         <label>Nome</label>
-        <input type="text" id="add-nome" placeholder="Ex: AP Sala de Reunião" required>
+        <input type="text" id="add-nome" placeholder="Ex: AP Sala de Reuniao">
       </div>
       <div class="form-group">
         <label>IP</label>
-        <input type="text" id="add-ip" placeholder="192.168.1.100" pattern="^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$" title="Formato: 192.168.1.100" required>
+        <input type="text" id="add-ip" placeholder="192.168.1.100" pattern="^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$" title="Formato: 192.168.1.100">
       </div>
       <div class="form-group">
         <label>Comunidade SNMP</label>
@@ -38,7 +64,7 @@
 
 <div class="toolbar">
   <button class="btn btn-danger btn-sm" id="btn-remover-selecionados" style="display:none"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Remover selecionados</button>
-  <button class="btn btn-primary" id="btn-sync"><svg class="icon-lg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg> Verificar via SNMP</button>
+  <button class="btn btn-primary" id="btn-sync"><svg class="icon-lg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg> Sincronizar</button>
   <span class="status-msg" id="sync-status"></span>
   <input type="text" class="search-input" placeholder="Buscar dispositivo..." oninput="filterTable('tab-wifi', this.value)" aria-label="Buscar dispositivo">
 </div>
@@ -53,16 +79,14 @@
           <th onclick="sortTable('tab-wifi',1)" aria-sort="none">Nome</th>
           <th onclick="sortTable('tab-wifi',2)" aria-sort="none">IP</th>
           <th onclick="sortTable('tab-wifi',3)" aria-sort="none">Modelo</th>
-          <th onclick="sortTable('tab-wifi',4)" aria-sort="none">2.4GHz</th>
-          <th onclick="sortTable('tab-wifi',5)" aria-sort="none">5GHz</th>
-          <th onclick="sortTable('tab-wifi',6)" aria-sort="none">Total</th>
-          <th onclick="sortTable('tab-wifi',7)" aria-sort="none">Status</th>
-          <th onclick="sortTable('tab-wifi',8)" aria-sort="none">Última Verif.</th>
-          <th aria-label="Ações"></th>
+          <th onclick="sortTable('tab-wifi',4)" aria-sort="none">Clientes</th>
+          <th onclick="sortTable('tab-wifi',5)" aria-sort="none">Status</th>
+          <th onclick="sortTable('tab-wifi',6)" aria-sort="none">Ultima Verif.</th>
+          <th aria-label="Acoes"></th>
         </tr>
       </thead>
       <tbody id="tab-wifi">
-        <tr><td colspan="10" class="loading"><span class="spinner"></span>Carregando...</td></tr>
+        <tr><td colspan="8" class="loading"><span class="spinner"></span>Carregando...</td></tr>
       </tbody>
     </table>
   </div>
@@ -74,6 +98,18 @@
 <script>
   const tbody = $('tab-wifi');
   const statusMsg = $('sync-status');
+
+  function toggleCard(id) {
+    var el = $(id);
+    var arrow = $('ctrl-arrow');
+    if (el.style.display === 'none') {
+      el.style.display = '';
+      arrow.innerHTML = '&#9660;';
+    } else {
+      el.style.display = 'none';
+      arrow.innerHTML = '&#9654;';
+    }
+  }
 
   async function carregar() {
     try {
@@ -87,7 +123,7 @@
       $('offline-wifi').textContent = total - online;
       $('clientes-wifi').textContent = totalClientes;
 
-      tbody.innerHTML = total ? '' : '<tr><td colspan="10" class="loading">Nenhum dispositivo. Adicione um AP acima.</td></tr>';
+      tbody.innerHTML = total ? '' : '<tr><td colspan="8" class="loading">Nenhum dispositivo.</td></tr>';
       dados.forEach(d => {
         const linha = document.createElement('tr');
         linha.innerHTML = `
@@ -95,12 +131,10 @@
           <td><strong>${d.nome}</strong></td>
           <td class="cell-mono">${d.ip}</td>
           <td><span title="${d.modelo || '-'}">${(d.modelo || '-').substring(0, 40)}</span></td>
-          <td class="cell-mono">${d.clientes_2g ?? '-'}</td>
-          <td class="cell-mono">${d.clientes_5g ?? '-'}</td>
           <td><strong>${d.clientes_total ?? '-'}</strong></td>
           <td><span class="status-badge ${d.status}">${d.status}</span></td>
           <td class="ult-verif">${d.ultima_verificacao || '-'}</td>
-          <td><button class="btn btn-danger btn-sm btn-remover" data-id="${d.id}" data-nome="${d.nome}"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Remover</button></td>
+          <td><button class="btn btn-danger btn-sm btn-remover" data-id="${d.id}" data-nome="${d.nome}"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
         `;
         tbody.appendChild(linha);
       });
@@ -116,28 +150,89 @@
       });
       initPagination('tab-wifi', 25);
     } catch {
-      tbody.innerHTML = '<tr><td colspan="10" class="loading loading-error">Erro ao carregar <button class="retry-link" onclick="carregar()">Tentar novamente</button></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="loading loading-error">Erro ao carregar <button class="retry-link" onclick="carregar()">Tentar novamente</button></td></tr>';
     }
+  }
+
+  async function carregarConfig() {
+    try {
+      const resp = await fetch('/api/config/unifi');
+      const cfg = await resp.json();
+      if (cfg.host) {
+        $('ctrl-host').value = cfg.host;
+        $('ctrl-user').value = cfg.username;
+        $('controller-badge').innerHTML = '<span class="status-badge online" style="font-size:11px;padding:1px 6px;margin-left:8px">' + cfg.host + '</span>';
+      } else {
+        $('controller-badge').innerHTML = '<span class="status-badge offline" style="font-size:11px;padding:1px 6px;margin-left:8px">Nao configurado</span>';
+      }
+    } catch {}
   }
 
   async function sincronizar() {
     const btn = $('btn-sync');
     btn.dataset.text = btn.innerHTML;
     setLoading(btn, true);
-    showStatus('Verificando dispositivos via SNMP...');
+    showStatus('Sincronizando...');
     try {
       const resp = await fetch('/api/sync/wifi', { method: 'POST' });
       const r = await resp.json();
       showStatus(r.message, resp.ok);
       if (resp.ok) carregar();
-    } catch { showStatus('Falha na verificação SNMP.', false); }
+    } catch { showStatus('Falha na sincronizacao.', false); }
     finally { setLoading(btn, false); }
   }
 
   $('btn-sync').addEventListener('click', sincronizar);
 
-  var batchRemoveBtn = $('btn-remover-selecionados');
+  $('btn-ctrl-testar').addEventListener('click', async () => {
+    const btn = $('btn-ctrl-testar');
+    btn.disabled = true;
+    btn.textContent = 'Testando...';
+    const status = $('ctrl-status');
+    try {
+      const resp = await fetch('/api/config/unifi/testar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          host: $('ctrl-host').value,
+          username: $('ctrl-user').value,
+          password: $('ctrl-pass').value
+        })
+      });
+      const r = await resp.json();
+      status.textContent = r.message;
+      status.className = 'status-msg ' + (resp.ok ? 'success' : 'error');
+      if (resp.ok) carregarConfig();
+    } catch { status.textContent = 'Erro na requisicao'; status.className = 'status-msg error'; }
+    finally { btn.disabled = false; btn.textContent = 'Testar Conexao'; }
+  });
 
+  $('form-controller').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('btn-ctrl-salvar');
+    btn.disabled = true;
+    btn.textContent = 'Salvando...';
+    const status = $('ctrl-status');
+    try {
+      const resp = await fetch('/api/config/unifi/salvar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          host: $('ctrl-host').value,
+          username: $('ctrl-user').value,
+          password: $('ctrl-pass').value
+        })
+      });
+      const r = await resp.json();
+      status.textContent = r.message;
+      status.className = 'status-msg success';
+      $('ctrl-pass').value = '';
+      carregarConfig();
+    } catch { status.textContent = 'Erro ao salvar'; status.className = 'status-msg error'; }
+    finally { btn.disabled = false; btn.textContent = 'Salvar'; }
+  });
+
+  var batchRemoveBtn = $('btn-remover-selecionados');
   function updateBatchRemoveBtn() {
     var selected = getSelectedIds('tab-wifi');
     batchRemoveBtn.style.display = selected.length ? 'inline-flex' : 'none';
@@ -183,12 +278,13 @@
         $('add-comunidade').value = 'public';
         carregar();
       }
-    } catch { showStatus('Não foi possível adicionar.', false); }
+    } catch { showStatus('Nao foi possivel adicionar.', false); }
     finally { btn.disabled = false; btn.textContent = '+ Adicionar'; }
   });
 
   window.addEventListener('DOMContentLoaded', function() {
     carregar();
+    carregarConfig();
     bindRowSelection('tab-wifi');
     document.getElementById('tab-wifi').addEventListener('change', function(e) {
       if (e.target.closest('.row-select')) updateBatchRemoveBtn();

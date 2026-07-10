@@ -82,6 +82,16 @@ if __name__ == '__main__':
         )
     ''')
 
+    # 7. Tabela de Configuração do UniFi Controller
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS config_unifi (
+            id INTEGER PRIMARY KEY,
+            host TEXT DEFAULT '',
+            username TEXT DEFAULT '',
+            password TEXT DEFAULT ''
+        )
+    ''')
+
     conn.commit()
     conn.close()
     print("Banco de dados atualizado com tabela de configuração!")
