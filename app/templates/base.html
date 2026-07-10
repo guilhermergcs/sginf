@@ -68,7 +68,7 @@
         const msgEl = document.getElementById('confirm-message');
         const okBtn = document.getElementById('confirm-ok');
         const cancelBtn = document.getElementById('confirm-cancel');
-        msgEl.textContent = msg;
+        msgEl.innerHTML = msg;
         const cleanup = () => {
           dlg.removeEventListener('close', onClose);
           okBtn.removeEventListener('click', onOk);
