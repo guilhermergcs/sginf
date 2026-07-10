@@ -1,8 +1,14 @@
 from flask import Flask
-
+import os
 
 def create_app():
     app = Flask(__name__, template_folder='templates')
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or os.urandom(32).hex()
+    app.config['TELEGRAM_BOT_TOKEN'] = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+
+    from app.blueprints.auth import auth_bp
+    app.register_blueprint(auth_bp)
+
     from app.blueprints.computadores import computadores_bp
     from app.blueprints.impressoras import impressoras_bp
     from app.blueprints.usuarios import usuarios_bp
@@ -15,4 +21,9 @@ def create_app():
     app.register_blueprint(grupos_bp)
     app.register_blueprint(config_ad_bp)
     app.register_blueprint(wifi_bp)
+
+    @app.teardown_appcontext
+    def shutdown_teardown(exc=None):
+        pass
+
     return app
