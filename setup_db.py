@@ -66,6 +66,22 @@ if __name__ == '__main__':
         )
     ''')
 
+    # 6. Tabela de Dispositivos Wi-Fi (Ubiquiti UniFi)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS dispositivos_wifi (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            ip TEXT NOT NULL,
+            comunidade_snmp TEXT DEFAULT 'public',
+            modelo TEXT DEFAULT '',
+            clientes_2g INTEGER DEFAULT 0,
+            clientes_5g INTEGER DEFAULT 0,
+            clientes_total INTEGER DEFAULT 0,
+            status TEXT DEFAULT 'offline',
+            ultima_verificacao TEXT DEFAULT ''
+        )
+    ''')
+
     conn.commit()
     conn.close()
     print("Banco de dados atualizado com tabela de configuração!")

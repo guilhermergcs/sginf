@@ -8,9 +8,11 @@ def create_app():
     from app.blueprints.usuarios import usuarios_bp
     from app.blueprints.grupos import grupos_bp
     from app.blueprints.config_ad import config_ad_bp
+    from app.blueprints.wifi import wifi_bp
     app.register_blueprint(computadores_bp)
     app.register_blueprint(impressoras_bp)
     app.register_blueprint(usuarios_bp)
     app.register_blueprint(grupos_bp)
     app.register_blueprint(config_ad_bp)
+    app.register_blueprint(wifi_bp)
     return app

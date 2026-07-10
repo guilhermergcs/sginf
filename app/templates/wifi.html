@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block title %}Wi-Fi - Gerenciamento de TI{% endblock %}
+{% block nav_wifi %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Dispositivos Wi-Fi</h2>
+  <p>Monitoramento de Access Points Ubiquiti via SNMP</p>
+</div>
+
+<div class="summary" id="summary">
+  <div class="stat"><div class="num" id="total-wifi">-</div><div class="label">Total</div></div>
+  <div class="stat"><div class="num num-success" id="online-wifi">-</div><div class="label">Online</div></div>
+  <div class="stat"><div class="num num-danger" id="offline-wifi">-</div><div class="label">Offline</div></div>
+  <div class="stat"><div class="num" id="clientes-wifi">-</div><div class="label">Clientes</div></div>
+</div>
+
+<div class="card">
+  <div class="card-header"><h3>Adicionar Dispositivo</h3></div>
+  <div class="card-body">
+    <form class="form-cadastro" id="form-add">
+      <div class="form-group">
+        <label>Nome</label>
+        <input type="text" id="add-nome" placeholder="Ex: AP Sala de Reunião" required>
+      </div>
+      <div class="form-group">
+        <label>IP</label>
+        <input type="text" id="add-ip" placeholder="192.168.1.100" pattern="^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$" title="Formato: 192.168.1.100" required>
+      </div>
+      <div class="form-group">
+        <label>Comunidade SNMP</label>
+        <input type="text" id="add-comunidade" placeholder="public" value="public">
+      </div>
+      <button type="submit" class="btn btn-success" id="btn-add">+ Adicionar</button>
+    </form>
+  </div>
+</div>
+
+<div class="toolbar">
+  <button class="btn btn-danger btn-sm" id="btn-remover-selecionados" style="display:none"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Remover selecionados</button>
+  <button class="btn btn-primary" id="btn-sync"><svg class="icon-lg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg> Verificar via SNMP</button>
+  <span class="status-msg" id="sync-status"></span>
+  <input type="text" class="search-input" placeholder="Buscar dispositivo..." oninput="filterTable('tab-wifi', this.value)" aria-label="Buscar dispositivo">
+</div>
+
+<div class="card">
+  <div class="card-header"><h3>Access Points</h3></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="select-col"><input type="checkbox" onchange="toggleAll(this,'tab-wifi')" aria-label="Selecionar todos"></th>
+          <th onclick="sortTable('tab-wifi',1)" aria-sort="none">Nome</th>
+          <th onclick="sortTable('tab-wifi',2)" aria-sort="none">IP</th>
+          <th onclick="sortTable('tab-wifi',3)" aria-sort="none">Modelo</th>
+          <th onclick="sortTable('tab-wifi',4)" aria-sort="none">2.4GHz</th>
+          <th onclick="sortTable('tab-wifi',5)" aria-sort="none">5GHz</th>
+          <th onclick="sortTable('tab-wifi',6)" aria-sort="none">Total</th>
+          <th onclick="sortTable('tab-wifi',7)" aria-sort="none">Status</th>
+          <th onclick="sortTable('tab-wifi',8)" aria-sort="none">Última Verif.</th>
+          <th aria-label="Ações"></th>
+        </tr>
+      </thead>
+      <tbody id="tab-wifi">
+        <tr><td colspan="10" class="loading"><span class="spinner"></span>Carregando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="tab-wifi-pagination"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const tbody = $('tab-wifi');
+  const statusMsg = $('sync-status');
+
+  async function carregar() {
+    try {
+      const resp = await fetch('/api/wifi');
+      const dados = await resp.json();
+      const total = dados.length;
+      const online = dados.filter(d => d.status === 'online').length;
+      const totalClientes = dados.reduce((s, d) => s + (d.clientes_total || 0), 0);
+      $('total-wifi').textContent = total;
+      $('online-wifi').textContent = online;
+      $('offline-wifi').textContent = total - online;
+      $('clientes-wifi').textContent = totalClientes;
+
+      tbody.innerHTML = total ? '' : '<tr><td colspan="10" class="loading">Nenhum dispositivo. Adicione um AP acima.</td></tr>';
+      dados.forEach(d => {
+        const linha = document.createElement('tr');
+        linha.innerHTML = `
+          <td class="select-col"><input type="checkbox" class="row-select" value="${d.id}" aria-label="Selecionar ${d.nome}"></td>
+          <td><strong>${d.nome}</strong></td>
+          <td class="cell-mono">${d.ip}</td>
+          <td><span title="${d.modelo || '-'}">${(d.modelo || '-').substring(0, 40)}</span></td>
+          <td class="cell-mono">${d.clientes_2g ?? '-'}</td>
+          <td class="cell-mono">${d.clientes_5g ?? '-'}</td>
+          <td><strong>${d.clientes_total ?? '-'}</strong></td>
+          <td><span class="status-badge ${d.status}">${d.status}</span></td>
+          <td class="ult-verif">${d.ultima_verificacao || '-'}</td>
+          <td><button class="btn btn-danger btn-sm btn-remover" data-id="${d.id}" data-nome="${d.nome}"><svg class="icon-lg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Remover</button></td>
+        `;
+        tbody.appendChild(linha);
+      });
+
+      document.querySelectorAll('.btn-remover').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!await confirmDialog('Remover dispositivo "' + btn.dataset.nome + '"?')) return;
+          const resp = await fetch('/api/wifi/remover/' + btn.dataset.id, { method: 'DELETE' });
+          const r = await resp.json();
+          if (resp.ok) carregar();
+          showStatus(r.message, resp.ok);
+        });
+      });
+      initPagination('tab-wifi', 25);
+    } catch {
+      tbody.innerHTML = '<tr><td colspan="10" class="loading loading-error">Erro ao carregar <button class="retry-link" onclick="carregar()">Tentar novamente</button></td></tr>';
+    }
+  }
+
+  async function sincronizar() {
+    const btn = $('btn-sync');
+    btn.dataset.text = btn.innerHTML;
+    setLoading(btn, true);
+    showStatus('Verificando dispositivos via SNMP...');
+    try {
+      const resp = await fetch('/api/sync/wifi', { method: 'POST' });
+      const r = await resp.json();
+      showStatus(r.message, resp.ok);
+      if (resp.ok) carregar();
+    } catch { showStatus('Falha na verificação SNMP.', false); }
+    finally { setLoading(btn, false); }
+  }
+
+  $('btn-sync').addEventListener('click', sincronizar);
+
+  var batchRemoveBtn = $('btn-remover-selecionados');
+
+  function updateBatchRemoveBtn() {
+    var selected = getSelectedIds('tab-wifi');
+    batchRemoveBtn.style.display = selected.length ? 'inline-flex' : 'none';
+    batchRemoveBtn.textContent = 'Remover ' + selected.length + ' selecionado' + (selected.length > 1 ? 's' : '');
+  }
+
+  batchRemoveBtn.addEventListener('click', async function() {
+    var ids = getSelectedIds('tab-wifi');
+    if (!ids.length) return;
+    if (!await confirmDialog('Remover ' + ids.length + ' dispositivo' + (ids.length > 1 ? 's' : '') + ' selecionado' + (ids.length > 1 ? 's' : '') + '?')) return;
+    for (var i = 0; i < ids.length; i++) {
+      var resp = await fetch('/api/wifi/remover/' + ids[i], { method: 'DELETE' });
+      var r = await resp.json();
+      showStatus(r.message, resp.ok);
+      if (!resp.ok) break;
+    }
+    carregar();
+  });
+
+  var origToggleAll = window.toggleAll;
+  window.toggleAll = function(src, tbodyId) {
+    if (origToggleAll) origToggleAll(src, tbodyId);
+    if (tbodyId === 'tab-wifi') updateBatchRemoveBtn();
+  };
+
+  $('form-add').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('btn-add');
+    const data = {
+      nome: $('add-nome').value,
+      ip: $('add-ip').value,
+      comunidade_snmp: $('add-comunidade').value
+    };
+    btn.disabled = true;
+    btn.textContent = 'Adicionando...';
+    try {
+      const resp = await fetch('/api/wifi/adicionar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const r = await resp.json();
+      showStatus(r.message, resp.ok);
+      if (resp.ok) {
+        $('add-nome').value = '';
+        $('add-ip').value = '';
+        $('add-comunidade').value = 'public';
+        carregar();
+      }
+    } catch { showStatus('Não foi possível adicionar.', false); }
+    finally { btn.disabled = false; btn.textContent = '+ Adicionar'; }
+  });
+
+  window.addEventListener('DOMContentLoaded', function() {
+    carregar();
+    bindRowSelection('tab-wifi');
+    document.getElementById('tab-wifi').addEventListener('change', function(e) {
+      if (e.target.closest('.row-select')) updateBatchRemoveBtn();
+    });
+  });
+</script>
+{% endblock %}
