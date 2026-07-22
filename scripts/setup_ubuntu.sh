@@ -84,6 +84,8 @@ echo "[5/7] Criando diretorio de dados..."
 mkdir -p "${APP_DIR}/data"
 
 cd "${APP_DIR}"
+echo "  Conteudo do diretorio:"
+ls -la
 
 echo "[6/7] Build da imagem Docker..."
 docker compose build --quiet
