@@ -30,7 +30,7 @@ Pygments==2.20.0
 PyJWT==2.13.0
 pyOpenSSL==26.3.0
 pysmi>=1.6.3
-pysnmp>=6.2.6
+pysnmp==5.4.5
 pysnmpcrypto>=0.0.4
 pytest==9.1.1
 pytest-cov==4.1.0
