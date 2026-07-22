@@ -5,35 +5,14 @@ import qrcode
 from flask import jsonify, request, make_response, render_template, g, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.blueprints.auth import auth_bp
-from app.blueprints.auth.services import (make_jwt, verify_jwt, generate_csrf,
-                                          require_auth, require_admin, CSRF_COOKIE)
+from app.blueprints.auth.services import (make_jwt, verify_jwt,
+                                          require_auth, require_admin)
 from app.blueprints.auth.webauthn_service import (
     register_begin, register_complete,
     login_begin, login_complete,
 )
 from app.blueprints.auth.telegram_bot import create_auth_token, get_user_by_telegram
 from app.db import get_db_connection
-
-@auth_bp.before_request
-def csrf_check():
-    if request.method in ('GET', 'HEAD', 'OPTIONS'):
-        return
-    if request.path.startswith('/api/bot/'):
-        return
-    if request.path.startswith('/api/auth/'):
-        token = request.cookies.get(CSRF_COOKIE)
-        header = request.headers.get('X-CSRF-Token')
-        if not token or not header or token != header:
-            return {'ok': False, 'error': 'CSRF invalido'}, 403
-
-@auth_bp.after_request
-def set_csrf_cookie(response):
-    if request.path.startswith('/api/auth/') or request.path == '/login':
-        if CSRF_COOKIE not in request.cookies:
-            response.set_cookie(CSRF_COOKIE, generate_csrf(),
-                               httponly=False, samesite='Lax',
-                               secure=not current_app.debug)
-    return response
 
 @auth_bp.route('/login')
 def login_page():
@@ -84,11 +63,16 @@ def api_me():
     conn = get_db_connection()
     user = conn.execute('SELECT * FROM usuarios_sistema WHERE id = ?',
                        (g.current_user['id'],)).fetchone()
+    cred_count = conn.execute(
+        'SELECT COUNT(*) FROM webauthn_credentials WHERE user_id = ?',
+        (user['id'],)
+    ).fetchone()[0]
     conn.close()
     return jsonify({
         'username': user['username'],
         'tipo': user['tipo'],
         'telegram_linked': bool(user['telegram_linked']),
+        'webauthn_count': cred_count,
     })
 
 @auth_bp.route('/api/auth/register', methods=['POST'])
@@ -208,6 +192,8 @@ def api_delete_webauthn_credential(cred_id):
 @auth_bp.route('/api/auth/telegram/qrcode', methods=['GET'])
 def api_telegram_qrcode():
     purpose = request.args.get('purpose', 'login')
+    if purpose not in ('login', 'link'):
+        return jsonify({'ok': False, 'error': 'Purpose invalido'}), 400
     user_id = None
     if purpose == 'link':
         if not request.cookies.get('session_token'):

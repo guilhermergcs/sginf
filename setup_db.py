@@ -1,9 +1,5 @@
-import sqlite3
+from app.db import get_db_connection
 
-def get_db_connection():
-    conn = sqlite3.connect('gestao_ti.db')
-    conn.row_factory = sqlite3.Row
-    return conn
 
 def criar_tabelas():
     conn = get_db_connection()
@@ -91,6 +87,7 @@ def criar_tabelas():
     ''')
     conn.commit()
     conn.close()
+
 
 if __name__ == '__main__':
     criar_tabelas()

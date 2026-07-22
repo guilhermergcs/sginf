@@ -4,3 +4,5 @@ __pycache__/
 gestao_ti.db
 .superpowers/
 .env
+playwright-mcp/
+.impeccable/

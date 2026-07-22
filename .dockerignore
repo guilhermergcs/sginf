@@ -1,0 +1,16 @@
+.git
+.venv
+__pycache__
+*.pyc
+*.pyo
+.env
+.superpowers
+.playwright-mcp
+.impeccable
+agent-skills
+docs
+scripts
+*.db
+*.md
+.github
+.gitignore
