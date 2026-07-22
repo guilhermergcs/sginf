@@ -88,7 +88,7 @@ echo "  Conteudo do diretorio:"
 ls -la
 
 echo "[6/7] Build da imagem Docker..."
-docker compose build --quiet
+docker compose build
 
 echo "[7/7] Iniciando container..."
 docker compose up -d
