@@ -77,7 +77,13 @@ PORT=${PORT}
 EOF
     echo "  Arquivo .env criado com SECRET_KEY segura."
 else
-    echo "  Arquivo .env ja existe. Mantido."
+    if ! grep -q "^SECRET_KEY=." "${ENV_FILE}"; then
+        SECRET_KEY=$(openssl rand -hex 32)
+        sed -i "1i SECRET_KEY=${SECRET_KEY}" "${ENV_FILE}"
+        echo "  SECRET_KEY adicionada ao .env existente."
+    else
+        echo "  Arquivo .env ja existe com SECRET_KEY."
+    fi
 fi
 
 echo "[5/7] Criando diretorio de dados..."
