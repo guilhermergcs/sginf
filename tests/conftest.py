@@ -11,9 +11,10 @@ os.environ['DATABASE_PATH'] = db_path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import create_app
-from setup_db import criar_tabelas
+from setup_db import criar_tabelas, criar_admin_padrao
 
 criar_tabelas()
+criar_admin_padrao()
 
 
 @pytest.fixture

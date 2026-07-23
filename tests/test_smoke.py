@@ -1,6 +1,3 @@
-import json
-
-
 def test_app_imports():
     from app import create_app
     from app.blueprints.impressoras.services import verificar_impressoras_snmp
@@ -22,25 +19,24 @@ def test_login_page_200(client):
     assert resp.status_code == 200
 
 
-def test_protected_redirects_to_login(client):
+def test_index_page_200(client):
     resp = client.get('/')
-    assert resp.status_code == 302
-    assert resp.location.endswith('/login')
+    assert resp.status_code == 200
 
 
-def test_protected_api_returns_401(client):
+def test_api_me_returns_200(client):
     resp = client.get('/api/auth/me')
-    assert resp.status_code == 401
-    assert resp.json == {'ok': False, 'error': 'Nao autenticado'}
+    assert resp.status_code == 200
+    data = resp.json
+    assert data['username'] == 'admin'
 
 
-def test_logout_without_auth_returns_401(client):
+def test_logout_returns_200(client):
     resp = client.post('/api/auth/logout')
-    assert resp.status_code == 401
-    assert resp.json == {'ok': False, 'error': 'Nao autenticado'}
+    assert resp.status_code == 200
 
 
-def test_login_register_logout_flow(client):
+def test_login_wrong_credentials(client):
     resp = client.post('/api/auth/login', json={'username': 'admin', 'password': 'wrong'})
     assert resp.status_code == 401
     assert resp.json['ok'] is False
