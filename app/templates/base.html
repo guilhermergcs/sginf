@@ -9,6 +9,7 @@
   {% block head %}{% endblock %}
 </head>
 <body>
+  {% block sidebar %}
   <nav class="sidebar">
     <div class="sidebar-header">
       <h1>Gestão TI</h1>
@@ -54,6 +55,7 @@
       </a>
     </div>
   </nav>
+  {% endblock %}
 
   <div class="{% block main_class %}main{% endblock %}">
     {% block content %}{% endblock %}
@@ -289,7 +291,11 @@
     }
 
     async function checkAuth() {
-      if (window.location.pathname === '/login') return;
+      if (window.location.pathname === '/login') {
+        const r = await fetch('/api/auth/me');
+        if (r.ok) { window.location.href = '/computadores'; }
+        return;
+      }
       const r = await fetch('/api/auth/me');
       if (!r.ok) { window.location.href = '/login'; return; }
       const data = await r.json();

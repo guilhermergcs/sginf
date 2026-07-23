@@ -45,7 +45,7 @@ def api_login():
     if not user or not check_password_hash(user['senha_hash'], password):
         return jsonify({'ok': False, 'error': 'Credenciais invalidas'}), 401
     token = make_jwt(user)
-    resp = make_response(jsonify({'ok': True, 'redirect': '/'}))
+    resp = make_response(jsonify({'ok': True, 'redirect': '/computadores'}))
     resp.set_cookie('session_token', token,
                    httponly=True, samesite='Lax',
                    secure=secure_cookie(),
@@ -162,7 +162,7 @@ def api_webauthn_login_complete():
         data = request.get_json(silent=True)
         user = login_complete(data['credential'], data['credential_id'], data['challenge_id'])
         token = make_jwt(user)
-        resp = make_response(jsonify({'ok': True, 'redirect': '/'}))
+        resp = make_response(jsonify({'ok': True, 'redirect': '/computadores'}))
         resp.set_cookie('session_token', token,
                        httponly=True, samesite='Lax',
                        secure=secure_cookie(),
@@ -272,7 +272,7 @@ def api_telegram_check():
             return jsonify({'ok': False, 'consumed': True, 'error': 'Usuario nao encontrado'})
         from app.blueprints.auth.services import make_jwt as mk_jwt
         jwt_token = mk_jwt(user)
-        resp = make_response(jsonify({'ok': True, 'consumed': True, 'redirect': '/'}))
+        resp = make_response(jsonify({'ok': True, 'consumed': True, 'redirect': '/computadores'}))
     resp.set_cookie('session_token', jwt_token,
                    httponly=True, samesite='Lax',
                    secure=secure_cookie(),
