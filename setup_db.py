@@ -119,6 +119,11 @@ def migrar():
         conn.commit()
     except Exception:
         pass
+    try:
+        conn.execute("ALTER TABLE usuarios_sistema ADD COLUMN avatar TEXT")
+        conn.commit()
+    except Exception:
+        pass
     finally:
         conn.close()
 

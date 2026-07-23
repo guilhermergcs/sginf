@@ -18,6 +18,10 @@ def create_app():
     app.config['COOKIE_SECURE'] = os.environ.get('COOKIE_SECURE', 'false').lower() not in ('0', 'false', 'no')
     app.config['TELEGRAM_BOT_TOKEN'] = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
+    avatars_dir = os.path.join(app.root_path, 'static', 'avatars')
+    os.makedirs(avatars_dir, exist_ok=True)
+    app.config['AVATARS_DIR'] = avatars_dir
+
     from app.blueprints.auth import auth_bp
     from app.blueprints.computadores import computadores_bp
     from app.blueprints.impressoras import impressoras_bp

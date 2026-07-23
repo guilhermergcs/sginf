@@ -1,9 +1,12 @@
 import json
 import base64
+import os
+import re
 from io import BytesIO
 import qrcode
-from flask import jsonify, request, make_response, render_template, g, current_app
+from flask import jsonify, request, make_response, render_template, g, current_app, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from app.blueprints.auth import auth_bp
 from app.blueprints.auth.services import (make_jwt, verify_jwt, secure_cookie,
                                           require_auth, require_admin, CSRF_COOKIE)
@@ -68,9 +71,11 @@ def api_me():
         (user['id'],)
     ).fetchone()[0]
     conn.close()
+    avatar_url = f'/api/auth/avatar/{user["id"]}' if user.get('avatar') else None
     return jsonify({
         'username': user['username'],
         'tipo': user['tipo'],
+        'avatar_url': avatar_url,
         'telegram_linked': bool(user['telegram_linked']),
         'webauthn_count': cred_count,
     })
@@ -188,6 +193,45 @@ def api_delete_webauthn_credential(cred_id):
     return jsonify({'ok': True})
 
 # Telegram
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@auth_bp.route('/api/auth/avatar', methods=['POST'])
+@require_auth
+def api_upload_avatar():
+    if 'avatar' not in request.files:
+        return jsonify({'ok': False, 'error': 'Nenhum arquivo enviado'}), 400
+    file = request.files['avatar']
+    if not file.filename or not allowed_file(file.filename):
+        return jsonify({'ok': False, 'error': 'Formato invalido. Use PNG, JPG, GIF ou WebP'}), 400
+    ext = file.filename.rsplit('.', 1)[1].lower()
+    filename = f'{g.current_user["id"]}.{ext}'
+    filepath = os.path.join(current_app.config['AVATARS_DIR'], filename)
+    file.save(filepath)
+    conn = get_db_connection()
+    conn.execute('UPDATE usuarios_sistema SET avatar = ? WHERE id = ?',
+                (filename, g.current_user['id']))
+    conn.commit()
+    conn.close()
+    # Remove old avatars with different extension
+    for old_ext in {'png', 'jpg', 'jpeg', 'gif', 'webp'} - {ext}:
+        old_path = os.path.join(current_app.config['AVATARS_DIR'], f'{g.current_user["id"]}.{old_ext}')
+        if os.path.exists(old_path):
+            os.remove(old_path)
+    return jsonify({'ok': True, 'avatar_url': f'/api/auth/avatar/{g.current_user["id"]}'})
+
+@auth_bp.route('/api/auth/avatar/<int:user_id>')
+def api_get_avatar(user_id):
+    conn = get_db_connection()
+    user = conn.execute('SELECT avatar FROM usuarios_sistema WHERE id = ?',
+                       (user_id,)).fetchone()
+    conn.close()
+    if not user or not user['avatar']:
+        return '', 204
+    return send_from_directory(current_app.config['AVATARS_DIR'], user['avatar'])
 
 @auth_bp.route('/api/auth/telegram/qrcode', methods=['GET'])
 def api_telegram_qrcode():

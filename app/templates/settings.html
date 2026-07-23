@@ -11,7 +11,19 @@
   <div class="card">
     <div class="card-header"><h3>Informações</h3></div>
     <div class="card-body">
-      <p><strong>Usuário:</strong> <span id="currentUsername"></span></p>
+      <div class="profile-info">
+        <div class="avatar-section">
+          <div class="avatar-preview" id="avatarPreview">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="avatar-actions">
+            <label class="btn btn-sm btn-secondary" for="avatarInput">Alterar Foto</label>
+            <input type="file" id="avatarInput" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
+            <button class="btn btn-sm btn-danger" id="removeAvatarBtn" style="display:none">Remover</button>
+          </div>
+        </div>
+        <p><strong>Usuário:</strong> <span id="currentUsername"></span></p>
+      </div>
     </div>
   </div>
 
@@ -72,8 +84,39 @@ async function loadProfile() {
   if (!r.ok) return window.location.href = '/login';
   const data = await r.json();
   document.getElementById('currentUsername').textContent = data.username;
+  const preview = document.getElementById('avatarPreview');
+  if (data.avatar_url) {
+    preview.innerHTML = `<img src="${data.avatar_url}?t=${Date.now()}" alt="Avatar">`;
+    document.getElementById('removeAvatarBtn').style.display = 'inline-block';
+  }
 }
 loadProfile();
+
+document.getElementById('avatarInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const form = new FormData();
+  form.append('avatar', file);
+  const r = await fetch('/api/auth/avatar', {
+    method: 'POST',
+    headers: {'X-CSRF-Token': getCookie('csrf_token')},
+    body: form,
+  });
+  const res = await r.json();
+  if (r.ok) {
+    const preview = document.getElementById('avatarPreview');
+    preview.innerHTML = `<img src="${res.avatar_url}?t=${Date.now()}" alt="Avatar">`;
+    document.getElementById('removeAvatarBtn').style.display = 'inline-block';
+    document.querySelector('.sidebar-user-avatar img')?.remove();
+  } else {
+    alert(res.error);
+  }
+  e.target.value = '';
+});
+
+document.getElementById('removeAvatarBtn').addEventListener('click', async () => {
+  alert('Funcionalidade de remover avatar sera implementada em breve.');
+});
 
 document.getElementById('passwordForm').addEventListener('submit', async (e) => {
   e.preventDefault();
