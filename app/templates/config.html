@@ -30,6 +30,10 @@
         <input type="text" id="ou_usuarios" name="ou_usuarios" placeholder="CN=Users" value="{{ ou_usuarios }}" title="Unidade Organizacional onde os usuários estão localizados">
       </div>
       <div class="form-group">
+        <label for="ou_computadores">OU de Computadores <span class="help-trigger" tabindex="0" role="button" aria-label="Ajuda">?<span class="help-popover">Unidade Organizacional onde os computadores estão armazenados. Deixe vazio para buscar em todo o domínio.</span></span></label>
+        <input type="text" id="ou_computadores" name="ou_computadores" placeholder="OU=Computadores,dc=exemplo,dc=local" value="{{ ou_computadores }}" title="Unidade Organizacional onde os computadores estão localizados">
+      </div>
+      <div class="form-group">
         <label for="password">Senha</label>
         <div class="password-wrapper">
           <input type="password" id="password" name="password" placeholder="••••••••" title="Senha do usuário administrador">
@@ -52,6 +56,7 @@
   const adIpInput = document.getElementById('ad_ip');
   const baseDnInput = document.getElementById('base_dn');
   const ouUsuariosInput = document.getElementById('ou_usuarios');
+  const ouComputadoresInput = document.getElementById('ou_computadores');
   const usernameInput = document.getElementById('username');
   const passwordInput = document.getElementById('password');
   const btnTestar = document.getElementById('btn-testar');
@@ -79,6 +84,7 @@
       ad_ip: adIpInput.value,
       base_dn: baseDnInput.value,
       ou_usuarios: ouUsuariosInput.value,
+      ou_computadores: ouComputadoresInput.value,
       username: usernameInput.value,
       password: passwordInput.value
     };
@@ -93,6 +99,7 @@
         adIpInput.value = data.ad_ip || '';
         baseDnInput.value = data.base_dn || '';
         ouUsuariosInput.value = data.ou_usuarios || 'CN=Users';
+        ouComputadoresInput.value = data.ou_computadores || '';
         usernameInput.value = data.username || '';
       }
     } catch { showFeedback('Não foi possível carregar a configuração salva.', 'error'); }

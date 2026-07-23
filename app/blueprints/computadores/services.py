@@ -73,8 +73,9 @@ def sync_computadores_ad(config):
     dns_server = config['ad_ip'] or config['server']
     ad_server = Server(target, get_info=ALL)
     ad_conn = Connection(ad_server, user=config['username'], password=config['password'], auto_bind=True)
+    search_base = config.get('ou_computadores') or config['base_dn']
     ad_conn.search(
-        search_base=config['base_dn'],
+        search_base=search_base,
         search_filter='(objectClass=computer)',
         attributes=['cn', 'dNSHostName', 'operatingSystem', 'lastLogonTimestamp']
     )

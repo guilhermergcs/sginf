@@ -3,6 +3,9 @@ import os
 
 
 def create_app():
+    from setup_db import migrar
+    migrar()
+
     app = Flask(__name__, template_folder='templates')
 
     secret_key = os.environ.get('SECRET_KEY')

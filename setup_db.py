@@ -52,7 +52,8 @@ def criar_tabelas():
             base_dn TEXT,
             username TEXT,
             password TEXT,
-            ou_usuarios TEXT
+            ou_usuarios TEXT,
+            ou_computadores TEXT
         );
 
         CREATE TABLE IF NOT EXISTS usuarios_sistema (
@@ -109,6 +110,17 @@ def criar_tabelas():
     ''')
     conn.commit()
     conn.close()
+
+
+def migrar():
+    conn = get_db_connection()
+    try:
+        conn.execute("ALTER TABLE config_ad ADD COLUMN ou_computadores TEXT")
+        conn.commit()
+    except Exception:
+        pass
+    finally:
+        conn.close()
 
 
 if __name__ == '__main__':
