@@ -1,4 +1,26 @@
+import secrets
+from werkzeug.security import generate_password_hash
 from app.db import get_db_connection
+
+
+def criar_admin_padrao():
+    conn = get_db_connection()
+    existing = conn.execute('SELECT id FROM usuarios_sistema LIMIT 1').fetchone()
+    if existing:
+        conn.close()
+        return
+    password = secrets.token_urlsafe(12)
+    hash = generate_password_hash(password)
+    conn.execute(
+        'INSERT INTO usuarios_sistema (username, senha_hash, tipo) VALUES (?, ?, ?)',
+        ('admin', hash, 'admin')
+    )
+    conn.commit()
+    conn.close()
+    print(f'[!] Nenhum admin encontrado. Criado usuario padrao:')
+    print(f'    Usuario: admin')
+    print(f'    Senha:   {password}')
+    print(f'    [!] Altere a senha apos o primeiro login.')
 
 
 def criar_tabelas():
@@ -91,4 +113,5 @@ def criar_tabelas():
 
 if __name__ == '__main__':
     criar_tabelas()
+    criar_admin_padrao()
     print('Tabelas criadas/verificadas com sucesso.')
