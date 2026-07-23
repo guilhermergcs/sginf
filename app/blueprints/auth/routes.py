@@ -66,16 +66,18 @@ def api_me():
     conn = get_db_connection()
     user = conn.execute('SELECT * FROM usuarios_sistema WHERE id = ?',
                        (g.current_user['id'],)).fetchone()
+    if not user:
+        conn.close()
+        return jsonify({'error': 'Usuario nao encontrado'}), 404
     cred_count = conn.execute(
         'SELECT COUNT(*) FROM webauthn_credentials WHERE user_id = ?',
         (user['id'],)
     ).fetchone()[0]
     conn.close()
-    avatar_url = f'/api/auth/avatar/{user["id"]}' if user.get('avatar') else None
     return jsonify({
         'username': user['username'],
         'tipo': user['tipo'],
-        'avatar_url': avatar_url,
+        'avatar_url': f'/api/auth/avatar/{user["id"]}' if user['avatar'] else None,
         'telegram_linked': bool(user['telegram_linked']),
         'webauthn_count': cred_count,
     })

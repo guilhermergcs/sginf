@@ -291,11 +291,7 @@
     }
 
     async function checkAuth() {
-      if (window.location.pathname === '/login') {
-        const r = await fetch('/api/auth/me');
-        if (r.ok) { window.location.href = '/computadores'; }
-        return;
-      }
+      if (window.location.pathname === '/login') return;
       const r = await fetch('/api/auth/me');
       if (!r.ok) { window.location.href = '/login'; return; }
       const data = await r.json();
