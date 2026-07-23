@@ -1,15 +1,87 @@
 import re
 import socket
+import struct
+import random
 import subprocess
 from ldap3 import Server, Connection, ALL, core
 from app.db import get_db_connection
 
 
-def _resolver(hostname, dns_server=None):
+def _dns_lookup(hostname, dns_server):
+    """DNS A-record query via UDP to a specific DNS server."""
+    tid = random.randrange(0, 65536)
+    labels = hostname.encode('ascii', errors='replace').split(b'.')
+    qname = b''.join(bytes([len(l)]) + l for l in labels) + b'\x00'
+    query = struct.pack('>HHHHHH', tid, 0x0100, 1, 0, 0, 0) + qname + struct.pack('>HH', 1, 1)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.settimeout(3)
     try:
-        return socket.gethostbyname(hostname)
-    except socket.gaierror:
+        sock.sendto(query, (dns_server, 53))
+        data, _ = sock.recvfrom(1024)
+    except:
+        return None
+    finally:
+        sock.close()
+    flags = struct.unpack('>H', data[2:4])[0]
+    if flags & 0x000f:
+        return None
+    ancount = struct.unpack('>H', data[6:8])[0]
+    if ancount == 0:
+        return None
+    pos = 12 + len(qname) + 4
+    for _ in range(ancount):
+        while pos < len(data):
+            if data[pos] & 0xc0 == 0xc0:
+                pos += 2
+                break
+            elif data[pos] == 0:
+                pos += 1
+                break
+            else:
+                pos += data[pos] + 1
+        if pos + 10 > len(data):
+            break
+        rtype, _, _, rdlen = struct.unpack('>HHIH', data[pos:pos+10])
+        pos += 10
+        if rtype == 1 and pos + 4 <= len(data):
+            ip = socket.inet_ntoa(data[pos:pos+4])
+            if ip != dns_server:
+                return ip
+        pos += rdlen
+    return None
+
+
+def _nmblookup(hostname):
+    """Resolve NetBIOS name (short computer name) via nmblookup."""
+    try:
+        out = subprocess.run(
+            ['nmblookup', hostname.split('.')[0]],
+            capture_output=True, text=True, timeout=5
+        ).stdout
+        for line in out.splitlines():
+            m = re.match(r'^\s*(\d+\.\d+\.\d+\.\d+)\s', line)
+            if m:
+                return m.group(1)
+    except:
         pass
+    return None
+
+
+def _resolver(hostname, dns_server=None):
+    if not hostname:
+        return None
+    short = hostname.split('.')[0]
+    candidates = set()
+    # system DNS
+    try:
+        candidates.add(socket.gethostbyname(hostname))
+    except:
+        pass
+    try:
+        candidates.add(socket.gethostbyname(short))
+    except:
+        pass
+    # nslookup fallback
     if dns_server:
         try:
             out = subprocess.run(
@@ -19,10 +91,21 @@ def _resolver(hostname, dns_server=None):
             for line in out.splitlines():
                 m = re.search(r'Address:\s*(\d+\.\d+\.\d+\.\d+)', line)
                 if m and m.group(1) != dns_server:
-                    return m.group(1)
-        except Exception:
+                    candidates.add(m.group(1))
+        except:
             pass
-    return None
+    # raw DNS query
+    if dns_server:
+        ip = _dns_lookup(hostname, dns_server)
+        if ip:
+            candidates.add(ip)
+    # nmblookup
+    ip = _nmblookup(hostname)
+    if ip:
+        candidates.add(ip)
+    # remove the DNS server IP itself if it sneaks in
+    candidates.discard(dns_server)
+    return next(iter(candidates), None)
 
 PS_SCRIPT_WMI = '''
 $ip = '_IP_'
@@ -111,21 +194,25 @@ def verificar_ping(ip):
             return ping.returncode == 0
         except:
             return False
-    try:
-        ping = subprocess.run(
-            ['ping', '-c', '1', '-W', '2', ip],
-            capture_output=True, text=True, timeout=5
-        )
-        if ping.returncode == 0:
-            return True
-    except:
-        pass
-    for port in (445, 135):
+    targets = [ip]
+    if '.' in ip and not ip.replace('.', '').isdigit():
+        targets.append(ip.split('.')[0])
+    for tgt in targets:
         try:
-            with socket.create_connection((ip, port), timeout=3):
+            ping = subprocess.run(
+                ['ping', '-c', '1', '-W', '2', tgt],
+                capture_output=True, text=True, timeout=5
+            )
+            if ping.returncode == 0:
                 return True
         except:
             pass
+        for port in (445, 135):
+            try:
+                with socket.create_connection((tgt, port), timeout=3):
+                    return True
+            except:
+                pass
     return False
 
 def buscar_usuario_wmi(ip, ad_user, ad_pass):
@@ -156,7 +243,12 @@ def verificar_status_computador(pc, ad_user, ad_pass, dns_server=None):
         resolved = _resolver(ip, dns_server)
         if resolved:
             ip = resolved
-    if ip and ip.replace('.', '').isdigit():
+    if not ip or not ip.replace('.', '').isdigit():
+        hostname = pc.get('nome', '')
+        resolved = _resolver(hostname, dns_server)
+        if resolved:
+            ip = resolved
+    if ip:
         online = verificar_ping(ip)
     if online and ip:
         usuario = buscar_usuario_wmi(ip, ad_user, ad_pass)
