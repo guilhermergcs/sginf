@@ -1,7 +1,7 @@
 import asyncio
 import warnings
-warnings.filterwarnings('ignore', message="The 'pysnmp-lextudio' package is deprecated")
-from pysnmp.hlapi.asyncio import getCmd, nextCmd, SnmpEngine, CommunityData, UdpTransportTarget, ContextData, ObjectType, ObjectIdentity
+warnings.filterwarnings('ignore', message="The.*pysnmp-lextudio.*deprecated")
+from pysnmp.hlapi.asyncio import get_cmd, walk_cmd, SnmpEngine, CommunityData, UdpTransportTarget, ContextData, ObjectType, ObjectIdentity
 
 OID_SYSNAME = '1.3.6.1.2.1.1.5.0'
 OID_SYSDESCR = '1.3.6.1.2.1.1.1.0'
@@ -15,7 +15,7 @@ async def _check_one(ip, comunidade):
     clientes_2g = 0
     clientes_5g = 0
     try:
-        errorIndication, errorStatus, errorIndex, varBinds = await getCmd(
+        errorIndication, errorStatus, errorIndex, varBinds = await get_cmd(
             SnmpEngine(),
             CommunityData(comunidade),
             UdpTransportTarget((ip, 161), timeout=3, retries=1),
@@ -31,7 +31,7 @@ async def _check_one(ip, comunidade):
                     nome = str(val)
                 elif oid == OID_SYSDESCR:
                     modelo = str(val)
-    except:
+    except Exception:
         pass
 
     if not online:
@@ -39,14 +39,13 @@ async def _check_one(ip, comunidade):
 
     try:
         stations = {}
-        for errorIndication, errorStatus, errorIndex, varBinds in nextCmd(
+        async for errorIndication, errorStatus, errorIndex, varBinds in walk_cmd(
             SnmpEngine(),
             CommunityData(comunidade),
             UdpTransportTarget((ip, 161), timeout=3, retries=1),
             ContextData(),
             ObjectType(ObjectIdentity(OID_VAP_NUMSTATIONS)),
-            ObjectType(ObjectIdentity(OID_VAP_RADIO)),
-            lexicographicMode=True
+            ObjectType(ObjectIdentity(OID_VAP_RADIO))
         ):
             if errorIndication or errorStatus:
                 break
@@ -74,7 +73,7 @@ async def _check_one(ip, comunidade):
                 clientes_2g += c
             else:
                 clientes_2g += c
-    except:
+    except Exception:
         pass
 
     return online, nome, modelo, clientes_2g, clientes_5g

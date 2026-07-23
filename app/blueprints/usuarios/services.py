@@ -33,7 +33,7 @@ def _set_password(config, sam_account_name, nova_senha, trocar_senha_proximo_log
 
 def _search_base(config, default='CN=Users'):
     base_dn = config['base_dn']
-    ou = config.get('ou_usuarios', default)
+    ou = config.get('ou_usuarios') or default
     if ou.lower().endswith(base_dn.lower()):
         return ou
     return f'{ou},{base_dn}'

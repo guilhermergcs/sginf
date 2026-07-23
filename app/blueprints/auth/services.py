@@ -50,7 +50,7 @@ def require_auth(f):
     return decorated
 
 def secure_cookie():
-    return not current_app.debug
+    return current_app.config.get('COOKIE_SECURE', True)
 
 def require_admin(f):
     from functools import wraps

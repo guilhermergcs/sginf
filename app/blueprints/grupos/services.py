@@ -157,7 +157,7 @@ def _update_group(config, group_cn, novo_cn='', description=''):
     if description:
         modificacoes['description'] = [(MODIFY_REPLACE, [description])]
     if novo_cn and novo_cn != group_cn:
-        ad_conn.modify_dn(dn, novo_cn)
+        ad_conn.modify_dn(dn, f'CN={novo_cn}')
         dn = f'CN={novo_cn},{target_ou}'
         modificacoes['sAMAccountName'] = [(MODIFY_REPLACE, [novo_cn])]
     if modificacoes:

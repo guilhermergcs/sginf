@@ -12,6 +12,7 @@ def create_app():
             'Generate one with: python -c "import secrets; print(secrets.token_hex(32))"'
         )
     app.config['SECRET_KEY'] = secret_key
+    app.config['COOKIE_SECURE'] = os.environ.get('COOKIE_SECURE', 'true').lower() not in ('0', 'false', 'no')
     app.config['TELEGRAM_BOT_TOKEN'] = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
     from app.blueprints.auth import auth_bp
@@ -78,7 +79,7 @@ def create_app():
             response.set_cookie(
                 CSRF_COOKIE, generate_csrf(),
                 httponly=False, samesite='Lax',
-                secure=not app.debug,
+                secure=app.config['COOKIE_SECURE'],
             )
         return response
 

@@ -5,8 +5,8 @@ import qrcode
 from flask import jsonify, request, make_response, render_template, g, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.blueprints.auth import auth_bp
-from app.blueprints.auth.services import (make_jwt, verify_jwt,
-                                          require_auth, require_admin)
+from app.blueprints.auth.services import (make_jwt, verify_jwt, secure_cookie,
+                                          require_auth, require_admin, CSRF_COOKIE)
 from app.blueprints.auth.webauthn_service import (
     register_begin, register_complete,
     login_begin, login_complete,
@@ -45,7 +45,7 @@ def api_login():
     resp = make_response(jsonify({'ok': True, 'redirect': '/'}))
     resp.set_cookie('session_token', token,
                    httponly=True, samesite='Lax',
-                   secure=not current_app.debug,
+                   secure=secure_cookie(),
                    max_age=8*3600)
     return resp
 
@@ -160,7 +160,7 @@ def api_webauthn_login_complete():
         resp = make_response(jsonify({'ok': True, 'redirect': '/'}))
         resp.set_cookie('session_token', token,
                        httponly=True, samesite='Lax',
-                       secure=not current_app.debug,
+                       secure=secure_cookie(),
                        max_age=8*3600)
         return resp
     except Exception as e:
@@ -229,9 +229,9 @@ def api_telegram_check():
         from app.blueprints.auth.services import make_jwt as mk_jwt
         jwt_token = mk_jwt(user)
         resp = make_response(jsonify({'ok': True, 'consumed': True, 'redirect': '/'}))
-        resp.set_cookie('session_token', jwt_token,
-                       httponly=True, samesite='Lax',
-                       secure=not current_app.debug,
-                       max_age=8*3600)
-        return resp
+    resp.set_cookie('session_token', jwt_token,
+                   httponly=True, samesite='Lax',
+                   secure=secure_cookie(),
+                   max_age=8*3600)
+    return resp
     return jsonify({'ok': True, 'consumed': True})

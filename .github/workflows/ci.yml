@@ -60,3 +60,22 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && vars.SSH_DEPLOY_ENABLED == 'true'
+    environment: production
+    steps:
+      - name: Deploy via SSH
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          ssh "$SSH_USER@$SSH_HOST" \
+            "cd /opt/sginf && git pull --ff-only && docker compose up -d --build"

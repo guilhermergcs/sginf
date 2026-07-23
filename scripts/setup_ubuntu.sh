@@ -60,7 +60,6 @@ else
     rm -rf "${APP_DIR}"
     git clone "${REPO_URL}" "${APP_DIR}" --quiet
     cd "${APP_DIR}"
-    git remote set-url origin "https://github.com/guilhermergcs/sginf.git"
 fi
 ls -la "${APP_DIR}/docker-compose.yml" || { echo "ERRO: docker-compose.yml nao encontrado em ${APP_DIR}"; exit 1; }
 echo "  Repositorio em: ${APP_DIR}"
@@ -73,6 +72,7 @@ if [ ! -f "${ENV_FILE}" ]; then
 SECRET_KEY=${SECRET_KEY}
 DATABASE_PATH=/app/data/gestao_ti.db
 TELEGRAM_BOT_TOKEN=
+COOKIE_SECURE=false
 PORT=${PORT}
 EOF
     echo "  Arquivo .env criado com SECRET_KEY segura."
@@ -101,7 +101,17 @@ docker compose up -d
 
 sleep 3
 
-if docker ps --format '{{.Names}}' | grep -q "^${APP_NAME}$"; then
+echo "  Aguardando container ficar saudavel..."
+for i in $(seq 1 10); do
+    if docker compose ps --services --filter status=running 2>/dev/null | grep -qx 'web'; then
+        echo "  Container pronto!"
+        break
+    fi
+    echo "  Tentativa $i/10..."
+    sleep 2
+done
+
+if docker compose ps --services --filter status=running 2>/dev/null | grep -qx 'web'; then
     echo ""
     echo "============================================"
     echo "  Aplicacao rodando com sucesso!"
