@@ -29,6 +29,15 @@ def generate():
         x509.NameAttribute(NameOID.COMMON_NAME, 'sginf.local'),
     ])
 
+    sans = [
+        x509.DNSName('localhost'),
+        x509.DNSName('sginf.local'),
+        x509.IPAddress(ipaddress.IPv4Address('127.0.0.1')),
+    ]
+    server_ip = os.environ.get('SERVER_IP')
+    if server_ip:
+        sans.append(x509.IPAddress(ipaddress.IPv4Address(server_ip)))
+
     cert = (
         x509.CertificateBuilder()
         .subject_name(subject)
@@ -37,14 +46,7 @@ def generate():
         .serial_number(x509.random_serial_number())
         .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
         .not_valid_after(datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=3650))
-        .add_extension(
-            x509.SubjectAlternativeName([
-                x509.DNSName('localhost'),
-                x509.DNSName('sginf.local'),
-                x509.IPAddress(ipaddress.IPv4Address('127.0.0.1')),
-            ]),
-            critical=False,
-        )
+        .add_extension(x509.SubjectAlternativeName(sans), critical=False)
         .sign(key, hashes.SHA256(), backend=default_backend())
     )
 

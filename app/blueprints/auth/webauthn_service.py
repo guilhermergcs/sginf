@@ -1,4 +1,5 @@
 import json
+import os
 from webauthn import (
     generate_registration_options, verify_registration_response,
     generate_authentication_options, verify_authentication_response,
@@ -13,10 +14,7 @@ from app.db import get_db_connection
 import secrets
 
 def get_rp_id():
-    host = request.host.split(':')[0]
-    if host in ('localhost', '127.0.0.1'):
-        return host
-    return host
+    return os.environ.get('RP_ID') or request.host.split(':')[0]
 
 def get_origin():
     return request.scheme + '://' + request.host
