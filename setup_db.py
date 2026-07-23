@@ -113,6 +113,7 @@ def criar_tabelas():
 
 
 def migrar():
+    criar_tabelas()
     conn = get_db_connection()
     try:
         conn.execute("ALTER TABLE config_ad ADD COLUMN ou_computadores TEXT")
@@ -126,6 +127,7 @@ def migrar():
         pass
     finally:
         conn.close()
+    criar_admin_padrao()
 
 
 if __name__ == '__main__':
