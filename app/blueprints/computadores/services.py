@@ -216,19 +216,43 @@ def verificar_ping(ip):
     return False
 
 def buscar_usuario_wmi(ip, ad_user, ad_pass):
+    import sys
+    if sys.platform == 'win32':
+        try:
+            def esc(s):
+                return s.replace("'", "''")
+            script = PS_SCRIPT_WMI.replace('_IP_', esc(ip)).replace('_USER_', esc(ad_user)).replace('_PASS_', esc(ad_pass))
+            ps = subprocess.run(
+                ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', script],
+                capture_output=True, text=True, timeout=15
+            )
+            saida = ps.stdout.strip()
+            if saida and 'Access Denied' not in saida and not saida.startswith('Error'):
+                if '; ' in saida:
+                    return saida
+                return saida.split('\\')[-1] if '\\' in saida else saida
+        except:
+            pass
+        return ''
     try:
-        def esc(s):
-            return s.replace("'", "''")
-        script = PS_SCRIPT_WMI.replace('_IP_', esc(ip)).replace('_USER_', esc(ad_user)).replace('_PASS_', esc(ad_pass))
-        ps = subprocess.run(
-            ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', script],
-            capture_output=True, text=True, timeout=15
-        )
-        saida = ps.stdout.strip()
-        if saida and 'Access Denied' not in saida and not saida.startswith('Error'):
-            if '; ' in saida:
-                return saida
-            return saida.split('\\')[-1] if '\\' in saida else saida
+        domain, username = ad_user.split('\\', 1) if '\\' in ad_user else ('', ad_user)
+        from impacket.wmi import WMI
+        wmi = WMI(ip, username, ad_pass, domain)
+        rows = wmi.wmi_query("SELECT Antecedent FROM Win32_LoggedOnUser")
+        users = set()
+        for row in rows:
+            ant = row.get('Antecedent', '')
+            n = re.search(r'Name="([^"]+)"', ant)
+            d = re.search(r'Domain="([^"]+)"', ant)
+            if n and d:
+                users.add(f'{d.group(1)}\\{n.group(1)}')
+        if users:
+            return '; '.join(sorted(users))
+        rows2 = wmi.wmi_query("SELECT UserName FROM Win32_ComputerSystem")
+        for row in rows2:
+            u = row.get('UserName', '')
+            if u:
+                return u
     except:
         pass
     return ''
