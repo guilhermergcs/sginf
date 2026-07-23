@@ -167,7 +167,13 @@ async function loadWebAuthn() {
       });
       const data1 = await r1.json();
       if (!r1.ok) throw new Error(data1.error);
-      const cred = await navigator.credentials.create({ publicKey: data1.options });
+      var opts = data1.options;
+      opts.challenge = base64ToArrayBuffer(opts.challenge);
+      opts.user.id = base64ToArrayBuffer(opts.user.id);
+      if (opts.excludeCredentials) {
+        opts.excludeCredentials.forEach(function(c) { c.id = base64ToArrayBuffer(c.id); });
+      }
+      const cred = await navigator.credentials.create({ publicKey: opts });
       const r2 = await fetch('/api/auth/webauthn/register/complete', {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'X-CSRF-Token': getCookie('csrf_token')},
@@ -228,5 +234,12 @@ document.getElementById('unlinkTelegram').addEventListener('click', async () => 
 });
 
 function getCookie(name) { return document.cookie.split('; ').find(r=>r.startsWith(name+'='))?.split('=')[1]||''; }
+
+function base64ToArrayBuffer(base64) {
+  var binary = atob(base64.replace(/-/g,'+').replace(/_/g,'/'));
+  var bytes = new Uint8Array(binary.length);
+  for (var i = 0; i < binary.length; i++) { bytes[i] = binary.charCodeAt(i); }
+  return bytes.buffer;
+}
 </script>
 {% endblock %}
