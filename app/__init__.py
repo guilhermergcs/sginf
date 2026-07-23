@@ -12,8 +12,7 @@ def create_app():
             'Generate one with: python -c "import secrets; print(secrets.token_hex(32))"'
         )
     app.config['SECRET_KEY'] = secret_key
-    default_secure = 'false' if app.debug else 'true'
-    app.config['COOKIE_SECURE'] = os.environ.get('COOKIE_SECURE', default_secure).lower() not in ('0', 'false', 'no')
+app.config['COOKIE_SECURE'] = os.environ.get('COOKIE_SECURE', 'false').lower() not in ('0', 'false', 'no')
     app.config['TELEGRAM_BOT_TOKEN'] = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
     from app.blueprints.auth import auth_bp
