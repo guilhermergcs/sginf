@@ -42,10 +42,11 @@ def sync_status():
     conn_db.close()
     ad_user = config['username'] if config else ''
     ad_pass = config['password'] if config else ''
+    dns_server = config['ad_ip'] or config['server'] if config else None
     resultados = []
 
     def verificar(pc):
-        resultado = verificar_status_computador(pc, ad_user, ad_pass)
+        resultado = verificar_status_computador(pc, ad_user, ad_pass, dns_server)
         resultados.append(resultado)
 
     threads = []

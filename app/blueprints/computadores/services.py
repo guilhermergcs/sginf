@@ -1,7 +1,28 @@
+import re
 import socket
 import subprocess
 from ldap3 import Server, Connection, ALL, core
 from app.db import get_db_connection
+
+
+def _resolver(hostname, dns_server=None):
+    try:
+        return socket.gethostbyname(hostname)
+    except socket.gaierror:
+        pass
+    if dns_server:
+        try:
+            out = subprocess.run(
+                ['nslookup', hostname, dns_server],
+                capture_output=True, text=True, timeout=5
+            ).stdout
+            for line in out.splitlines():
+                m = re.search(r'Address:\s*(\d+\.\d+\.\d+\.\d+)', line)
+                if m and m.group(1) != dns_server:
+                    return m.group(1)
+        except Exception:
+            pass
+    return None
 
 PS_SCRIPT_WMI = '''
 $ip = '_IP_'
@@ -49,6 +70,7 @@ try {
 
 def sync_computadores_ad(config):
     target = config['ad_ip'] or config['server']
+    dns_server = config['ad_ip'] or config['server']
     ad_server = Server(target, get_info=ALL)
     ad_conn = Connection(ad_server, user=config['username'], password=config['password'], auto_bind=True)
     ad_conn.search(
@@ -63,11 +85,9 @@ def sync_computadores_ad(config):
         hostname = str(entry.dNSHostName) if hasattr(entry, 'dNSHostName') and entry.dNSHostName else ''
         sistema = str(entry.operatingSystem) if hasattr(entry, 'operatingSystem') and entry.operatingSystem else ''
         ip = hostname if hostname and '.' in hostname else ''
-        if ip:
-            try:
-                ip = socket.gethostbyname(hostname)
-            except:
-                pass
+        resolved = _resolver(ip, dns_server) if ip else None
+        if resolved:
+            ip = resolved
         conn_db.execute(
             'INSERT INTO computadores (nome, ip, usuario_logado, status) VALUES (?, ?, ?, ?)',
             (nome, ip, '', 'offline')
@@ -80,12 +100,24 @@ def sync_computadores_ad(config):
 def verificar_ping(ip):
     if not ip:
         return False
+    import sys
+    if sys.platform == 'win32':
+        try:
+            ping = subprocess.run(
+                ['ping', '-n', '1', '-w', '2000', ip],
+                capture_output=True, text=True, timeout=5
+            )
+            return ping.returncode == 0
+        except:
+            return False
     try:
-        ping = subprocess.run(
-            ['ping', '-n', '1', '-w', '2000', ip],
-            capture_output=True, text=True, timeout=5
-        )
-        return ping.returncode == 0
+        with socket.create_connection((ip, 445), timeout=3):
+            return True
+    except:
+        pass
+    try:
+        with socket.create_connection((ip, 135), timeout=3):
+            return True
     except:
         return False
 
@@ -107,18 +139,17 @@ def buscar_usuario_wmi(ip, ad_user, ad_pass):
         pass
     return ''
 
-def verificar_status_computador(pc, ad_user, ad_pass):
+def verificar_status_computador(pc, ad_user, ad_pass, dns_server=None):
     pc_id = pc['id']
     nome = pc['nome']
     ip = pc['ip']
     online = False
     usuario = ''
     if ip and not ip.replace('.', '').isdigit():
-        try:
-            ip = socket.gethostbyname(ip)
-        except:
-            pass
-    if ip:
+        resolved = _resolver(ip, dns_server)
+        if resolved:
+            ip = resolved
+    if ip and ip.replace('.', '').isdigit():
         online = verificar_ping(ip)
     if online and ip:
         usuario = buscar_usuario_wmi(ip, ad_user, ad_pass)
