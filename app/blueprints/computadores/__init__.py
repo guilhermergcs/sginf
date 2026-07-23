@@ -26,6 +26,7 @@ def sync_computadores():
     conn_db.close()
     if not config:
         return jsonify({"status": "error", "message": "Configuração AD não encontrada"}), 400
+    config = dict(config)
     try:
         total = sync_computadores_ad(config)
         return jsonify({"status": "success", "message": f"Sincronizados {total} computadores do AD!"})
@@ -42,7 +43,11 @@ def sync_status():
     conn_db.close()
     ad_user = config['username'] if config else ''
     ad_pass = config['password'] if config else ''
-    dns_server = config['ad_ip'] or config['server'] if config else None
+    if config:
+        config = dict(config)
+        dns_server = config.get('ad_ip') or config.get('server')
+    else:
+        dns_server = None
     resultados = []
 
     def verificar(pc):
