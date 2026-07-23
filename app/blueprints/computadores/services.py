@@ -112,15 +112,21 @@ def verificar_ping(ip):
         except:
             return False
     try:
-        with socket.create_connection((ip, 445), timeout=3):
+        ping = subprocess.run(
+            ['ping', '-c', '1', '-W', '2', ip],
+            capture_output=True, text=True, timeout=5
+        )
+        if ping.returncode == 0:
             return True
     except:
         pass
-    try:
-        with socket.create_connection((ip, 135), timeout=3):
-            return True
-    except:
-        return False
+    for port in (445, 135):
+        try:
+            with socket.create_connection((ip, port), timeout=3):
+                return True
+        except:
+            pass
+    return False
 
 def buscar_usuario_wmi(ip, ad_user, ad_pass):
     try:
