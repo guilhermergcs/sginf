@@ -51,7 +51,7 @@ def sync_status():
     resultados = []
 
     def verificar(pc):
-        resultado = verificar_status_computador(pc, ad_user, ad_pass, dns_server)
+        resultado = verificar_status_computador(dict(pc), ad_user, ad_pass, dns_server)
         resultados.append(resultado)
 
     threads = []
