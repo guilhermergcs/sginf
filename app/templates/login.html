@@ -1,107 +1,221 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
 {% block sidebar %}{% endblock %}
-{% block main_class %}main-full{% endblock %}
+{% block main_class %}main-full login-page{% endblock %}
 {% block content %}
-<div class="card" style="width:400px;padding:2rem">
-  <h2 style="margin-bottom:1.5rem;text-align:center">SGINF</h2>
-  <form id="loginForm">
-    <div class="form-group">
-      <label>Usuário</label>
-      <input type="text" id="username" class="form-control" required autofocus>
-    </div>
-    <div class="form-group">
-      <label>Senha</label>
-      <input type="password" id="password" class="form-control" required>
-    </div>
-    <button type="submit" class="btn btn-primary btn-full">Entrar</button>
-  </form>
-  <div class="feedback error" id="loginError" style="display:none"></div>
-  <hr style="margin:1.5rem 0">
-  <div style="display:flex;flex-direction:column;gap:8px">
-    <button id="webauthnBtn" class="btn btn-secondary btn-full" style="display:none">Entrar com Windows Hello</button>
-    <button id="telegramBtn" class="btn btn-secondary btn-full">Entrar com Telegram</button>
+<canvas id="particles" class="particles-canvas"></canvas>
+<div class="login-bg">
+  <div class="shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
   </div>
-  <div id="telegramQR" style="display:none;text-align:center;margin-top:1rem">
-    <h4>Escaneie com Telegram</h4>
-    <img id="qrImage" style="width:200px;height:200px;background:#fff;padding:8px;border-radius:8px;margin:8px auto">
-    <p id="qrStatus" style="margin-top:0.5rem">Aguardando leitura...</p>
-    <button id="cancelTelegram" class="btn btn-sm btn-secondary">Cancelar</button>
+  <div class="login-card">
+    <h1 class="login-title">SGINF</h1>
+    <p class="login-subtitle">Sistema de Gestão de TI</p>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">Usuário</label>
+        <input type="text" id="username" class="form-control" placeholder="Nome de usuário" required autofocus>
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" class="form-control" placeholder="Sua senha" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Entrar</button>
+    </form>
+    <div id="loginError" class="login-error" style="display:none"></div>
+    <div class="login-divider">Ou entre com</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button id="webauthnBtn" class="btn btn-secondary" style="display:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Windows Hello
+      </button>
+      <button id="telegramBtn" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Telegram
+      </button>
+    </div>
+    <div id="telegramQR" class="login-qr" style="display:none">
+      <h4>Escaneie com Telegram</h4>
+      <img id="qrImage" alt="QR Code">
+      <p id="qrStatus">Aguardando leitura...</p>
+      <button id="cancelTelegram" class="btn btn-secondary" style="margin-top:8px">Cancelar</button>
+    </div>
   </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script>
+// Particles
+(function() {
+  var canvas = document.getElementById('particles');
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var mouseX = -1000;
+  var mouseY = -1000;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function Particle() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.vx = (Math.random() - 0.5) * 0.4;
+    this.vy = (Math.random() - 0.5) * 0.4;
+    this.r = Math.random() * 2 + 1;
+  }
+
+  Particle.prototype.update = function() {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+    var dx = mouseX - this.x;
+    var dy = mouseY - this.y;
+    var dist = Math.sqrt(dx*dx+dy*dy);
+    if (dist < 200) {
+      this.x -= dx * 0.002;
+      this.y -= dy * 0.002;
+    }
+  };
+
+  Particle.prototype.draw = function() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(59,130,246,0.4)';
+    ctx.fill();
+  };
+
+  function init() {
+    particles = [];
+    for (var i = 0; i < 80; i++) particles.push(new Particle());
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var i = 0; i < particles.length; i++) {
+      particles[i].update();
+      particles[i].draw();
+    }
+    for (var i = 0; i < particles.length; i++) {
+      for (var j = i + 1; j < particles.length; j++) {
+        var dx = particles[i].x - particles[j].x;
+        var dy = particles[i].y - particles[j].y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 150) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(59,130,246,' + (0.08 * (1 - dist / 150)).toFixed(3) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+
+  canvas.addEventListener('mousemove', function(e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+  canvas.addEventListener('mouseleave', function() {
+    mouseX = -1000;
+    mouseY = -1000;
+  });
+  window.addEventListener('resize', resize);
+  resize();
+  init();
+  animate();
+})();
+
+// Login form
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  const r = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ username, password })
-  });
-  const data = await r.json();
-  if (r.ok) {
-    window.location.href = data.redirect || '/computadores';
-  } else {
-    document.getElementById('loginError').textContent = data.error;
-    document.getElementById('loginError').style.display = 'block';
+  var btn = e.target.querySelector('button[type=submit]');
+  btn.disabled = true;
+  btn.textContent = 'Entrando...';
+  var username = document.getElementById('username').value;
+  var password = document.getElementById('password').value;
+  try {
+    var r = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ username, password })
+    });
+    var data = await r.json();
+    if (r.ok) {
+      window.location.href = data.redirect || '/computadores';
+    } else {
+      var err = document.getElementById('loginError');
+      err.textContent = data.error;
+      err.style.display = 'block';
+    }
+  } catch(e) {
+    var err = document.getElementById('loginError');
+    err.textContent = 'Erro de conexão';
+    err.style.display = 'block';
   }
+  btn.disabled = false;
+  btn.textContent = 'Entrar';
 });
 
 // WebAuthn
 if (window.PublicKeyCredential) {
-  document.getElementById('webauthnBtn').style.display = 'block';
+  document.getElementById('webauthnBtn').style.display = 'flex';
   document.getElementById('webauthnBtn').addEventListener('click', async () => {
     try {
-      const r1 = await fetch('/api/auth/webauthn/login/begin', {
+      var r1 = await fetch('/api/auth/webauthn/login/begin', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({}),
       });
-      const data1 = await r1.json();
+      var data1 = await r1.json();
       if (!r1.ok) throw new Error(data1.error);
       var opts = data1.options;
       opts.challenge = base64ToArrayBuffer(opts.challenge);
       if (opts.allowCredentials) {
         opts.allowCredentials.forEach(function(c) { c.id = base64ToArrayBuffer(c.id); });
       }
-      const cred = await navigator.credentials.get({ publicKey: opts });
-      const r2 = await fetch('/api/auth/webauthn/login/complete', {
+      var cred = await navigator.credentials.get({ publicKey: opts });
+      var r2 = await fetch('/api/auth/webauthn/login/complete', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ credential: cred, credential_id: cred.id, challenge_id: data1.challenge_id }),
       });
-      const data2 = await r2.json();
+      var data2 = await r2.json();
       if (r2.ok) window.location.href = data2.redirect;
       else throw new Error(data2.error);
     } catch (e) {
-      document.getElementById('loginError').textContent = e.message;
-      document.getElementById('loginError').style.display = 'block';
+      var err = document.getElementById('loginError');
+      err.textContent = e.message;
+      err.style.display = 'block';
     }
   });
 }
 
 // Telegram QR
-let telegramToken = null;
-let telegramPoll = null;
+var telegramPoll = null;
 document.getElementById('telegramBtn').addEventListener('click', async () => {
   document.getElementById('telegramBtn').style.display = 'none';
   document.getElementById('telegramQR').style.display = 'block';
   try {
-    const r = await fetch('/api/auth/telegram/qrcode?purpose=login');
-    const data = await r.json();
+    var r = await fetch('/api/auth/telegram/qrcode?purpose=login');
+    var data = await r.json();
     if (!r.ok) throw new Error(data.error);
-    telegramToken = data.token;
+    var token = data.token;
     document.getElementById('qrImage').src = 'data:image/png;base64,' + data.qr_base64;
     telegramPoll = setInterval(async () => {
-      const r2 = await fetch('/api/auth/telegram/check', {
+      var r2 = await fetch('/api/auth/telegram/check', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ token: telegramToken }),
+        body: JSON.stringify({ token: token }),
       });
-      const d2 = await r2.json();
+      var d2 = await r2.json();
       if (d2.consumed) {
         clearInterval(telegramPoll);
         if (d2.redirect) window.location.href = d2.redirect;
@@ -115,7 +229,7 @@ document.getElementById('telegramBtn').addEventListener('click', async () => {
 document.getElementById('cancelTelegram').addEventListener('click', () => {
   clearInterval(telegramPoll);
   document.getElementById('telegramQR').style.display = 'none';
-  document.getElementById('telegramBtn').style.display = 'block';
+  document.getElementById('telegramBtn').style.display = 'flex';
 });
 
 function base64ToArrayBuffer(base64) {

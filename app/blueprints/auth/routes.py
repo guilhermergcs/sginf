@@ -106,6 +106,59 @@ def api_register():
     conn.close()
     return jsonify({'ok': True})
 
+@auth_bp.route('/api/auth/usuarios-sistema')
+@require_admin
+def api_list_usuarios_sistema():
+    conn = get_db_connection()
+    users = conn.execute('''
+        SELECT u.id, u.username, u.tipo, u.telegram_linked, u.created_at,
+               (SELECT COUNT(*) FROM webauthn_credentials w WHERE w.user_id = u.id) as webauthn_count
+        FROM usuarios_sistema u
+        ORDER BY u.username
+    ''').fetchall()
+    conn.close()
+    return jsonify([dict(u) for u in users])
+
+@auth_bp.route('/api/auth/usuarios-sistema/<int:id>', methods=['PUT'])
+@require_admin
+def api_update_usuario_sistema(id):
+    data = request.get_json(silent=True) or {}
+    username = data.get('username', '').strip()
+    tipo = data.get('tipo', 'admin')
+    new_password = data.get('password', '').strip()
+    if not username or len(username) < 3:
+        return jsonify({'ok': False, 'error': 'Username deve ter ao menos 3 caracteres'}), 400
+    conn = get_db_connection()
+    existing = conn.execute('SELECT id FROM usuarios_sistema WHERE username = ? AND id != ?',
+                           (username, id)).fetchone()
+    if existing:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Username ja existe'}), 409
+    if new_password:
+        if len(new_password) < 4:
+            conn.close()
+            return jsonify({'ok': False, 'error': 'Senha deve ter ao menos 4 caracteres'}), 400
+        pw_hash = generate_password_hash(new_password)
+        conn.execute('UPDATE usuarios_sistema SET username = ?, tipo = ?, senha_hash = ? WHERE id = ?',
+                    (username, tipo, pw_hash, id))
+    else:
+        conn.execute('UPDATE usuarios_sistema SET username = ?, tipo = ? WHERE id = ?',
+                    (username, tipo, id))
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True})
+
+@auth_bp.route('/api/auth/usuarios-sistema/<int:id>', methods=['DELETE'])
+@require_admin
+def api_delete_usuario_sistema(id):
+    if id == g.current_user['id']:
+        return jsonify({'ok': False, 'error': 'Nao pode excluir a si mesmo'}), 400
+    conn = get_db_connection()
+    conn.execute('DELETE FROM usuarios_sistema WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True})
+
 @auth_bp.route('/api/auth/change-password', methods=['POST'])
 @require_auth
 def api_change_password():

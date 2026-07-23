@@ -1,3 +1,122 @@
+# User Management Page Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Transform `/register` from a single registration form into a full user management page with list, search, create, edit, and delete for `usuarios_sistema` table.
+
+**Architecture:** 3 new REST endpoints in `auth/routes.py` (GET list, PUT update, DELETE delete). Frontend in `register.html` uses a table + single shared modal (create/edit mode). Pagination/filter utilities reused from `base.html`.
+
+**Tech Stack:** Flask, SQLite, vanilla JS, CSS from `style.css`.
+
+## Global Constraints
+
+- All new endpoints protected by `@require_admin`
+- DELETE blocks self-deletion (id == g.current_user['id'])
+- PUT only updates password if field is non-empty string
+- Frontend English variable names consistent with existing JS in `/usuarios`
+
+---
+
+### Task 1: Backend — API Endpoints for System Users
+
+**Files:**
+- Modify: `app/blueprints/auth/routes.py` — add 3 endpoints after `api_register()` (line 107)
+
+**Interfaces:**
+- Produces: `GET /api/auth/usuarios-sistema` → JSON array of users; `PUT /api/auth/usuarios-sistema/<id>` → `{'ok': True}`; `DELETE /api/auth/usuarios-sistema/<id>` → `{'ok': True}`
+
+- [ ] **Step 1: Add GET list endpoint**
+
+Insert after line 107 (`api_register` function ends):
+
+```python
+@auth_bp.route('/api/auth/usuarios-sistema')
+@require_admin
+def api_list_usuarios_sistema():
+    conn = get_db_connection()
+    users = conn.execute('''
+        SELECT u.id, u.username, u.tipo, u.telegram_linked, u.created_at,
+               (SELECT COUNT(*) FROM webauthn_credentials w WHERE w.user_id = u.id) as webauthn_count
+        FROM usuarios_sistema u
+        ORDER BY u.username
+    ''').fetchall()
+    conn.close()
+    return jsonify([dict(u) for u in users])
+```
+
+- [ ] **Step 2: Add PUT update endpoint**
+
+```python
+@auth_bp.route('/api/auth/usuarios-sistema/<int:id>', methods=['PUT'])
+@require_admin
+def api_update_usuario_sistema(id):
+    data = request.get_json(silent=True) or {}
+    username = data.get('username', '').strip()
+    tipo = data.get('tipo', 'admin')
+    new_password = data.get('password', '').strip()
+    if not username or len(username) < 3:
+        return jsonify({'ok': False, 'error': 'Username deve ter ao menos 3 caracteres'}), 400
+    conn = get_db_connection()
+    existing = conn.execute('SELECT id FROM usuarios_sistema WHERE username = ? AND id != ?',
+                           (username, id)).fetchone()
+    if existing:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Username ja existe'}), 409
+    if new_password:
+        if len(new_password) < 4:
+            conn.close()
+            return jsonify({'ok': False, 'error': 'Senha deve ter ao menos 4 caracteres'}), 400
+        pw_hash = generate_password_hash(new_password)
+        conn.execute('UPDATE usuarios_sistema SET username = ?, tipo = ?, senha_hash = ? WHERE id = ?',
+                    (username, tipo, pw_hash, id))
+    else:
+        conn.execute('UPDATE usuarios_sistema SET username = ?, tipo = ? WHERE id = ?',
+                    (username, tipo, id))
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True})
+```
+
+- [ ] **Step 3: Add DELETE endpoint**
+
+```python
+@auth_bp.route('/api/auth/usuarios-sistema/<int:id>', methods=['DELETE'])
+@require_admin
+def api_delete_usuario_sistema(id):
+    if id == g.current_user['id']:
+        return jsonify({'ok': False, 'error': 'Nao pode excluir a si mesmo'}), 400
+    conn = get_db_connection()
+    conn.execute('DELETE FROM usuarios_sistema WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True})
+```
+
+- [ ] **Step 4: Verify backend**
+
+Start the Flask app and test with curl or browser:
+```bash
+curl -X GET http://localhost:5000/api/auth/usuarios-sistema  # should list users or return 401
+```
+
+Expected: Returns JSON array or 401 redirect (if not logged in).
+
+---
+
+### Task 2: Frontend — Rewrite register.html
+
+**Files:**
+- Rewrite: `app/templates/register.html`
+
+**Interfaces:**
+- Consumes: `GET /api/auth/usuarios-sistema`, `POST /api/auth/register`, `PUT /api/auth/usuarios-sistema/<id>`, `DELETE /api/auth/usuarios-sistema/<id>`
+- Reuses: `confirmDialog()`, `getCookie()`, `filterTable()`, `initPagination()`, `applyPagination()` from base.html
+
+- [ ] **Step 1: Write the complete HTML template**
+
+Replace entire content of `register.html`:
+
+```html
 {% extends "base.html" %}
 {% block title %}Usuários do Sistema{% endblock %}
 {% block nav_register %}active{% endblock %}
@@ -116,14 +235,20 @@ function openModal(title, username, tipo, editId) {
   document.getElementById('user-feedback').textContent = '';
   document.getElementById('user-feedback').className = 'dialog-message';
   document.getElementById('user-ok').textContent = editId ? 'Atualizar' : 'Salvar';
-  const pw = document.getElementById('user-password');
+
+  const pwGroup = document.getElementById('user-password-group');
+  const confirmGroup = document.getElementById('user-confirm-group');
   const hint = document.getElementById('password-hint');
   if (editId) {
-    pw.required = false;
+    pwGroup.style.display = 'block';
+    confirmGroup.style.display = 'block';
     hint.textContent = 'Deixe em branco para manter a atual';
+    document.getElementById('user-password').required = false;
   } else {
-    pw.required = true;
+    pwGroup.style.display = 'block';
+    confirmGroup.style.display = 'block';
     hint.textContent = 'Mínimo 4 caracteres';
+    document.getElementById('user-password').required = true;
   }
   document.getElementById('user-dialog').showModal();
 }
@@ -229,3 +354,21 @@ async function deleteUser(id, username) {
 document.addEventListener('DOMContentLoaded', loadUsers);
 </script>
 {% endblock %}
+```
+
+This overwrites the entire file content.
+
+- [ ] **Step 2: Verify frontend loads**
+
+Start the Flask app, log in as admin, navigate to `/register`. Expected: table loads with user list, "Novo Usuário" button opens modal, create/edit/delete work.
+
+- [ ] **Step 3: Verify delete protection**
+
+Try to delete yourself (the currently logged-in user). Expected: error message "Nao pode excluir a si mesmo".
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add app/blueprints/auth/routes.py app/templates/register.html
+git commit -m "feat: transform /register into full user management page"
+```
