@@ -1,42 +1,65 @@
 {% extends "base.html" %}
 {% block title %}Ajustes{% endblock %}
-{% block nav_settings %}active{% endblock %}
+{% block main_class %}main-center{% endblock %}
 {% block content %}
-<div style="max-width:600px;margin:2rem auto">
-  <div class="card">
+<div class="config-card">
+  <div class="page-header">
     <h2>Ajustes da Conta</h2>
-    <p><strong>Usuário:</strong> <span id="currentUsername"></span></p>
+    <p>Gerencie suas credenciais e integrações</p>
+  </div>
 
-    <h3 style="margin-top:2rem">Alterar Senha</h3>
-    <form id="passwordForm">
-      <div class="form-group">
-        <label>Senha atual</label>
-        <input type="password" id="oldPassword" class="form-control" required>
-      </div>
-      <div class="form-group">
-        <label>Nova senha</label>
-        <input type="password" id="newPassword" class="form-control" required minlength="4">
-      </div>
-      <button type="submit" class="btn btn-primary">Salvar Senha</button>
-    </form>
-    <p id="pwMsg" style="margin-top:0.5rem"></p>
-
-    <h3 style="margin-top:2rem">Windows Hello</h3>
-    <div id="webauthnSection">
-      <p id="webauthnStatus">Verificando...</p>
-      <button id="registerWebauthn" class="btn btn-primary" style="display:none">Registrar Windows Hello</button>
-      <button id="removeWebauthn" class="btn btn-danger" style="display:none">Remover</button>
+  <div class="card">
+    <div class="card-header"><h3>Informações</h3></div>
+    <div class="card-body">
+      <p><strong>Usuário:</strong> <span id="currentUsername"></span></p>
     </div>
+  </div>
 
-    <h3 style="margin-top:2rem">Telegram</h3>
-    <div id="telegramSection">
-      <p id="telegramStatus">Verificando...</p>
-      <button id="linkTelegram" class="btn btn-primary" style="display:none">Vincular Telegram</button>
-      <button id="unlinkTelegram" class="btn btn-danger" style="display:none">Desvincular</button>
-      <div id="telegramLinkQR" style="display:none;text-align:center;margin-top:1rem">
-        <p>Escaneie com Telegram e envie o codigo:</p>
-        <img id="telegramQrImg" style="width:200px;height:200px;background:#fff;padding:8px;border-radius:8px">
-        <p id="telegramLinkStatus" style="margin-top:0.5rem"></p>
+  <div class="card">
+    <div class="card-header"><h3>Alterar Senha</h3></div>
+    <div class="card-body">
+      <form id="passwordForm">
+        <div class="form-group">
+          <label>Senha atual</label>
+          <input type="password" id="oldPassword" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Nova senha</label>
+          <input type="password" id="newPassword" class="form-control" required minlength="4">
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar Senha</button>
+      </form>
+      <div class="feedback" id="pwMsg"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>Windows Hello</h3></div>
+    <div class="card-body">
+      <div id="webauthnSection">
+        <p id="webauthnStatus">Verificando...</p>
+        <div class="actions actions-mt">
+          <button id="registerWebauthn" class="btn btn-primary" style="display:none">Registrar Windows Hello</button>
+          <button id="removeWebauthn" class="btn btn-danger" style="display:none">Remover</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>Telegram</h3></div>
+    <div class="card-body">
+      <div id="telegramSection">
+        <p id="telegramStatus">Verificando...</p>
+        <div class="actions actions-mt">
+          <button id="linkTelegram" class="btn btn-primary" style="display:none">Vincular Telegram</button>
+          <button id="unlinkTelegram" class="btn btn-danger" style="display:none">Desvincular</button>
+        </div>
+        <div id="telegramLinkQR" style="display:none;text-align:center;margin-top:1rem">
+          <p>Escaneie com Telegram e envie o codigo:</p>
+          <img id="telegramQrImg" style="width:200px;height:200px;background:#fff;padding:8px;border-radius:8px">
+          <p id="telegramLinkStatus" style="margin-top:0.5rem"></p>
+        </div>
       </div>
     </div>
   </div>
@@ -65,11 +88,11 @@ document.getElementById('passwordForm').addEventListener('submit', async (e) => 
   const res = await r.json();
   const msg = document.getElementById('pwMsg');
   if (r.ok) {
-    msg.className = 'text-success';
+    msg.className = 'feedback success';
     msg.textContent = 'Senha alterada com sucesso!';
     document.getElementById('passwordForm').reset();
   } else {
-    msg.className = 'text-danger';
+    msg.className = 'feedback error';
     msg.textContent = res.error;
   }
 });
