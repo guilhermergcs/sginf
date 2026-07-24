@@ -128,9 +128,7 @@ class TelegramBot:
             await application.run_polling(stop_signals=[])
 
         def run():
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(run_bot())
+            asyncio.run(run_bot())
 
         self._thread = threading.Thread(target=run, daemon=True)
         self._thread.start()
