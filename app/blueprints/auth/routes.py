@@ -319,11 +319,16 @@ def api_telegram_qrcode():
             return jsonify({'ok': False, 'error': 'Sessao invalida'}), 401
         user_id = payload['sub']
     token = create_auth_token('telegram_' + purpose, user_id)
-    qr = qrcode.make(token, box_size=8)
+    bot_username = current_app.config.get('TELEGRAM_BOT_USERNAME', '')
+    if bot_username:
+        qr_content = f'tg://resolve?domain={bot_username}&start={token}'
+    else:
+        qr_content = token
+    qr = qrcode.make(qr_content, box_size=8)
     buf = BytesIO()
     qr.save(buf, format='PNG')
     b64 = base64.b64encode(buf.getvalue()).decode()
-    return jsonify({'ok': True, 'token': token, 'qr_base64': b64})
+    return jsonify({'ok': True, 'token': token, 'qr_base64': b64, 'bot_username': bot_username})
 
 @auth_bp.route('/api/auth/telegram/check', methods=['POST'])
 def api_telegram_check():

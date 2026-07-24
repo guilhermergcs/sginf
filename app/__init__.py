@@ -19,6 +19,7 @@ def create_app():
     app.config['SECRET_KEY'] = secret_key
     app.config['COOKIE_SECURE'] = os.environ.get('COOKIE_SECURE', 'false').lower() not in ('0', 'false', 'no')
     app.config['TELEGRAM_BOT_TOKEN'] = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+    app.config['TELEGRAM_BOT_USERNAME'] = os.environ.get('TELEGRAM_BOT_USERNAME', '')
 
     avatars_dir = os.path.join(app.root_path, 'static', 'avatars')
     os.makedirs(avatars_dir, exist_ok=True)
@@ -61,7 +62,8 @@ def create_app():
         bot_token = app.config.get('TELEGRAM_BOT_TOKEN', '')
         if bot_token:
             from app.blueprints.auth.telegram_bot import TelegramBot
-            bot = TelegramBot(bot_token)
+            bot_username = app.config.get('TELEGRAM_BOT_USERNAME', '')
+            bot = TelegramBot(bot_token, bot_username)
             bot.start(app)
             app.config['TELEGRAM_BOT'] = bot
 

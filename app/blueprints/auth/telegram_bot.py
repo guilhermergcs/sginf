@@ -62,8 +62,9 @@ def get_user_by_telegram(telegram_chat_id):
     return dict(user) if user else None
 
 class TelegramBot:
-    def __init__(self, token):
+    def __init__(self, token, bot_username=''):
         self.token = token
+        self.bot_username = bot_username
         self._thread = None
 
     def start(self, app):
@@ -73,6 +74,31 @@ class TelegramBot:
 
         async def start_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
             log.info(f'Received /start from {update.effective_chat.id}')
+            if context.args:
+                token = context.args[0]
+                t = check_token(token)
+                if not t:
+                    await update.message.reply_text('Codigo invalido ou expirado.')
+                    return
+                if t['purpose'] == 'telegram_login':
+                    user = get_user_by_telegram(update.effective_chat.id)
+                    if not user:
+                        await update.message.reply_text(
+                            'Sua conta do Telegram nao esta vinculada a nenhum usuario. '
+                            'Vincule primeiro em Ajustes > Telegram usando /link.'
+                        )
+                        return
+                    consume_token(token, update.effective_chat.id)
+                    await update.message.reply_text('Login autorizado! Volte ao navegador.')
+                elif t['purpose'] == 'telegram_link':
+                    consume_token(token, update.effective_chat.id)
+                    link_telegram(t['user_id'], update.effective_chat.id)
+                    await update.message.reply_text(
+                        'Telegram vinculado com sucesso! Agora voce pode fazer login com /login.'
+                    )
+                else:
+                    await update.message.reply_text('Codigo invalido.')
+                return
             await update.message.reply_text(
                 'Bot do SGINF\n\n'
                 '/login <codigo> - Entrar no sistema\n'
