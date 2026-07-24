@@ -1,7 +1,7 @@
 import jwt as pyjwt
 from datetime import datetime, timedelta, timezone
 import secrets
-from flask import current_app, g, request
+from flask import current_app, g, request, jsonify
 
 ALGORITHM = 'HS256'
 CSRF_COOKIE = 'csrf_token'
@@ -33,7 +33,7 @@ def require_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if 'current_user' not in g or not g.current_user:
-            g.current_user = {'id': 1, 'username': 'admin', 'tipo': 'admin'}
+            return jsonify({'ok': False, 'error': 'Nao autenticado'}), 401
         return f(*args, **kwargs)
     return decorated
 
@@ -45,8 +45,8 @@ def require_admin(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if 'current_user' not in g or not g.current_user:
-            g.current_user = {'id': 1, 'username': 'admin', 'tipo': 'admin'}
+            return jsonify({'ok': False, 'error': 'Nao autenticado'}), 401
         if g.current_user.get('tipo') != 'admin':
-            return {'ok': False, 'error': 'Acesso restrito a administradores'}, 403
+            return jsonify({'ok': False, 'error': 'Acesso restrito a administradores'}), 403
         return f(*args, **kwargs)
     return decorated

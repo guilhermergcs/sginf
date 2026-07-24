@@ -38,9 +38,21 @@ def create_app():
     app.register_blueprint(config_ad_bp)
     app.register_blueprint(wifi_bp)
 
+    from app.blueprints.auth.services import verify_jwt
+
     @app.before_request
-    def skip_auth():
-        g.current_user = {'id': 1, 'username': 'admin', 'tipo': 'admin'}
+    def load_current_user():
+        token = request.cookies.get('session_token')
+        if token:
+            payload = verify_jwt(token)
+            if payload:
+                g.current_user = {
+                    'id': payload['sub'],
+                    'username': payload['username'],
+                    'tipo': payload['tipo'],
+                }
+                return
+        g.current_user = None
 
     if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         bot_token = app.config.get('TELEGRAM_BOT_TOKEN', '')
