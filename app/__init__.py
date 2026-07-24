@@ -1,4 +1,5 @@
 from flask import Flask, request, g
+from werkzeug.middleware.proxy_fix import ProxyFix
 import os
 
 
@@ -7,6 +8,7 @@ def create_app():
     migrar()
 
     app = Flask(__name__, template_folder='templates')
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
     secret_key = os.environ.get('SECRET_KEY')
     if not secret_key:
