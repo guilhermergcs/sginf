@@ -1,4 +1,3 @@
-import json
 import os
 from webauthn import (
     generate_registration_options, verify_registration_response,
@@ -7,7 +6,6 @@ from webauthn import (
 )
 from webauthn.helpers.structs import (
     AuthenticatorSelectionCriteria, UserVerificationRequirement,
-    RegistrationCredential, AuthenticationCredential,
 )
 from flask import request, current_app
 from app.db import get_db_connection
@@ -46,7 +44,7 @@ def register_complete(user_id, credential):
     origin = get_origin()
     rp_id = get_rp_id()
     verification = verify_registration_response(
-        credential=RegistrationCredential.model_validate_json(json.dumps(credential)),
+        credential=credential,
         expected_challenge=challenge_data['challenge'],
         expected_rp_id=rp_id,
         expected_origin=origin,
@@ -117,7 +115,7 @@ def login_complete(credential, credential_id_hex, challenge_id):
     origin = get_origin()
     rp_id = get_rp_id()
     verification = verify_authentication_response(
-        credential=AuthenticationCredential.model_validate_json(json.dumps(credential)),
+        credential=credential,
         expected_challenge=challenge_data['challenge'],
         expected_rp_id=rp_id,
         expected_origin=origin,
