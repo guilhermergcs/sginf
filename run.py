@@ -17,7 +17,7 @@ if __name__ == '__main__':
         print(f'[*] HTTPS em https://{host}:{port}')
         if sys.platform != 'win32' and port == 443:
             print('[*] Porta 443 requer root. Use PORT=8443 ou sudo.')
-        app.run(host=host, port=port, ssl_context=(CERT_PATH, KEY_PATH), debug=True)
+        app.run(host=host, port=port, ssl_context=(CERT_PATH, KEY_PATH), debug=False)
     else:
         print('[!] Certificado SSL nao encontrado. Execute: python scripts/generate_ssl.py')
         print('[!] Iniciando sem HTTPS...')
