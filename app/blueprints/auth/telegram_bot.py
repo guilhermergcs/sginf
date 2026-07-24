@@ -1,9 +1,12 @@
 import secrets
 import threading
 import logging
+import asyncio
 from datetime import datetime, timedelta, timezone
 from flask import current_app
 from app.db import get_db_connection
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -62,84 +65,72 @@ class TelegramBot:
     def __init__(self, token):
         self.token = token
         self._thread = None
-        self._stop = threading.Event()
 
     def start(self, app):
         if not self.token:
             log.warning('TELEGRAM_BOT_TOKEN not set, bot disabled')
             return
-        def run():
-            import asyncio
-            from telegram import Update
-            from telegram.ext import Application, CommandHandler, ContextTypes
 
+        async def start_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+            await update.message.reply_text(
+                'Bot do SGINF\n\n'
+                '/login <codigo> - Entrar no sistema\n'
+                '/link <codigo> - Vincular Telegram a sua conta\n\n'
+                'Gere um codigo na pagina de login ou ajustes.'
+            )
+
+        async def login_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+            if not context.args:
+                await update.message.reply_text('Use: /login <codigo>')
+                return
+            token = context.args[0]
+            t = check_token(token)
+            if not t:
+                await update.message.reply_text('Codigo invalido ou expirado.')
+                return
+            if t['purpose'] != 'telegram_login':
+                await update.message.reply_text('Codigo invalido para login.')
+                return
+            user = get_user_by_telegram(update.effective_chat.id)
+            if not user:
+                await update.message.reply_text(
+                    'Sua conta do Telegram nao esta vinculada a nenhum usuario. '
+                    'Vincule primeiro em Ajustes > Telegram usando /link.'
+                )
+                return
+            consume_token(token, update.effective_chat.id)
+            await update.message.reply_text('Login autorizado! Volte ao navegador.')
+
+        async def link_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+            if not context.args:
+                await update.message.reply_text('Use: /link <codigo>')
+                return
+            token = context.args[0]
+            t = check_token(token)
+            if not t:
+                await update.message.reply_text('Codigo invalido ou expirado.')
+                return
+            if t['purpose'] != 'telegram_link' or not t['user_id']:
+                await update.message.reply_text('Codigo invalido para vinculacao.')
+                return
+            consume_token(token, update.effective_chat.id)
+            link_telegram(t['user_id'], update.effective_chat.id)
+            await update.message.reply_text(
+                'Telegram vinculado com sucesso! Agora voce pode fazer login com /login.'
+            )
+
+        async def run_bot():
             application = Application.builder().token(self.token).build()
-
-            async def start_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-                await update.message.reply_text(
-                    'Bot do SGINF\n\n'
-                    '/login <codigo> - Entrar no sistema\n'
-                    '/link <codigo> - Vincular Telegram a sua conta\n\n'
-                    'Gere um codigo na pagina de login ou ajustes.'
-                )
-
-            async def login_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-                if not context.args:
-                    await update.message.reply_text('Use: /login <codigo>')
-                    return
-                token = context.args[0]
-                t = check_token(token)
-                if not t:
-                    await update.message.reply_text('Codigo invalido ou expirado.')
-                    return
-                if t['purpose'] != 'telegram_login':
-                    await update.message.reply_text('Codigo invalido para login.')
-                    return
-                user = get_user_by_telegram(update.effective_chat.id)
-                if not user:
-                    await update.message.reply_text(
-                        'Sua conta do Telegram nao esta vinculada a nenhum usuario. '
-                        'Vincule primeiro em Ajustes > Telegram usando /link.'
-                    )
-                    return
-                consume_token(token, update.effective_chat.id)
-                await update.message.reply_text('Login autorizado! Volte ao navegador.')
-
-            async def link_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-                if not context.args:
-                    await update.message.reply_text('Use: /link <codigo>')
-                    return
-                token = context.args[0]
-                t = check_token(token)
-                if not t:
-                    await update.message.reply_text('Codigo invalido ou expirado.')
-                    return
-                if t['purpose'] != 'telegram_link' or not t['user_id']:
-                    await update.message.reply_text('Codigo invalido para vinculacao.')
-                    return
-                consume_token(token, update.effective_chat.id)
-                link_telegram(t['user_id'], update.effective_chat.id)
-                await update.message.reply_text(
-                    'Telegram vinculado com sucesso! Agora voce pode fazer login com /login.'
-                )
-
             application.add_handler(CommandHandler('start', start_cmd))
             application.add_handler(CommandHandler('login', login_cmd))
             application.add_handler(CommandHandler('link', link_cmd))
+            log.info('Telegram bot started polling')
+            await application.run_polling(stop_signals=[])
 
+        def run():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            loop.run_until_complete(application.initialize())
-            loop.run_until_complete(application.start())
-            log.info('Telegram bot started polling')
-            loop.run_until_complete(application.updater.start_polling())
-            self._stop.wait()
-            loop.run_until_complete(application.updater.stop())
-            loop.run_until_complete(application.stop())
-            loop.run_until_complete(application.shutdown())
+            loop.run_until_complete(run_bot())
 
         self._thread = threading.Thread(target=run, daemon=True)
         self._thread.start()
-
-    def stop(self):
-        self._stop.set()
