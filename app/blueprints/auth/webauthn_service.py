@@ -97,14 +97,16 @@ def login_begin(username=None):
     }
     return options_to_json(options), creds[0]['credential_id'], challenge_id
 
-def login_complete(credential, credential_id_hex, challenge_id):
+def login_complete(credential, credential_id_b64, challenge_id):
     challenge_data = current_app.config.get('webauthn_challenges', {}).pop(challenge_id, None)
     if not challenge_data or challenge_data['type'] != 'authentication':
         raise ValueError('No pending authentication challenge')
+    from webauthn.helpers.base64url_to_bytes import base64url_to_bytes
+    cred_id_hex = base64url_to_bytes(credential_id_b64).hex()
     conn = get_db_connection()
     cred = conn.execute(
         'SELECT * FROM webauthn_credentials WHERE credential_id = ?',
-        (credential_id_hex,),
+        (cred_id_hex,),
     ).fetchone()
     if not cred:
         conn.close()

@@ -2,9 +2,11 @@ import json
 import base64
 import os
 import re
+import traceback
 from io import BytesIO
 import qrcode
-from flask import jsonify, request, make_response, render_template, g, current_app, send_from_directory
+from flask import jsonify, request, make_response, render_template, g, send_from_directory
+from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from app.blueprints.auth import auth_bp
@@ -200,6 +202,7 @@ def api_webauthn_register_complete():
         result = register_complete(g.current_user['id'], cred)
         return jsonify({'ok': True, 'credential': result})
     except Exception as e:
+        traceback.print_exc()
         return jsonify({'ok': False, 'error': str(e)}), 400
 
 @auth_bp.route('/api/auth/webauthn/login/begin', methods=['POST'])
@@ -209,6 +212,7 @@ def api_webauthn_login_begin():
         options, cred_id, challenge_id = login_begin(data.get('username'))
         return jsonify({'ok': True, 'options': json.loads(options), 'challenge_id': challenge_id})
     except Exception as e:
+        traceback.print_exc()
         return jsonify({'ok': False, 'error': str(e)}), 400
 
 @auth_bp.route('/api/auth/webauthn/login/complete', methods=['POST'])
@@ -224,6 +228,7 @@ def api_webauthn_login_complete():
                        max_age=8*3600)
         return resp
     except Exception as e:
+        traceback.print_exc()
         return jsonify({'ok': False, 'error': str(e)}), 400
 
 @auth_bp.route('/api/auth/webauthn/credentials')
