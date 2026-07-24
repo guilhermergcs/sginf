@@ -6,6 +6,7 @@ from webauthn import (
 )
 from webauthn.helpers.structs import (
     AuthenticatorSelectionCriteria, UserVerificationRequirement,
+    PublicKeyCredentialDescriptor, PublicKeyCredentialType,
 )
 from flask import request, current_app
 from app.db import get_db_connection
@@ -77,7 +78,10 @@ def login_begin(username=None):
     if not creds:
         raise ValueError('No credentials registered')
     allow_credentials = [
-        {'id': bytes.fromhex(c['credential_id']), 'type': 'public-key'}
+        PublicKeyCredentialDescriptor(
+            id=bytes.fromhex(c['credential_id']),
+            type=PublicKeyCredentialType.PUBLIC_KEY,
+        )
         for c in creds
     ]
     challenge = secrets.token_bytes(32)
