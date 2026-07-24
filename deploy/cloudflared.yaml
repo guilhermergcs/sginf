@@ -1,0 +1,7 @@
+tunnel: sginf
+credentials-file: /etc/cloudflared/sginf.json
+
+ingress:
+  - hostname: sginf.gob.org.br
+    service: http://localhost:8443
+  - service: http_status:404
