@@ -9,7 +9,7 @@ CSRF_COOKIE = 'csrf_token'
 def make_jwt(user):
     now = datetime.now(timezone.utc)
     payload = {
-        'sub': user['id'],
+        'sub': str(user['id']),
         'username': user['username'],
         'tipo': user['tipo'],
         'iat': now,

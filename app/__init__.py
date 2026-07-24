@@ -50,7 +50,7 @@ def create_app():
         if payload is None:
             return
         g.current_user = {
-            'id': payload['sub'],
+            'id': int(payload['sub']),
             'username': payload['username'],
             'tipo': payload['tipo'],
         }
