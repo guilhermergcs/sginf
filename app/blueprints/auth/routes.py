@@ -49,7 +49,7 @@ def api_login():
     token = make_jwt(user)
     resp = make_response(jsonify({'ok': True, 'redirect': '/computadores'}))
     resp.set_cookie('session_token', token,
-                   httponly=True, samesite='Lax',
+                   httponly=True, samesite='Lax', path='/',
                    secure=secure_cookie(),
                    max_age=8*3600)
     return resp
@@ -223,7 +223,7 @@ def api_webauthn_login_complete():
         token = make_jwt(user)
         resp = make_response(jsonify({'ok': True, 'redirect': '/computadores'}))
         resp.set_cookie('session_token', token,
-                       httponly=True, samesite='Lax',
+                       httponly=True, samesite='Lax', path='/',
                        secure=secure_cookie(),
                        max_age=8*3600)
         return resp
@@ -283,6 +283,18 @@ def api_upload_avatar():
             os.remove(old_path)
     return jsonify({'ok': True, 'avatar_url': f'/api/auth/avatar/{g.current_user["id"]}'})
 
+@auth_bp.route('/api/auth/debug')
+def api_auth_debug():
+    token = request.cookies.get('session_token', 'NONE')
+    from app.blueprints.auth.services import verify_jwt
+    payload = verify_jwt(token) if token != 'NONE' else None
+    return jsonify({
+        'has_cookie': token != 'NONE',
+        'token_prefix': token[:20] + '...' if token != 'NONE' else None,
+        'payload': payload,
+        'cookie_header': request.headers.get('Cookie', 'NONE'),
+    })
+
 @auth_bp.route('/api/auth/avatar/<int:user_id>')
 def api_get_avatar(user_id):
     conn = get_db_connection()
@@ -334,7 +346,7 @@ def api_telegram_check():
         jwt_token = mk_jwt(user)
         resp = make_response(jsonify({'ok': True, 'consumed': True, 'redirect': '/computadores'}))
     resp.set_cookie('session_token', jwt_token,
-                   httponly=True, samesite='Lax',
+                   httponly=True, samesite='Lax', path='/',
                    secure=secure_cookie(),
                    max_age=8*3600)
     return resp
