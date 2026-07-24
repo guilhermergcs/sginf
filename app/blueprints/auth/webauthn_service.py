@@ -11,8 +11,10 @@ from flask import request, current_app
 from app.db import get_db_connection
 import secrets
 
+DOMAIN = os.environ.get('RP_ID') or os.environ.get('DOMAIN') or 'sginf.gob.org.br'
+
 def get_rp_id():
-    return os.environ.get('RP_ID') or request.host.split(':')[0]
+    return DOMAIN
 
 def get_origin():
     return request.scheme + '://' + request.host
