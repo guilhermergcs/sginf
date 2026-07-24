@@ -72,14 +72,17 @@ class TelegramBot:
             return
 
         async def start_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+            log.info(f'Received /start from {update.effective_chat.id}')
             await update.message.reply_text(
                 'Bot do SGINF\n\n'
                 '/login <codigo> - Entrar no sistema\n'
                 '/link <codigo> - Vincular Telegram a sua conta\n\n'
                 'Gere um codigo na pagina de login ou ajustes.'
             )
+            log.info(f'Replied to /start from {update.effective_chat.id}')
 
         async def login_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+            log.info(f'Received /login from {update.effective_chat.id}')
             if not context.args:
                 await update.message.reply_text('Use: /login <codigo>')
                 return
@@ -102,6 +105,7 @@ class TelegramBot:
             await update.message.reply_text('Login autorizado! Volte ao navegador.')
 
         async def link_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+            log.info(f'Received /link from {update.effective_chat.id}')
             if not context.args:
                 await update.message.reply_text('Use: /link <codigo>')
                 return
@@ -119,16 +123,29 @@ class TelegramBot:
                 'Telegram vinculado com sucesso! Agora voce pode fazer login com /login.'
             )
 
-        async def run_bot():
+        def run():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
             application = Application.builder().token(self.token).build()
             application.add_handler(CommandHandler('start', start_cmd))
             application.add_handler(CommandHandler('login', login_cmd))
             application.add_handler(CommandHandler('link', link_cmd))
-            log.info('Telegram bot started polling')
-            await application.run_polling(stop_signals=[])
 
-        def run():
-            asyncio.run(run_bot())
+            loop.run_until_complete(application.initialize())
+            loop.run_until_complete(application.start())
+            loop.run_until_complete(application.updater.start_polling())
+            log.info('Telegram bot started polling')
+
+            try:
+                loop.run_forever()
+            except KeyboardInterrupt:
+                pass
+            finally:
+                loop.run_until_complete(application.updater.stop())
+                loop.run_until_complete(application.stop())
+                loop.run_until_complete(application.shutdown())
+                loop.close()
 
         self._thread = threading.Thread(target=run, daemon=True)
         self._thread.start()
